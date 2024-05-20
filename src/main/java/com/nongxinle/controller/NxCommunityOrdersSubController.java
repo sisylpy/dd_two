@@ -143,7 +143,7 @@ public class NxCommunityOrdersSubController {
 //                nxCommunityOrdersSubService.update(entity);
 //            }
 //        }
-
+        System.out.println("Fa");
         return R.ok().put("data", subEntities);
     }
 
