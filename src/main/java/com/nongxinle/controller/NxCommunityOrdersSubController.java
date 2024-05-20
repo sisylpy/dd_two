@@ -130,6 +130,7 @@ public class NxCommunityOrdersSubController {
             entity.setNxCommunityOrdersSubId(pEntity.getNxCommunityOrdersPrintSubId());
             entity.setNxCosStatus(9); //锁定状态
             nxCommunityOrdersSubService.update(entity);
+             System.out.println("aaaaaaa");
         }
         System.out.println("ddss----");
 
