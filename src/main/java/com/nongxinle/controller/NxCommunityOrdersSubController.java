@@ -131,6 +131,7 @@ public class NxCommunityOrdersSubController {
             entity.setNxCosStatus(9); //锁定状态
             nxCommunityOrdersSubService.update(entity);
             System.out.println("dbbbbb11");
+             System.out.println("aaaaaa");
             System.out.println("cccc");
         }
         System.out.println("ddss啊111222");
