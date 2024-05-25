@@ -45,20 +45,20 @@
         </where>
         order by nx_cg_goods_pinyin
     </select>
-    <select id="queryAddCommunityNxGoods" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">
-        select *
-        from nx_community_goods
-        where nx_cg_community_id = #{comId}
-          and nx_cg_nx_goods_id = #{goodsId}
-    </select>
+<!--    <select id="queryAddCommunityNxGoods" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">-->
+<!--        select *-->
+<!--        from nx_community_goods-->
+<!--        where nx_cg_community_id = #{comId}-->
+<!--          and nx_cg_nx_goods_id = #{goodsId}-->
+<!--    </select>-->
 
 
     <select id="queryComGoodsByParams" resultMap="cgGoods">
         select * from
         (select * from nx_community_goods
         <where>
-            <if test="supplierId != null">
-                and nx_cg_community_supplier_id = #{supplierId}
+            <if test="cardId != null">
+                and nx_cg_card_id = #{cardId}
             </if>
             <if test="comId != null">
                 and nx_cg_community_id = #{comId}
@@ -94,24 +94,16 @@
         )as cg
         left join nx_community_standard as cs on cs.nx_CS_comm_goods_id = cg.nx_community_goods_id
         left join nx_community_alias as ca on ca.nx_CA_com_goods_id = cg.nx_community_goods_id
-        left join nx_restraunt_orders as ro on ro.nx_RO_com_goods_id = cg.nx_community_goods_id
-        and ro.nx_ro_status &lt; 5 and ro.nx_RO_restraunt_father_id = #{resFatherId}
-        left join nx_restraunt_user as ru on ru.nx_restraunt_user_id = ro.nx_RO_order_user_id
         order by cg.nx_cg_goods_py, cg.nx_cg_goods_pinyin, cg.nx_cg_nx_goods_id, cs.nx_community_standard_id
 
 
     </select>
 
-    <select id="queryComGoodsHasNxGoodsFather" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">
-        select *
-        from nx_community_goods
-        where nx_cg_community_id = #{comId}
-          and nx_cg_nx_father_id = #{nxFatherId}
-    </select>
 
     <select id="queryObject" resultMap="cgGoods">
         select * from nx_community_goods as cg
         left join nx_community_standard as ds on ds.nx_CS_comm_goods_id = cg.nx_community_goods_id
+        left join nx_community_card as ncc on ncc.nx_community_card_id = cg.nx_cg_card_id
         where nx_community_goods_id = #{value}
     </select>
 
@@ -128,8 +120,9 @@
 
     <resultMap id="subOrders" type="NxCommunityOrdersSubEntity">
         <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
-		<result property="nxCosCucId" column="nx_cos_cuc_id"/>
-		<result property="nxCosStatus" column="nx_cos_status"/>
+		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
+        <result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
+        <result property="nxCosStatus" column="nx_cos_status"/>
 		<result property="nxCosRemark" column="nx_COS_remark"/>
 		<result property="nxCosType" column="nx_COS_type"/>
 		<result property="nxCosService" column="nx_COS_service"/>
@@ -164,10 +157,16 @@
 
     <resultMap id="cgGoods" type="NxCommunityGoodsEntity">
         <id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
-		<result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
-		<result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
-		<result property="nxCgCommunityId" column="nx_cg_community_id"/>
+        <result property="nxCgCardId" column="nx_cg_card_id"/>
+        <result property="nxCgStartTime" column="nx_cg_start_time"/>
+        <result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>
+        <result property="nxCgStopTime" column="nx_cg_stop_time"/>
+        <result property="nxCgStopTimeZone" column="nx_cg_stop_time_zone"/>
+        <result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
         <result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
+        <result property="nxCgGoodsHuaxianPrice" column="nx_cg_goods_huaxian_price"/>
+        <result property="nxCgGoodsHuaxianPriceDifferent" column="nx_cg_goods_huaxian_price_different"/>
+        <result property="nxCgCommunityId" column="nx_cg_community_id"/>
         <result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
         <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
         <result property="nxCgGoodsName" column="nx_cg_goods_name"/>
@@ -177,9 +176,6 @@
         <result property="nxCgGoodsDetail" column="nx_cg_goods_detail"/>
         <result property="nxCgGoodsStandardWeight" column="nx_cg_goods_standard_weight"/>
         <result property="nxCgGoodsPrice" column="nx_cg_goods_price"/>
-        <result property="nxCgGoodsHuaxianPrice" column="nx_cg_goods_huaxian_price"/>
-        <result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
-        <result property="nxCgGoodsHuaxianPriceDifferent" column="nx_cg_goods_huaxian_price_different"/>
         <result property="nxCgGoodsPriceInteger" column="nx_cg_goods_price_integer"/>
         <result property="nxCgGoodsPriceDecimal" column="nx_cg_goods_price_decimal"/>
         <result property="nxCgGoodsTwoPrice" column="nx_cg_goods_two_price"/>
@@ -204,10 +200,9 @@
         <result property="nxCgDistributerId" column="nx_cg_distributer_id"/>
         <result property="nxCgDistributerGoodsId" column="nx_cg_distributer_goods_id"/>
         <result property="nxCgGoodsType" column="nx_cg_goods_type"/>
-        <result property="nxCgSellType" column="nx_cg_sell_type"/>
-        <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
         <result property="nxCgBuyingPrice" column="nx_cg_buying_price"/>
         <association property="nxCommunityEntity" resultMap="community"/>
+        <association property="nxCommunityCardEntity" resultMap="goodsCard"/>
         <collection property="nxCommunityAliasEntities" resultMap="comAlias"/>
         <collection property="nxCommunityStandardEntities" resultMap="comStandard"/>
     </resultMap>
@@ -230,10 +225,16 @@
 
     <resultMap id="cgGoodsWithChainResArr" type="NxCommunityGoodsEntity">
         <id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
-		<result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
-		<result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
-		<result property="nxCgCommunityId" column="nx_cg_community_id"/>
+        <result property="nxCgCardId" column="nx_cg_card_id"/>
+        <result property="nxCgStartTime" column="nx_cg_start_time"/>
+        <result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>
+        <result property="nxCgStopTime" column="nx_cg_stop_time"/>
+        <result property="nxCgStopTimeZone" column="nx_cg_stop_time_zone"/>
+        <result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
         <result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
+        <result property="nxCgGoodsHuaxianPrice" column="nx_cg_goods_huaxian_price"/>
+        <result property="nxCgGoodsHuaxianPriceDifferent" column="nx_cg_goods_huaxian_price_different"/>
+        <result property="nxCgCommunityId" column="nx_cg_community_id"/>
         <result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
         <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
         <result property="nxCgGoodsName" column="nx_cg_goods_name"/>
@@ -315,46 +316,46 @@
 
     </select>
 
-    <select id="queryDisDownloadGoods" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">
-        select *
-        from nx_community_goods
-        where nx_cg_community_id = #{comId}
-          and nx_cg_nx_goods_id = #{goodsId}
-    </select>
+<!--    <select id="queryDisDownloadGoods" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">-->
+<!--        select *-->
+<!--        from nx_community_goods-->
+<!--        where nx_cg_community_id = #{comId}-->
+<!--          and nx_cg_nx_goods_id = #{goodsId}-->
+<!--    </select>-->
 
 
-    <select id="queryCommunityDownloadGoods" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">
-        select *
-        from nx_community_goods
-        where nx_cg_community_id = #{communityId}
-          and nx_cg_nx_goods_id = #{goodsId}
-    </select>
+<!--    <select id="queryCommunityDownloadGoods" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">-->
+<!--        select *-->
+<!--        from nx_community_goods-->
+<!--        where nx_cg_community_id = #{communityId}-->
+<!--          and nx_cg_nx_goods_id = #{goodsId}-->
+<!--    </select>-->
 
 
-    <select id="queryDistributerGoods" resultMap="cgGoods">
-        select * from nx_community_goods as cg
-        left join nx_community as c on c.nx_community_id = cg.nx_cg_community_id
-        where nx_cg_distributer_id = #{nxDistributerId}
-        <if test="offset != null and limit != null">
-            limit #{offset}, #{limit}
-        </if>
-    </select>
+<!--    <select id="queryDistributerGoods" resultMap="cgGoods">-->
+<!--        select * from nx_community_goods as cg-->
+<!--        left join nx_community as c on c.nx_community_id = cg.nx_cg_community_id-->
+<!--        where nx_cg_distributer_id = #{nxDistributerId}-->
+<!--        <if test="offset != null and limit != null">-->
+<!--            limit #{offset}, #{limit}-->
+<!--        </if>-->
+<!--    </select>-->
 
-    <select id="queryHasNxGoodsFather" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">
-        select *
-        from nx_community_goods
-        WHERE nx_cg_community_id = #{communityId}
-          and nx_cg_nx_father_id = #{nxFatherId}
-    </select>
+<!--    <select id="queryHasNxGoodsFather" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">-->
+<!--        select *-->
+<!--        from nx_community_goods-->
+<!--        WHERE nx_cg_community_id = #{communityId}-->
+<!--          and nx_cg_nx_father_id = #{nxFatherId}-->
+<!--    </select>-->
 
-    <select id="queryStockGoods" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">
-        select * from nx_community_goods where nx_cg_community_id = #{nxCommunityId}
-        and nx_cg_goods_type = 2
-        <if test="offset != null and limit != null">
-            limit #{offset}, #{limit}
-        </if>
+<!--    <select id="queryStockGoods" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">-->
+<!--        select * from nx_community_goods where nx_cg_community_id = #{nxCommunityId}-->
+<!--        and nx_cg_goods_type = 2-->
+<!--        <if test="offset != null and limit != null">-->
+<!--            limit #{offset}, #{limit}-->
+<!--        </if>-->
 
-    </select>
+<!--    </select>-->
     <select id="queryCommunityGoodsWithPinyin" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">
         select *
         from nx_community_goods
@@ -393,35 +394,41 @@
         </where>
         order by nx_cg_goods_pinyin
     </select>
-    <select id="queryCgSubNameByFatherId" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">
-        select * from nx_community_goods
-        <where>
-            <if test="supplierId != null">
-                and nx_cg_community_supplier_id = #{supplierId}
-            </if>
-            <if test="fatherId != null">
-                and nx_cg_cfg_goods_father_id = #{fatherId}
-            </if>
+<!--    <select id="queryCgSubNameByFatherId" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">-->
+<!--        select * from nx_community_goods-->
+<!--        <where>-->
+<!--            <if test="supplierId != null">-->
+<!--                and nx_cg_community_supplier_id = #{supplierId}-->
+<!--            </if>-->
+<!--            <if test="fatherId != null">-->
+<!--                and nx_cg_cfg_goods_father_id = #{fatherId}-->
+<!--            </if>-->
 
-            <if test="serviceLevel != null and serviceLevel == 1">
-                and nx_cg_goods_price &gt; 0
-            </if>
-            <if test="serviceLevel != null and serviceLevel == 2">
-                and nx_cg_goods_two_price &gt; 0
-            </if>
-            <if test="serviceLevel != null and serviceLevel == 3">
-                and nx_cg_goods_three_price &gt; 0
-            </if>
-        </where>
-    </select>
+<!--            <if test="serviceLevel != null and serviceLevel == 1">-->
+<!--                and nx_cg_goods_price &gt; 0-->
+<!--            </if>-->
+<!--            <if test="serviceLevel != null and serviceLevel == 2">-->
+<!--                and nx_cg_goods_two_price &gt; 0-->
+<!--            </if>-->
+<!--            <if test="serviceLevel != null and serviceLevel == 3">-->
+<!--                and nx_cg_goods_three_price &gt; 0-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </select>-->
 
 
     <resultMap id="resManCgGoods" type="NxCommunityGoodsEntity">
         <id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
-		<result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
-		<result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
-		<result property="nxCgCommunityId" column="nx_cg_community_id"/>
+        <result property="nxCgCardId" column="nx_cg_card_id"/>
+        <result property="nxCgStartTime" column="nx_cg_start_time"/>
+        <result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>
+        <result property="nxCgStopTime" column="nx_cg_stop_time"/>
+        <result property="nxCgStopTimeZone" column="nx_cg_stop_time_zone"/>
+        <result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
         <result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
+        <result property="nxCgGoodsHuaxianPrice" column="nx_cg_goods_huaxian_price"/>
+        <result property="nxCgGoodsHuaxianPriceDifferent" column="nx_cg_goods_huaxian_price_different"/>
+        <result property="nxCgCommunityId" column="nx_cg_community_id"/>
         <result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
         <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
         <result property="nxCgGoodsName" column="nx_cg_goods_name"/>
@@ -532,13 +539,7 @@
         </where>
         order by nx_cg_goods_pinyin
     </select>
-    <select id="comQueryDisComGoodsByParams" resultMap="comGoods">
-        select *
-        from nx_community_goods as cg
-        where nx_cg_distributer_id = #{disId}
-          and nx_cg_community_id = #{comId}
 
-    </select>
     <select id="queryComGoodsWithSupplierByParams" resultMap="comGoods">
         select * from
         (select * from nx_community_goods
@@ -585,40 +586,40 @@
     </select>
 
 
-    <select id="queryChainComResGoodsByParams" resultMap="cgGoodsWithChainResArr">
-        select * from
-        (select * from nx_community_goods
-        <where>
+<!--    <select id="queryChainComResGoodsByParams" resultMap="cgGoodsWithChainResArr">-->
+<!--        select * from-->
+<!--        (select * from nx_community_goods-->
+<!--        <where>-->
 
-            <if test="cgFatherId != null">
-                and nx_cg_cfg_goods_father_id = #{cgFatherId}
-            </if>
+<!--            <if test="cgFatherId != null">-->
+<!--                and nx_cg_cfg_goods_father_id = #{cgFatherId}-->
+<!--            </if>-->
 
-            <if test="serviceLevel != null and serviceLevel == 1">
-                and nx_cg_goods_price is not null and nx_cg_goods_price &gt; 0
-            </if>
-            <if test="serviceLevel != null and serviceLevel == 2">
-                and nx_cg_goods_two_price is not null and nx_cg_goods_two_price &gt; 0
-            </if>
-            <if test="serviceLevel != null and serviceLevel > 2">
-                and nx_cg_goods_three_price is not null and nx_cg_goods_three_price &gt; 0
-            </if>
-        </where>
-        order by nx_cg_goods_py, nx_cg_goods_pinyin
-        <if test="offset != null and limit != null">
-            limit #{offset}, #{limit}
-        </if>
-        )as cg
-        left join nx_community_standard as cs on cs.nx_CS_comm_goods_id = cg.nx_community_goods_id
-        left join nx_community_alias as ca on ca.nx_CA_com_goods_id = cg.nx_community_goods_id
-        left join nx_restraunt_com_goods as rc on rc.nx_RCG_com_goods_id = cg.nx_community_goods_id
-        left join nx_restraunt as r on r.nx_restraunt_id = rc.nx_RCG_restraunt_father_id
-        and nx_RCG_restraunt_father_id in
-        <foreach item="id" collection="ids" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-        order by cg.nx_cg_goods_py, cg.nx_cg_goods_pinyin, cg.nx_cg_nx_goods_id, r.nx_restraunt_id
-    </select>
+<!--            <if test="serviceLevel != null and serviceLevel == 1">-->
+<!--                and nx_cg_goods_price is not null and nx_cg_goods_price &gt; 0-->
+<!--            </if>-->
+<!--            <if test="serviceLevel != null and serviceLevel == 2">-->
+<!--                and nx_cg_goods_two_price is not null and nx_cg_goods_two_price &gt; 0-->
+<!--            </if>-->
+<!--            <if test="serviceLevel != null and serviceLevel > 2">-->
+<!--                and nx_cg_goods_three_price is not null and nx_cg_goods_three_price &gt; 0-->
+<!--            </if>-->
+<!--        </where>-->
+<!--        order by nx_cg_goods_py, nx_cg_goods_pinyin-->
+<!--        <if test="offset != null and limit != null">-->
+<!--            limit #{offset}, #{limit}-->
+<!--        </if>-->
+<!--        )as cg-->
+<!--        left join nx_community_standard as cs on cs.nx_CS_comm_goods_id = cg.nx_community_goods_id-->
+<!--        left join nx_community_alias as ca on ca.nx_CA_com_goods_id = cg.nx_community_goods_id-->
+<!--        left join nx_restraunt_com_goods as rc on rc.nx_RCG_com_goods_id = cg.nx_community_goods_id-->
+<!--        left join nx_restraunt as r on r.nx_restraunt_id = rc.nx_RCG_restraunt_father_id-->
+<!--        and nx_RCG_restraunt_father_id in-->
+<!--        <foreach item="id" collection="ids" open="(" separator="," close=")">-->
+<!--            #{id}-->
+<!--        </foreach>-->
+<!--        order by cg.nx_cg_goods_py, cg.nx_cg_goods_pinyin, cg.nx_cg_nx_goods_id, r.nx_restraunt_id-->
+<!--    </select>-->
 
     <select id="resQueryComExchangePriceGoodsByDate" resultType="com.nongxinle.entity.NxCommunityGoodsEntity">
         select * from nx_restraunt_com_goods as nrcg
@@ -687,7 +688,8 @@
 
     <resultMap id="subOrder" type="NxCommunityOrdersSubEntity">
         <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
-		<result property="nxCosCucId" column="nx_cos_cuc_id"/>
+		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
+        <result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
 		<result property="nxCosStatus" column="nx_cos_status"/>
 		<result property="nxCosRemark" column="nx_COS_remark"/>
 		<result property="nxCosType" column="nx_COS_type"/>
@@ -731,6 +733,7 @@
     <resultMap id="goodsItem" type="NxCommunityGoodsSetItemEntity">
         <id property="nxCommunityGoodsSetItemId" column="p_nx_community_goods_set_item_id"/>
         <result property="nxCgsiCgPropertyId" column="p_nx_cgsi_cg_property_id"/>
+        <result property="nxCgsiItemStatus" column="p_nx_cgsi_item_status"/>
         <result property="nxCgsiItemQuantity" column="p_nx_cgsi_item_quantity"/>
         <result property="nxCgsiItemCgGoodsId" column="p_nx_cgsi_item_cg_goods_id"/>
         <result property="nxCgsiItemName" column="p_nx_cgsi_item_name"/>
@@ -744,6 +747,7 @@
     <resultMap id="goodsItemGoods" type="NxCommunityGoodsSetItemEntity">
         <id property="nxCommunityGoodsSetItemId" column="goods_nx_community_goods_set_item_id"/>
         <result property="nxCgsiItemQuantity" column="goods_nx_cgsi_item_quantity"/>
+        <result property="nxCgsiItemStatus" column="goods_nx_cgsi_item_status"/>
         <result property="nxCgsiCgPropertyId" column="goods_nx_cgsi_cg_property_id"/>
         <result property="nxCgsiItemCgGoodsId" column="goods_nx_cgsi_item_cg_goods_id"/>
         <result property="nxCgsiItemName" column="goods_nx_cgsi_item_name"/>
@@ -780,19 +784,29 @@
         <result property="nxCosRemark" column="memberCos_nx_COS_remark"/>
     </resultMap>
 
-
+    <resultMap id="goodsCard" type="NxCommunityCardEntity">
+        <id property="nxCommunityCardId" column="nx_community_card_id"/>
+        <result property="nxCommunityCardName" column="nx_community_card_name"/>
+        <result property="nxCcEffectiveDays" column="nx_cc_effective_days"/>
+        <result property="nxCcFilePath" column="nx_cc_file_path"/>
+        <result property="nxCcPrice" column="nx_cc_price"/>
+        <result property="nxCcWords" column="nx_cc_words"/>
+    </resultMap>
 
     <resultMap id="comGoods" type="NxCommunityGoodsEntity">
         <id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
-		<result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
-		<result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
-		<result property="nxCgCommunityId" column="nx_cg_community_id"/>
-        <result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
-        <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
-        <result property="nxCgSellType" column="nx_cg_sell_type"/>
-        <result property="nxCgIsSetMenu" column="nx_cg_is_set_menu"/>
+        <result property="nxCgCardId" column="nx_cg_card_id"/>
+        <result property="nxCgStartTime" column="nx_cg_start_time"/>
+        <result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>
+        <result property="nxCgStopTime" column="nx_cg_stop_time"/>
+        <result property="nxCgStopTimeZone" column="nx_cg_stop_time_zone"/>
+        <result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
+        <result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
         <result property="nxCgGoodsHuaxianPrice" column="nx_cg_goods_huaxian_price"/>
         <result property="nxCgGoodsHuaxianPriceDifferent" column="nx_cg_goods_huaxian_price_different"/>
+        <result property="nxCgCommunityId" column="nx_cg_community_id"/>
+        <result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
+        <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
         <result property="nxCgGoodsName" column="nx_cg_goods_name"/>
         <result property="nxCgGoodsStandardname" column="nx_cg_goods_standardname"/>
         <result property="nxCgGoodsBrand" column="nx_cg_goods_brand"/>
@@ -827,6 +841,7 @@
         <result property="nxCgBuyingPrice" column="nx_cg_buying_price"/>
         <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
         <association property="ordersSubEntity" resultMap="subOrder"/>
+        <association property="nxCommunityCardEntity" resultMap="goodsCard"/>
         <association property="memberOrdersSubEntity" resultMap="memberSubOrder"/>
         <collection property="nxCommunityGoodsSetItemEntities" resultMap="goodsItemGoods"/>
         <collection property="nxCommunityGoodsSetPropertyEntities" resultMap="cgGoodProperty"/>
@@ -834,16 +849,18 @@
 
     <resultMap id="remarkComGoods" type="NxCommunityGoodsEntity">
         <id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
-		<result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
-		<result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
-		<result property="nxCgCommunityId" column="nx_cg_community_id"/>
+        <result property="nxCgCardId" column="nx_cg_card_id"/>
+        <result property="nxCgStartTime" column="nx_cg_start_time"/>
+        <result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>
+        <result property="nxCgStopTime" column="nx_cg_stop_time"/>
+        <result property="nxCgStopTimeZone" column="nx_cg_stop_time_zone"/>
+        <result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
         <result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
-        <result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
-        <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
-        <result property="nxCgSellType" column="nx_cg_sell_type"/>
-        <result property="nxCgIsSetMenu" column="nx_cg_is_set_menu"/>
         <result property="nxCgGoodsHuaxianPrice" column="nx_cg_goods_huaxian_price"/>
         <result property="nxCgGoodsHuaxianPriceDifferent" column="nx_cg_goods_huaxian_price_different"/>
+        <result property="nxCgCommunityId" column="nx_cg_community_id"/>
+        <result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
+        <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
         <result property="nxCgGoodsName" column="nx_cg_goods_name"/>
         <result property="nxCgGoodsStandardname" column="nx_cg_goods_standardname"/>
         <result property="nxCgGoodsBrand" column="nx_cg_goods_brand"/>
@@ -878,6 +895,7 @@
         <result property="nxCgBuyingPrice" column="nx_cg_buying_price"/>
         <result property="nxCgBuyingPriceExchange" column="nx_cg_buying_price_exchange"/>
         <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
+        <association property="nxCommunityCardEntity" resultMap="goodsCard"/>
         <collection property="remarkOrdersSubEntities" resultMap="subOrders"/>
         <collection property="remarkMemberOrdersSubEntities" resultMap="memberSubOrder"/>
         <collection property="nxCommunityGoodsSetItemEntities" resultMap="goodsItemGoods"/>
@@ -888,6 +906,7 @@
         select * ,
         ncgsiGoods.nx_community_goods_set_item_id 'goods_nx_community_goods_set_item_id',
         ncgsiGoods.nx_cgsi_item_name 'goods_nx_cgsi_item_name',
+        ncgsiGoods.nx_cgsi_item_status 'goods_nx_cgsi_item_status',
         ncgsiGoods.nx_cgsi_item_cg_goods_id 'goods_nx_cgsi_item_cg_goods_id',
         ncgsiGoods.nx_cgsi_item_quantity 'goods_nx_cgsi_item_quantity',
         ncgsiGoods.nx_cgsi_item_type 'goods_nx_cgsi_item_type',
@@ -897,6 +916,7 @@
 
         ncgsi.nx_community_goods_set_item_id 'p_nx_community_goods_set_item_id',
         ncgsi.nx_cgsi_item_name 'p_nx_cgsi_item_name',
+        ncgsi.nx_cgsi_item_status 'p_nx_cgsi_item_status',
         ncgsi.nx_cgsi_cg_property_id 'p_nx_cgsi_cg_property_id',
         ncgsi.nx_cgsi_item_quantity 'p_nx_cgsi_item_quantity',
         ncgsi.nx_cgsi_item_cg_goods_id 'p_nx_cgsi_item_cg_goods_id',
@@ -919,6 +939,7 @@
         memberCos.nx_COS_subtotal 'memberCos_nx_COS_subtotal',
         memberCos.nx_COS_remark 'memberCos_nx_COS_remark'
         from nx_community_goods as ncg
+        left join nx_community_card as ncc on ncc.nx_community_card_id = ncg.nx_cg_card_id
         left join nx_community_goods_set_item as ncgsiGoods on ncgsiGoods.nx_cgsi_item_cg_goods_id =
         ncg.nx_community_goods_id
         left join nx_community_goods_set_property as ncgsp on ncgsp.nx_cgsp_cg_goods_id = ncg.nx_community_goods_id
@@ -943,6 +964,7 @@
         select * ,
         ncgsiGoods.nx_community_goods_set_item_id 'goods_nx_community_goods_set_item_id',
         ncgsiGoods.nx_cgsi_item_name 'goods_nx_cgsi_item_name',
+        ncgsiGoods.nx_cgsi_item_status 'goods_nx_cgsi_item_status',
         ncgsiGoods.nx_cgsi_item_cg_goods_id 'goods_nx_cgsi_item_cg_goods_id',
         ncgsiGoods.nx_cgsi_item_quantity 'goods_nx_cgsi_item_quantity',
         ncgsiGoods.nx_cgsi_item_type 'goods_nx_cgsi_item_type',
@@ -952,6 +974,7 @@
 
         ncgsi.nx_community_goods_set_item_id 'p_nx_community_goods_set_item_id',
         ncgsi.nx_cgsi_item_name 'p_nx_cgsi_item_name',
+        ncgsi.nx_cgsi_item_status 'p_nx_cgsi_item_status',
         ncgsi.nx_cgsi_cg_property_id 'p_nx_cgsi_cg_property_id',
         ncgsi.nx_cgsi_item_quantity 'p_nx_cgsi_item_quantity',
         ncgsi.nx_cgsi_item_cg_goods_id 'p_nx_cgsi_item_cg_goods_id',
@@ -973,6 +996,7 @@
         memberCos.nx_COS_subtotal 'memberCos_nx_COS_subtotal',
         memberCos.nx_COS_remark 'memberCos_nx_COS_remark'
         from nx_community_goods as ncg
+        left join nx_community_card as ncc on ncc.nx_community_card_id = ncg.nx_cg_card_id
         left join nx_community_goods_set_item as ncgsiGoods on ncgsiGoods.nx_cgsi_item_cg_goods_id =
         ncg.nx_community_goods_id
         left join nx_community_goods_set_property as ncgsp on ncgsp.nx_cgsp_cg_goods_id = ncg.nx_community_goods_id
@@ -996,6 +1020,7 @@
         select * ,
         ncgsiGoods.nx_community_goods_set_item_id 'goods_nx_community_goods_set_item_id',
         ncgsiGoods.nx_cgsi_item_name 'goods_nx_cgsi_item_name',
+        ncgsiGoods.nx_cgsi_item_status 'goods_nx_cgsi_item_status',
         ncgsiGoods.nx_cgsi_item_cg_goods_id 'goods_nx_cgsi_item_cg_goods_id',
         ncgsiGoods.nx_cgsi_item_quantity 'goods_nx_cgsi_item_quantity',
         ncgsiGoods.nx_cgsi_item_type 'goods_nx_cgsi_item_type',
@@ -1004,6 +1029,7 @@
 
         ncgsi.nx_community_goods_set_item_id 'p_nx_community_goods_set_item_id',
         ncgsi.nx_cgsi_item_name 'p_nx_cgsi_item_name',
+        ncgsi.nx_cgsi_item_status 'p_nx_cgsi_item_status',
         ncgsi.nx_cgsi_cg_property_id 'p_nx_cgsi_cg_property_id',
         ncgsi.nx_cgsi_item_quantity 'p_nx_cgsi_item_quantity',
         ncgsi.nx_cgsi_item_cg_goods_id 'p_nx_cgsi_item_cg_goods_id',
@@ -1104,7 +1130,13 @@
          `nx_cg_goods_huaxian_price_different`,
          `nx_cg_set_sub_number`,
          `nx_cg_goods_huaxian_quantity`,
-         `nx_cg_goods_sort`
+         `nx_cg_goods_sort`,
+         `nx_cg_start_time`,
+         `nx_cg_start_time_zone`,
+         `nx_cg_stop_time_zone`,
+         `nx_cg_stop_time`,
+         `nx_cg_card_id`
+
 
          )
         values (#{nxCommunityGoodsId},
@@ -1163,7 +1195,12 @@
                 #{nxCgGoodsHuaxianPriceDifferent},
                 #{nxCgSetSubNumber},
                 #{nxCgGoodsHuaxianQuantity},
-                #{nxCgGoodsSort}
+                #{nxCgGoodsSort},
+                #{nxCgStartTime},
+                #{nxCgStartTimeZone},
+                #{nxCgStopTimeZone},
+                #{nxCgStopTime},
+                #{nxCgCardId}
 
                 )
     </insert>
@@ -1212,6 +1249,7 @@
             <if test="nxCgExpectGrossProfit != null">`nx_cg_expect_gross_profit` = #{nxCgExpectGrossProfit},</if>
             <if test="nxCgRealityGrossProfit != null">`nx_cg_reality_gross_profit` = #{nxCgRealityGrossProfit},</if>
             <if test="nxCgGoodsPriceExchange != null">`nx_cg_goods_price_exchange` = #{nxCgGoodsPriceExchange},</if>
+            <if test="nxCgCardId != null">`nx_cg_card_id` = #{nxCgCardId},</if>
             <if test="nxCgGoodsTwoPriceExchange != null">`nx_cg_goods_two_price_exchange` =
                 #{nxCgGoodsTwoPriceExchange},
             </if>
@@ -1240,6 +1278,10 @@
             <if test="nxCgSetSubNumber != -99">`nx_cg_set_sub_number` = #{nxCgSetSubNumber},</if>
             <if test="nxCgGoodsHuaxianQuantity != -99">`nx_cg_goods_huaxian_quantity` = #{nxCgGoodsHuaxianQuantity},</if>
             <if test="nxCgGoodsSort != null">`nx_cg_goods_sort` = #{nxCgGoodsSort},</if>
+            <if test="nxCgStartTime != null">`nx_cg_start_time` = #{nxCgStartTime},</if>
+            <if test="nxCgStartTimeZone != null">`nx_cg_start_time_zone` = #{nxCgStartTimeZone},</if>
+            <if test="nxCgStopTimeZone != null">`nx_cg_stop_time_zone` = #{nxCgStopTimeZone},</if>
+            <if test="nxCgStopTime != null">`nx_cg_stop_time` = #{nxCgStopTime},</if>
             <if test="nxCgGoodsType != null">`nx_cg_goods_type` = #{nxCgGoodsType}</if>
         </set>
         where nx_community_goods_id = #{nxCommunityGoodsId}

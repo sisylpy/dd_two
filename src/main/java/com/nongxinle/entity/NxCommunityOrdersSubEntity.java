@@ -99,6 +99,7 @@ public class NxCommunityOrdersSubEntity implements Serializable, Comparable {
 
 
   	private String nxCosSubWeight;
+  	private String nxCosHuaxianSubtotal;
 
   	private Integer nxCosSubDistributerId;
 

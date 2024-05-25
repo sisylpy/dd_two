@@ -57,10 +57,7 @@ public class NxCustomerUserServiceImpl implements NxCustomerUserService {
 		nxCustomerUserDao.deleteBatch(custUserIds);
 	}
 
-    @Override
-    public String queryOpenId(Integer nxOrdersUserId) {
-        return nxCustomerUserDao.queryOpenId(nxOrdersUserId);
-    }
+
 
     @Override
     public NxCustomerUserEntity queryUserByOpenId(String openid) {

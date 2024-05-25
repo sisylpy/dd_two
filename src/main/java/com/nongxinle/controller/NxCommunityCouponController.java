@@ -13,15 +13,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.nongxinle.entity.NxCommunityFatherGoodsEntity;
-import com.nongxinle.entity.NxCommunityGoodsEntity;
+import com.nongxinle.entity.*;
 import com.nongxinle.service.NxCommunityGoodsService;
+import com.nongxinle.service.NxCustomerUserCardService;
+import com.nongxinle.service.NxCustomerUserCouponService;
 import com.nongxinle.utils.UploadFile;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.nongxinle.entity.NxCommunityCouponEntity;
 import com.nongxinle.service.NxCommunityCouponService;
 import com.nongxinle.utils.PageUtils;
 import com.nongxinle.utils.R;
@@ -38,6 +38,8 @@ public class NxCommunityCouponController {
 	private NxCommunityCouponService nxCommunityCouponService;
 	@Autowired
 	private NxCommunityGoodsService nxCommunityGoodsService;
+	@Autowired
+	private NxCustomerUserCouponService nxCustomerUserCouponService;
 
 
 	@RequestMapping(value = "/comGetCouponDetail/{id}")
@@ -50,39 +52,42 @@ public class NxCommunityCouponController {
 		return R.ok().put("data", communityCouponEntity);
 	}
 
-	@RequestMapping(value = "/comSaveOneCoupon", method = RequestMethod.POST)
-	@ResponseBody
-	public R comSaveOneCoupon (@RequestBody NxCommunityCouponEntity  coupon) {
-		System.out.println("safnfnff" + coupon);
-		coupon.setNxCpStatus(0);
-		nxCommunityCouponService.save(coupon);
-		return R.ok();
-	}
+//	@RequestMapping(value = "/comSaveOneCoupon", method = RequestMethod.POST)
+//	@ResponseBody
+//	public R comSaveOneCoupon (@RequestBody NxCommunityCouponEntity  coupon) {
+//		System.out.println("safnfnff" + coupon);
+//		coupon.setNxCpStatus(0);
+//		nxCommunityCouponService.save(coupon);
+//		return R.ok();
+//	}
 
 
 	@RequestMapping(value = "/delComCoupon", method = RequestMethod.POST)
 	@ResponseBody
 	public R delComCoupon (Integer id,HttpSession session) {
 
-		NxCommunityCouponEntity communityCouponEntity = nxCommunityCouponService.queryObject(id);
-		Integer nxCpCgGoodsId = communityCouponEntity.getNxCpCgGoodsId();
-		NxCommunityGoodsEntity nxCommunityGoodsEntity = nxCommunityGoodsService.queryObject(nxCpCgGoodsId);
-
-		if (nxCommunityGoodsEntity.getNxCgNxGoodsFilePath() != null) {
-			ServletContext servletContext = session.getServletContext();
-			String realPath1 = servletContext.getRealPath(nxCommunityGoodsEntity.getNxCgNxGoodsFilePath());
-			File file1 = new File(realPath1);
-			if (file1.exists()) {
-				file1.delete();
+		Map<String, Object> map = new HashMap<>();
+		map.put("coupId", id);
+		List<NxCustomerUserCouponEntity> nxCustomerUserCouponEntities = nxCustomerUserCouponService.queryUserCouponListByParams(map);
+		if(nxCustomerUserCouponEntities.size() > 0){
+			return R.error(-1,"有用户已购买，不能删除");
+		}else{
+			NxCommunityCouponEntity communityCouponEntity = nxCommunityCouponService.queryObject(id);
+			Integer nxCpCgGoodsId = communityCouponEntity.getNxCpCgGoodsId();
+			NxCommunityGoodsEntity nxCommunityGoodsEntity = nxCommunityGoodsService.queryObject(nxCpCgGoodsId);
+			if (nxCommunityGoodsEntity.getNxCgNxGoodsFilePath() != null) {
+				ServletContext servletContext = session.getServletContext();
+				String realPath1 = servletContext.getRealPath(nxCommunityGoodsEntity.getNxCgNxGoodsFilePath());
+				File file1 = new File(realPath1);
+				if (file1.exists()) {
+					file1.delete();
+				}
 			}
+			nxCommunityGoodsService.delete(nxCpCgGoodsId);
+			nxCommunityCouponService.delte(id);
+			return R.ok();
 		}
 
-		nxCommunityGoodsService.delete(nxCpCgGoodsId);
-
-		nxCommunityCouponService.delte(id);
-
-
-	    return R.ok();
 	}
 
 	@RequestMapping(value = "/comGetConponList", method = RequestMethod.POST)
@@ -175,7 +180,7 @@ public class NxCommunityCouponController {
 
 		nxCommunityCouponService.update(communityCouponEntity);
 
-		return R.ok();
+		return R.ok().put("data", communityCouponEntity);
 	}
 
 

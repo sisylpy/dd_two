@@ -116,5 +116,6 @@ public class NxCommunitySplicingOrdersEntity implements Serializable {
 	private NxCustomerUserEntity otherUser;
 	private NxCustomerUserEntity orderUser;
 	private List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities;
+	private List<NxCommunityCardEntity> nxCommunityCardEntities;
 
 }

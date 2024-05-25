@@ -15,7 +15,6 @@ import java.util.Map;
 public interface NxCustomerUserDao extends BaseDao<NxCustomerUserEntity> {
 
 
-    String queryOpenId(Integer nxOrdersUserId);
 
     NxCustomerUserEntity queryUserByOpenId(String openid);
 

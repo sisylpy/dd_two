@@ -50,6 +50,27 @@ public class NxCommunitySplicingOrdersController {
 		return R.ok();
 	}
 
+	//
+	@RequestMapping(value = "/clearPindan/{id}")
+	@ResponseBody
+	public R clearPindan(@PathVariable Integer id) {
+
+		NxCommunitySplicingOrdersEntity splicingOrdersEntity = nxCommSplicingOrdersService.queryObject(id);
+		splicingOrdersEntity.setNxCsoStatus(0);
+		nxCommSplicingOrdersService.update(splicingOrdersEntity);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("orderId", id);
+		map.put("dayuType", 3);
+		List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
+		if(nxCommunityOrdersSubEntities.size() > 0){
+			for(NxCommunityOrdersSubEntity subEntity: nxCommunityOrdersSubEntities){
+				nxCommunityOrdersSubService.delete(subEntity.getNxCommunityOrdersSubId());
+			}
+		}
+		return R.ok();
+	}
+
 
 
 

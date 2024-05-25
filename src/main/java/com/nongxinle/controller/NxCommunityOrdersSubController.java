@@ -130,23 +130,9 @@ public class NxCommunityOrdersSubController {
             entity.setNxCommunityOrdersSubId(pEntity.getNxCommunityOrdersPrintSubId());
             entity.setNxCosStatus(9); //锁定状态
             nxCommunityOrdersSubService.update(entity);
-            System.out.println("dbbbbb11");
-             System.out.println("aaaaaa");
-            System.out.println("cccchhh");
         }
-        System.out.println("ddss啊111222");
 
-//        map.put("status",9);
-//        List<NxCommunityPrintOrdersSubEntity> subEntitiesNine = nxCommunityOrdersSubService.queryPrintSubOrders(map);
-//        if(subEntitiesNine.size() > 0){
-//            for(NxCommunityPrintOrdersSubEntity subEntity: subEntitiesNine){
-//                entity = new NxCommunityOrdersSubEntity();
-//                entity.setNxCommunityOrdersSubId(subEntity.getNxCommunityOrdersPrintSubId());
-//                entity.setNxCosStatus(1); //锁定状态
-//                nxCommunityOrdersSubService.update(entity);
-//            }
-//        }
-        System.out.println("Fa");
+
         return R.ok().put("data", subEntities);
     }
 

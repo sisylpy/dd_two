@@ -49,6 +49,8 @@ public class NxCommunityGoodsController {
     private NxCommunityOrdersSubService nxCommunityOrdersSubService;
     @Autowired
     private NxCommunityCouponService nxCommunityCouponService;
+    @Autowired
+    private NxCommunityCardService nxCommunityCardService;
 
 //
 
@@ -127,11 +129,58 @@ public class NxCommunityGoodsController {
                 nxCommunityGoodsEntity.setNxCgBuyingPrice(nxCommunityGoodsEntity.getNxCgGoodsPrice());
                 nxCommunityGoodsEntity.setNxCgBuyingPriceExchange(nxCommunityGoodsEntity.getNxCgGoodsHuaxianPrice());
             }
+        }else{
+            nxCommunityGoodsEntity.setNxCgGoodsHuaxianPriceDifferent(null);
+            nxCommunityGoodsEntity.setNxCgGoodsHuaxianPrice(null);
+            nxCommunityGoodsEntity.setNxCgGoodsHuaxianQuantity(null);
+
         }
+
+
+        if(nxCommunityGoodsEntity.getNxCgSellType() == 1){
+            String cgStartTime = nxCommunityGoodsEntity.getNxCgStartTime();
+            String startHour = cgStartTime.substring(0, 2);
+            String startMinute = cgStartTime.substring(3, 5);
+            System.out.println("starthOurr==" + startHour);
+            System.out.println("starthOurr==" + startMinute);
+            BigDecimal hourMinuteStart = new BigDecimal(startHour).multiply(new BigDecimal(60));
+            BigDecimal decimalStart = hourMinuteStart.add(new BigDecimal(startMinute)).setScale(0, BigDecimal.ROUND_HALF_UP);
+            nxCommunityGoodsEntity.setNxCgStartTimeZone(decimalStart.toString());
+
+            String cgStopTime = nxCommunityGoodsEntity.getNxCgStopTime();
+            String stopHour = cgStopTime.substring(0, 2);
+            String stopMinute = cgStopTime.substring(3, 5);
+            System.out.println("stophOurr==" + stopHour);
+            System.out.println("stopOurr==" + stopMinute);
+            BigDecimal hourMinuteStop = new BigDecimal(stopHour).multiply(new BigDecimal(60));
+            BigDecimal decimalStop = hourMinuteStop.add(new BigDecimal(stopMinute)).setScale(0, BigDecimal.ROUND_HALF_UP);
+            nxCommunityGoodsEntity.setNxCgStopTimeZone(decimalStop.toString());
+            System.out.println("reesotototo" + nxCommunityGoodsEntity.getNxCgStopTimeZone());
+
+        }else{
+
+            BigDecimal multiply = new BigDecimal(24).multiply(new BigDecimal(60));
+            nxCommunityGoodsEntity.setNxCgStopTimeZone(multiply.toString());
+            nxCommunityGoodsEntity.setNxCgStartTimeZone("0");
+            nxCommunityGoodsEntity.setNxCgStartTime("00:00");
+            nxCommunityGoodsEntity.setNxCgStopTime("23:59");
+
+        }
+
+
         System.out.println("-----------------updateeeeekeekkekkekekek");
         System.out.println("nxcoenne"+ nxCommunityGoodsEntity.getNxCgGoodsHuaxianQuantity());
         cgService.update(nxCommunityGoodsEntity);
-        return R.ok();
+
+        if(nxCommunityGoodsEntity.getNxCgCardId() != null){
+            Integer nxCgCardId = nxCommunityGoodsEntity.getNxCgCardId();
+            NxCommunityCardEntity nxCommunityCardEntity = nxCommunityCardService.queryObject(nxCgCardId);
+            nxCommunityGoodsEntity.setNxCommunityCardEntity(nxCommunityCardEntity);
+        }
+
+
+
+        return R.ok().put("data", nxCommunityGoodsEntity);
     }
 
 
@@ -278,6 +327,35 @@ public class NxCommunityGoodsController {
             nxCommunityGoodsEntity.setNxCgBuyingPriceExchange(nxCommunityGoodsEntity.getNxCgGoodsHuaxianPrice());
         }
 
+        if(nxCommunityGoodsEntity.getNxCgSellType() == 1){
+            String cgStartTime = nxCommunityGoodsEntity.getNxCgStartTime();
+            String startHour = cgStartTime.substring(0, 2);
+            String startMinute = cgStartTime.substring(3, 5);
+            System.out.println("starthOurr==" + startHour);
+            System.out.println("starthOurr==" + startMinute);
+            BigDecimal hourMinuteStart = new BigDecimal(startHour).multiply(new BigDecimal(60));
+            BigDecimal decimalStart = hourMinuteStart.add(new BigDecimal(startMinute)).setScale(0, BigDecimal.ROUND_HALF_UP);
+            nxCommunityGoodsEntity.setNxCgStartTimeZone(decimalStart.toString());
+
+            String cgStopTime = nxCommunityGoodsEntity.getNxCgStopTime();
+            String stopHour = cgStopTime.substring(0, 2);
+            String stopMinute = cgStopTime.substring(3, 5);
+            System.out.println("stophOurr==" + stopHour);
+            System.out.println("stopOurr==" + stopMinute);
+            BigDecimal hourMinuteStop = new BigDecimal(stopHour).multiply(new BigDecimal(60));
+            BigDecimal decimalStop = hourMinuteStop.add(new BigDecimal(stopMinute)).setScale(0, BigDecimal.ROUND_HALF_UP);
+            nxCommunityGoodsEntity.setNxCgStopTimeZone(decimalStop.toString());
+
+        }else{
+
+            BigDecimal multiply = new BigDecimal(24).multiply(new BigDecimal(60));
+            nxCommunityGoodsEntity.setNxCgStopTimeZone(multiply.toString());
+            nxCommunityGoodsEntity.setNxCgStartTimeZone("0");
+            nxCommunityGoodsEntity.setNxCgStartTime("00:00");
+            nxCommunityGoodsEntity.setNxCgStopTime("23:59");
+
+        }
+
         cgService.save(nxCommunityGoodsEntity);
 
         List<NxCommunityGoodsSetItemEntity> itemSubEntities = nxCommunityGoodsEntity.getNxCommunityGoodsSetItemEntities();
@@ -336,16 +414,16 @@ public class NxCommunityGoodsController {
         return R.ok();
     }
 
-    @RequestMapping(value = "/comGetDistributerComGoods", method = RequestMethod.POST)
-    @ResponseBody
-    public R comGetDistributerComGoods(Integer comId, Integer disId) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("comId", comId);
-        map.put("disId", disId);
-        List<NxCommunityGoodsEntity> communityGoodsEntities = cgService.comQueryDisComGoodsByParams(map);
-
-        return R.ok().put("data", communityGoodsEntities);
-    }
+//    @RequestMapping(value = "/comGetDistributerComGoods", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R comGetDistributerComGoods(Integer comId, Integer disId) {
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("comId", comId);
+//        map.put("disId", disId);
+//        List<NxCommunityGoodsEntity> communityGoodsEntities = cgService.comQueryDisComGoodsByParams(map);
+//
+//        return R.ok().put("data", communityGoodsEntities);
+//    }
 
     @RequestMapping(value = "/resManQueryComResGoodsInFatherId", method = RequestMethod.POST)
     @ResponseBody
@@ -397,35 +475,35 @@ public class NxCommunityGoodsController {
     }
 
 
-    @RequestMapping(value = "/getCgGoodsSubNamesByFatherId", method = RequestMethod.POST)
-    @ResponseBody
-    public R getCgGoodsSubNamesByFatherId(Integer fatherId, Integer level) {
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("fathersFatherId", fatherId);
-        map.put("level", level);
-        List<NxCommunityFatherGoodsEntity> goodsEntities1 = cfgService.queryComFathersGoodsByParams(map);
-
-        List<NxCommunityFatherGoodsEntity> newList = new ArrayList<>();
-
-        for (NxCommunityFatherGoodsEntity fatherGoods : goodsEntities1) {
-            StringBuilder builder = new StringBuilder();
-            Map<String, Object> map1 = new HashMap<>();
-            Integer communityFatherGoodsId = fatherGoods.getNxCommunityFatherGoodsId();
-            map1.put("fatherId", communityFatherGoodsId);
-            map1.put("serviceLevel", level);
-            List<NxCommunityGoodsEntity> goodsEntities = cgService.queryCgSubNameByFatherId(map1);
-
-            for (NxCommunityGoodsEntity goods : goodsEntities) {
-                String nxGoodsName = goods.getNxCgGoodsName();
-                builder.append(nxGoodsName);
-                builder.append(',');
-            }
-            fatherGoods.setCgGoodsSubNames(builder.toString());
-            newList.add(fatherGoods);
-        }
-        return R.ok().put("data", newList);
-    }
+//    @RequestMapping(value = "/getCgGoodsSubNamesByFatherId", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R getCgGoodsSubNamesByFatherId(Integer fatherId, Integer level) {
+//
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("fathersFatherId", fatherId);
+//        map.put("level", level);
+//        List<NxCommunityFatherGoodsEntity> goodsEntities1 = cfgService.queryComFathersGoodsByParams(map);
+//
+//        List<NxCommunityFatherGoodsEntity> newList = new ArrayList<>();
+//
+//        for (NxCommunityFatherGoodsEntity fatherGoods : goodsEntities1) {
+//            StringBuilder builder = new StringBuilder();
+//            Map<String, Object> map1 = new HashMap<>();
+//            Integer communityFatherGoodsId = fatherGoods.getNxCommunityFatherGoodsId();
+//            map1.put("fatherId", communityFatherGoodsId);
+//            map1.put("serviceLevel", level);
+//            List<NxCommunityGoodsEntity> goodsEntities = cgService.queryCgSubNameByFatherId(map1);
+//
+//            for (NxCommunityGoodsEntity goods : goodsEntities) {
+//                String nxGoodsName = goods.getNxCgGoodsName();
+//                builder.append(nxGoodsName);
+//                builder.append(',');
+//            }
+//            fatherGoods.setCgGoodsSubNames(builder.toString());
+//            newList.add(fatherGoods);
+//        }
+//        return R.ok().put("data", newList);
+//    }
 
 
 
@@ -481,82 +559,82 @@ public class NxCommunityGoodsController {
     /**
      * 批发商商品列表
      *
-     * @param fatherId 父类id
+     * @param
      * @return 批发商商品列表
      */
-    @RequestMapping(value = "/comGetComGoodsListByFatherId", method = RequestMethod.POST)
-    @ResponseBody
-    public R comGetComGoodsListByFatherId(Integer fatherId, Integer type,
-                                          Integer limit, Integer page) {
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("offset", (page - 1) * limit);
-        map.put("limit", limit);
-        map.put("cgFatherId", fatherId);
-        map.put("type", type);
-        List<NxCommunityGoodsEntity>  goodsEntities1 ;
-        if(type.equals(4)){
-            goodsEntities1 = cgService.queryComGoodsWithSupplierByParams(map);
-        }else {
-            goodsEntities1 = cgService.queryComGoodsByParams(map);
-        }
-
-
-        Map<String, Object> map3 = new HashMap<>();
-        map3.put("fatherId", fatherId);
-        map3.put("type", type);
-        int total = cgService.queryTotalByFatherId(map3);
-        PageUtils pageUtil = new PageUtils(goodsEntities1, total, limit, page);
-        return R.ok().put("page", pageUtil);
-    }
-
-
-
-    @RequestMapping(value = "/queryGoodsWithPinyin", method = RequestMethod.POST)
-    @ResponseBody
-    public R queryGoodsWithPinyin(@RequestBody NxCommunityGoodsEntity goodsEntity) {
-        System.out.println("haiiahfiai");
-        System.out.println(goodsEntity);
-        System.out.println(goodsEntity.getNxCgGoodsPinyin());
-        Integer nxCgCommunityId = goodsEntity.getNxCgCommunityId();
-        Map<String, Object> map = new HashMap<>();
-        map.put("nxCgCommunityId", nxCgCommunityId);
-        map.put("pinyin", goodsEntity.getNxCgGoodsPinyin());
-        List<NxCommunityGoodsEntity> entities = cgService.queryCommunityGoodsWithPinyin(map);
-        return R.ok().put("data", entities);
-    }
+//    @RequestMapping(value = "/comGetComGoodsListByFatherId", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R comGetComGoodsListByFatherId(Integer fatherId, Integer type,
+//                                          Integer limit, Integer page) {
+//
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("offset", (page - 1) * limit);
+//        map.put("limit", limit);
+//        map.put("cgFatherId", fatherId);
+//        map.put("type", type);
+//        List<NxCommunityGoodsEntity>  goodsEntities1 ;
+//        if(type.equals(4)){
+//            goodsEntities1 = cgService.queryComGoodsWithSupplierByParams(map);
+//        }else {
+//            goodsEntities1 = cgService.queryComGoodsByParams(map);
+//        }
+//
+//
+//        Map<String, Object> map3 = new HashMap<>();
+//        map3.put("fatherId", fatherId);
+//        map3.put("type", type);
+//        int total = cgService.queryTotalByFatherId(map3);
+//        PageUtils pageUtil = new PageUtils(goodsEntities1, total, limit, page);
+//        return R.ok().put("page", pageUtil);
+//    }
 
 
-    @RequestMapping(value = "/getStockGoods", method = RequestMethod.POST)
-    @ResponseBody
-    public R getStockGoods(Integer limit, Integer page, Integer nxCommunityId) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("offset", (page - 1) * limit);
-        map.put("limit", limit);
-        map.put("nxCommunityId", nxCommunityId);
-        List<NxCommunityGoodsEntity> entities = cgService.queryStockGoods(map);
 
-        int total = cgService.queryTotalByFatherId(map);
+//    @RequestMapping(value = "/queryGoodsWithPinyin", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R queryGoodsWithPinyin(@RequestBody NxCommunityGoodsEntity goodsEntity) {
+//        System.out.println("haiiahfiai");
+//        System.out.println(goodsEntity);
+//        System.out.println(goodsEntity.getNxCgGoodsPinyin());
+//        Integer nxCgCommunityId = goodsEntity.getNxCgCommunityId();
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("nxCgCommunityId", nxCgCommunityId);
+//        map.put("pinyin", goodsEntity.getNxCgGoodsPinyin());
+//        List<NxCommunityGoodsEntity> entities = cgService.queryCommunityGoodsWithPinyin(map);
+//        return R.ok().put("data", entities);
+//    }
 
-        PageUtils pageUtil = new PageUtils(entities, total, limit, page);
-        return R.ok().put("page", pageUtil);
-    }
+
+//    @RequestMapping(value = "/getStockGoods", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R getStockGoods(Integer limit, Integer page, Integer nxCommunityId) {
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("offset", (page - 1) * limit);
+//        map.put("limit", limit);
+//        map.put("nxCommunityId", nxCommunityId);
+//        List<NxCommunityGoodsEntity> entities = cgService.queryStockGoods(map);
+//
+//        int total = cgService.queryTotalByFatherId(map);
+//
+//        PageUtils pageUtil = new PageUtils(entities, total, limit, page);
+//        return R.ok().put("page", pageUtil);
+//    }
 
 
-    @RequestMapping(value = "/getDistributerGoods", method = RequestMethod.POST)
-    @ResponseBody
-    public R getDistributerGoods(Integer limit, Integer page, Integer nxDistributerId) {
-        System.out.println("daole zheli");
-        Map<String, Object> map = new HashMap<>();
-        map.put("offset", (page - 1) * limit);
-        map.put("limit", limit);
-        map.put("nxDistributerId", nxDistributerId);
-        List<NxCommunityGoodsEntity> entities = cgService.queryDistributerGoods(map);
-
-        int total = cgService.queryTotalByFatherId(map);
-        PageUtils pageUtil = new PageUtils(entities, total, limit, page);
-        return R.ok().put("page", pageUtil);
-    }
+//    @RequestMapping(value = "/getDistributerGoods", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R getDistributerGoods(Integer limit, Integer page, Integer nxDistributerId) {
+//        System.out.println("daole zheli");
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("offset", (page - 1) * limit);
+//        map.put("limit", limit);
+//        map.put("nxDistributerId", nxDistributerId);
+//        List<NxCommunityGoodsEntity> entities = cgService.queryDistributerGoods(map);
+//
+//        int total = cgService.queryTotalByFatherId(map);
+//        PageUtils pageUtil = new PageUtils(entities, total, limit, page);
+//        return R.ok().put("page", pageUtil);
+//    }
 
 
     @RequestMapping(value = "/getCommunityGoodsDetail", method = RequestMethod.POST)
@@ -635,22 +713,24 @@ public class NxCommunityGoodsController {
 
         return R.ok().put("data", dgGoodsLit);
     }
-    @RequestMapping(value = "/getCommunityGoods", method = RequestMethod.POST)
-    @ResponseBody
-    public R getCommunityGoods(Integer limit, Integer page, Integer nxCommunityFatherGoodsId) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("offset", (page - 1) * limit);
-        map.put("limit", limit);
-        map.put("nxCommunityFatherGoodsId", nxCommunityFatherGoodsId);
 
-        //查询列表数据
-        List<NxCommunityGoodsEntity> dgGoodsLit = cgService.queryCommunityGoods(map);
 
-        int total = cgService.queryTotalByFatherId(map);
-
-        PageUtils pageUtil = new PageUtils(dgGoodsLit, total, limit, page);
-        return R.ok().put("page", pageUtil);
-    }
+//    @RequestMapping(value = "/getCommunityGoods", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R getCommunityGoods(Integer limit, Integer page, Integer nxCommunityFatherGoodsId) {
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("offset", (page - 1) * limit);
+//        map.put("limit", limit);
+//        map.put("nxCommunityFatherGoodsId", nxCommunityFatherGoodsId);
+//
+//        //查询列表数据
+//        List<NxCommunityGoodsEntity> dgGoodsLit = cgService.queryCommunityGoods(map);
+//
+//        int total = cgService.queryTotalByFatherId(map);
+//
+//        PageUtils pageUtil = new PageUtils(dgGoodsLit, total, limit, page);
+//        return R.ok().put("page", pageUtil);
+//    }
 
 
     /**

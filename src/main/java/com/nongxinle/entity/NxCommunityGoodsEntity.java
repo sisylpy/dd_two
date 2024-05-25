@@ -127,6 +127,7 @@ public class NxCommunityGoodsEntity implements Serializable, Comparable {
 	private String nxCgBuyingPriceExchange;
 	private String nxCgBuyingPriceExchangeDate;
 	private Integer nxCgIsSetMenu;
+	private Integer nxCgCardId;
 
 
 	////////
@@ -158,6 +159,12 @@ public class NxCommunityGoodsEntity implements Serializable, Comparable {
 	private String couponStartTime;
 	private String couponStopDate;
 	private String couponStopTime;
+	private String nxCgStartTime;
+	private String nxCgStartTimeZone;
+	private String nxCgStopTimeZone;
+	private String nxCgStopTime;
+
+	private NxCommunityCardEntity nxCommunityCardEntity;
 
 	private List<NxCommunityStandardEntity> nxCommunityStandardEntities;
 	private List<NxAliasEntity> nxAliasEntities;

@@ -36,6 +36,7 @@
 	<resultMap id="goodsItem" type="NxCommunityGoodsSetItemEntity">
 		<id property="nxCommunityGoodsSetItemId" column="p_nx_community_goods_set_item_id"/>
 		<result property="nxCgsiCgPropertyId" column="p_nx_cgsi_cg_property_id"/>
+		<result property="nxCgsiItemStatus" column="p_nx_cgsi_item_status"/>
 		<result property="nxCgsiItemQuantity" column="p_nx_cgsi_item_quantity"/>
 		<result property="nxCgsiItemCgGoodsId" column="p_nx_cgsi_item_cg_goods_id"/>
 		<result property="nxCgsiItemName" column="p_nx_cgsi_item_name"/>
@@ -48,6 +49,7 @@
 	<resultMap id="goodsItemGoods" type="NxCommunityGoodsSetItemEntity">
 		<id property="nxCommunityGoodsSetItemId" column="goods_nx_community_goods_set_item_id"/>
 		<result property="nxCgsiItemQuantity" column="goods_nx_cgsi_item_quantity"/>
+		<result property="nxCgsiItemStatus" column="goods_nx_cgsi_item_status"/>
 		<result property="nxCgsiCgPropertyId" column="goods_nx_cgsi_cg_property_id"/>
 		<result property="nxCgsiItemCgGoodsId" column="goods_nx_cgsi_item_cg_goods_id"/>
 		<result property="nxCgsiItemName" column="goods_nx_cgsi_item_name"/>
@@ -67,6 +69,11 @@
 
 	<resultMap id="comGoods" type="NxCommunityGoodsEntity">
 		<id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
+		<result property="nxCgCardId" column="nx_cg_card_id"/>
+		<result property="nxCgStartTime" column="nx_cg_start_time"/>
+		<result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>
+		<result property="nxCgStopTime" column="nx_cg_stop_time"/>
+		<result property="nxCgStopTimeZone" column="nx_cg_stop_time_zone"/>
 		<result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
 		<result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
 		<result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
@@ -135,6 +142,7 @@
 		select * ,
 		ncgsiGoods.nx_community_goods_set_item_id 'goods_nx_community_goods_set_item_id',
 		ncgsiGoods.nx_cgsi_item_name 'goods_nx_cgsi_item_name',
+		ncgsiGoods.nx_cgsi_item_status 'goods_nx_cgsi_item_status',
 		ncgsiGoods.nx_cgsi_item_cg_goods_id 'goods_nx_cgsi_item_cg_goods_id',
 		ncgsiGoods.nx_cgsi_item_quantity 'goods_nx_cgsi_item_quantity',
 		ncgsiGoods.nx_cgsi_item_type 'goods_nx_cgsi_item_type',
@@ -144,6 +152,7 @@
 
 		ncgsi.nx_community_goods_set_item_id 'p_nx_community_goods_set_item_id',
 		ncgsi.nx_cgsi_item_name 'p_nx_cgsi_item_name',
+		ncgsi.nx_cgsi_item_status 'p_nx_cgsi_item_status',
 		ncgsi.nx_cgsi_cg_property_id 'p_nx_cgsi_cg_property_id',
 		ncgsi.nx_cgsi_item_quantity 'p_nx_cgsi_item_quantity',
 		ncgsi.nx_cgsi_item_cg_goods_id 'p_nx_cgsi_item_cg_goods_id',

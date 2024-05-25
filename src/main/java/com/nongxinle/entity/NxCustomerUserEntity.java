@@ -8,6 +8,7 @@ package com.nongxinle.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -51,7 +52,7 @@ public class NxCustomerUserEntity implements Serializable {
 	/**
 	 *
 	 */
-	private Date nxCuJoinDate;
+	private String nxCuJoinDate;
 
 	/**
 	 *
@@ -64,6 +65,9 @@ public class NxCustomerUserEntity implements Serializable {
 	private Integer nxCuOrderTimes;
 
 	private NxCustomerEntity nxCustomerEntity;
+
+
+	private List<NxCustomerUserCardEntity> userCardEntityList;
 
 
 }

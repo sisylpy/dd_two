@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nongxinle.dao.NxCustomerUserCardDao">
+
+	<select id="queryObject" resultType="com.nongxinle.entity.NxCustomerUserCardEntity">
+		select * from nx_customer_user_card where nx_customer_user_card_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.nongxinle.entity.NxCustomerUserCardEntity">
+		select * from nx_customer_user_card 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from nx_customer_user_card 
+	</select>
+
+	<resultMap id="goodsCard" type="NxCommunityCardEntity">
+		<id property="nxCommunityCardId" column="nx_community_card_id"/>
+		<result property="nxCommunityCardName" column="nx_community_card_name"/>
+		<result property="nxCcEffectiveDays" column="nx_cc_effective_days"/>
+		<result property="nxCcFilePath" column="nx_cc_file_path"/>
+		<result property="nxCcPrice" column="nx_cc_price"/>
+		<result property="nxCcWords" column="nx_cc_words"/>
+	</resultMap>
+	<resultMap id="userCard" type="NxCustomerUserCardEntity">
+		<id property="nxCustomerUserCardId" column="nx_customer_user_card_id"/>
+		<result property="nxCucaCardId" column="nx_cuca_card_id"/>
+		<result property="nxCucaCustomerUserId" column="nx_cuca_customer_user_id"/>
+		<result property="nxCucaStartDate" column="nx_cuca_start_date"/>
+		<result property="nxCucaStopDate" column="nx_cuca_stop_date"/>
+		<result property="nxCucaStatus" column="nx_cuca_status"/>
+		<result property="nxCucaType" column="nx_cuca_type"/>
+		<result property="nxCucaCommunityId" column="nx_cuca_community_id"/>
+		<association property="nxCommunityCardEntity" resultMap="goodsCard"/>
+	</resultMap>
+    <select id="queryUserCardByParams" resultMap="userCard">
+		select * from nx_customer_user_card as ncuc
+		left join nx_community_card as ncc  on ncc.nx_community_card_id = ncuc.nx_cuca_card_id
+			<where>
+				<if test="userId != null">
+					and nx_cuca_customer_user_id = #{userId}
+				</if>
+				<if test="orderId != null">
+					and nx_cuca_com_order_id = #{orderId}
+				</if>
+				<if test="cardId != null">
+					and nx_cuca_card_id = #{cardId}
+				</if>
+				<if test="status != null">
+					and nx_cuca_status = #{status}
+				</if>
+			</where>
+	</select>
+
+    <insert id="save" parameterType="com.nongxinle.entity.NxCustomerUserCardEntity">
+		insert into nx_customer_user_card
+		(
+			`nx_customer_user_card_id`, 
+			`nx_cuca_card_id`, 
+			`nx_cuca_customer_user_id`, 
+			`nx_cuca_community_id`, 
+			`nx_cuca_status`, 
+			`nx_cuca_type`, 
+			`nx_cuca_start_date`, 
+			`nx_cuca_stop_date`,
+			`nx_cuca_com_order_id`
+		)
+		values
+		(
+			#{nxCustomerUserCardId}, 
+			#{nxCucaCardId}, 
+			#{nxCucaCustomerUserId}, 
+			#{nxCucaCommunityId}, 
+			#{nxCucaStatus}, 
+			#{nxCucaType}, 
+			#{nxCucaStartDate}, 
+			#{nxCucaStopDate},
+			#{nxCucaComOrderId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.nongxinle.entity.NxCustomerUserCardEntity">
+		update nx_customer_user_card 
+		<set>
+			<if test="nxCucaCardId != null">`nx_cuca_card_id` = #{nxCucaCardId}, </if>
+			<if test="nxCucaCustomerUserId != null">`nx_cuca_customer_user_id` = #{nxCucaCustomerUserId}, </if>
+			<if test="nxCucaCommunityId != null">`nx_cuca_community_id` = #{nxCucaCommunityId}, </if>
+			<if test="nxCucaStatus != null">`nx_cuca_status` = #{nxCucaStatus}, </if>
+			<if test="nxCucaType != null">`nx_cuca_type` = #{nxCucaType}, </if>
+			<if test="nxCucaStartDate != null">`nx_cuca_start_date` = #{nxCucaStartDate}, </if>
+			<if test="nxCucaComOrderId != null">`nx_cuca_com_order_id` = #{nxCucaComOrderId}, </if>
+			<if test="nxCucaStopDate != null">`nx_cuca_stop_date` = #{nxCucaStopDate}</if>
+		</set>
+		where nx_customer_user_card_id = #{nxCustomerUserCardId}
+	</update>
+	
+	<delete id="delete">
+		delete from nx_customer_user_card where nx_customer_user_card_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from nx_customer_user_card where nx_customer_user_card_id in 
+		<foreach item="nxCustomerUserCardId" collection="array" open="(" separator="," close=")">
+			#{nxCustomerUserCardId}
+		</foreach>
+	</delete>
+
+</mapper>

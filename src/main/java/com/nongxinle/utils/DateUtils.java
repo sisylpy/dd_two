@@ -81,11 +81,6 @@ public class DateUtils {
 
     public static String formatWhatDayString(int what) {
 
-//        Date whatDay = calendarDay(what).getTime();
-//
-//        SimpleDateFormat dateFormat2 = new SimpleDateFormat(DATE_PATTERN);
-//        String format1 = dateFormat2.format(whatDay);
-//        String date = format1.replace("-", "月");
         Calendar cal = Calendar.getInstance();
         Date date = calendarDay(what).getTime();
 
@@ -100,6 +95,17 @@ public class DateUtils {
 
 
         return month + "月" + day + "日";
+    }
+
+    public static int getNowMinute() {
+
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        System.out.println("xianzhaihourr===" + hour);
+        hour = hour * 60;
+        int minute = calendar.get(Calendar.MINUTE) ;
+        int total = hour + minute;
+        return total;
     }
 
     public static String formatDayNumber(int what) {

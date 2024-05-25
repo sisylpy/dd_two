@@ -19,13 +19,15 @@
 	</select>
 
 	<resultMap id="customerUser" type="NxCustomerUserEntity">
-		<id property="nxCuUserId" column="nx_cu_user_id"/>
-		<result property="nxCuWxNickName" column="nx_cu_wx_nick_name"/>
-		<result property="nxCuWxAvatarUrl" column="nx_cu_wx_avatar_url"/>
-		<result property="nxCuWxGender" column="nx_cu_wx_gender"/>
-		<result property="nxCuJoinDate" column="nx_cu_join_date"/>
-		<result property="nxCuOrderAmount" column="nx_cu_order_amount"/>
-		<result property="nxCuOrderTimes" column="nx_cu_order_times"/>
+		<id property="nxCuUserId" column="nx_CU_user_id"/>
+		<result property="nxCuOrderTimes" column="nx_CU_order_times"/>
+		<result property="nxCuOrderTimes" column="nx_CU_order_times"/>
+		<result property="nxCuWxGender" column="nx_CU_wx_gender"/>
+		<result property="nxCuWxPhoneNumber" column="nx_CU_wx_phone_number"/>
+		<result property="nxCuCommunityId" column="nx_CU_community_id"/>
+		<result property="nxCuWxOpenId" column="nx_CU_wx_open_id"/>
+		<result property="nxCuWxAvatarUrl" column="nx_CU_wx_avatra_url"/>
+		<result property="nxCuCustomerId" column="nx_CU_customer_id"/>
 	</resultMap>
 
 	<resultMap id="customers" type="NxCustomerEntity">

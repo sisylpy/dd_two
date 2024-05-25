@@ -41,7 +41,8 @@
 			`nx_cgsi_item_file_path`,
 			`nx_cgsi_item_type`,
 			`nx_cgsi_item_quantity`,
-			`nx_cgsi_item_sort`
+			`nx_cgsi_item_sort`,
+			`nx_cgsi_item_status`
 		)
 		values
 		(
@@ -53,7 +54,8 @@
 			#{nxCgsiItemFilePath},
 			#{nxCgsiItemType},
 			#{nxCgsiItemQuantity},
-			#{nxCgsiItemSort}
+			#{nxCgsiItemSort},
+			#{nxCgsiItemStatus}
 		)
 	</insert>
 	 
@@ -67,6 +69,7 @@
 			<if test="nxCgsiItemType != null">`nx_cgsi_item_type` = #{nxCgsiItemType}, </if>
 			<if test="nxCgsiItemQuantity != null">`nx_cgsi_item_quantity` = #{nxCgsiItemQuantity}, </if>
 			<if test="nxCgsiItemSort != null">`nx_cgsi_item_sort` = #{nxCgsiItemSort}, </if>
+			<if test="nxCgsiItemStatus != null">`nx_cgsi_item_status` = #{nxCgsiItemStatus}, </if>
 			<if test="nxCgsiItemFilePath != null">`nx_cgsi_item_file_path` = #{nxCgsiItemFilePath}</if>
 		</set>
 		where nx_community_goods_set_item_id = #{nxCommunityGoodsSetItemId}

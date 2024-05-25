@@ -58,51 +58,51 @@ public class NxCommunityGoodsServiceImpl implements NxCommunityGoodsService {
 		return nxCommunityGoodsDao.queryCommunityGoods(map);
     }
 
-    @Override
-    public int queryTotalByFatherId(Map<String, Object> map) {
+//    @Override
+//    public int queryTotalByFatherId(Map<String, Object> map) {
+//
+//		return nxCommunityGoodsDao.queryTotalByFatherId(map);
+//    }
 
-		return nxCommunityGoodsDao.queryTotalByFatherId(map);
-    }
-
-    @Override
-    public List<NxCommunityGoodsEntity> queryDisDownloadGoods(Map<String, Object> map) {
-
-		return nxCommunityGoodsDao.queryDisDownloadGoods(map);
-    }
+//    @Override
+//    public List<NxCommunityGoodsEntity> queryDisDownloadGoods(Map<String, Object> map) {
+//
+//		return nxCommunityGoodsDao.queryDisDownloadGoods(map);
+//    }
 
 
-    @Override
-    public List<NxCommunityGoodsEntity> queryCommunityDownloadGoods(Map<String, Object> map) {
+//    @Override
+//    public List<NxCommunityGoodsEntity> queryCommunityDownloadGoods(Map<String, Object> map) {
+//
+//		return nxCommunityGoodsDao.queryCommunityDownloadGoods(map);
+//    }
 
-		return nxCommunityGoodsDao.queryCommunityDownloadGoods(map);
-    }
+//	@Override
+//	public List<NxCommunityGoodsEntity> queryDistributerGoods(Map<String, Object> map) {
+//		return nxCommunityGoodsDao.queryDistributerGoods(map);
+//
+//	}
 
-	@Override
-	public List<NxCommunityGoodsEntity> queryDistributerGoods(Map<String, Object> map) {
-		return nxCommunityGoodsDao.queryDistributerGoods(map);
+//    @Override
+//    public List<NxCommunityGoodsEntity>  queryHasNxGoodsFather(Map<String, Object> map) {
+//        return nxCommunityGoodsDao.queryHasNxGoodsFather(map);
+//    }
+//
+//    @Override
+//    public List<NxCommunityGoodsEntity> queryStockGoods(Map<String, Object> map) {
+//        return nxCommunityGoodsDao.queryStockGoods(map);
+//    }
 
-	}
+//	@Override
+//	public List<NxCommunityGoodsEntity> queryCommunityGoodsWithPinyin(Map<String, Object> map) {
+//		return nxCommunityGoodsDao.queryCommunityGoodsWithPinyin(map);
+//	}
 
-    @Override
-    public List<NxCommunityGoodsEntity>  queryHasNxGoodsFather(Map<String, Object> map) {
-        return nxCommunityGoodsDao.queryHasNxGoodsFather(map);
-    }
-
-    @Override
-    public List<NxCommunityGoodsEntity> queryStockGoods(Map<String, Object> map) {
-        return nxCommunityGoodsDao.queryStockGoods(map);
-    }
-
-	@Override
-	public List<NxCommunityGoodsEntity> queryCommunityGoodsWithPinyin(Map<String, Object> map) {
-		return nxCommunityGoodsDao.queryCommunityGoodsWithPinyin(map);
-	}
-
-    @Override
-    public List<NxCommunityGoodsEntity> queryComGoodsHasNxGoodsFather(Map<String, Object> map) {
-
-		return nxCommunityGoodsDao.queryComGoodsHasNxGoodsFather(map);
-    }
+//    @Override
+//    public List<NxCommunityGoodsEntity> queryComGoodsHasNxGoodsFather(Map<String, Object> map) {
+//
+//		return nxCommunityGoodsDao.queryComGoodsHasNxGoodsFather(map);
+//    }
 
     @Override
     public List<NxCommunityGoodsEntity> queryComGoodsByParams(Map<String, Object> map7) {
@@ -116,12 +116,12 @@ public class NxCommunityGoodsServiceImpl implements NxCommunityGoodsService {
 
 		return nxCommunityGoodsDao.queryComGoodsDetail(map7);
     }
-
-    @Override
-    public List<NxCommunityGoodsEntity> queryAddCommunityNxGoods(Map<String, Object> map) {
-
-		return nxCommunityGoodsDao.queryAddCommunityNxGoods(map);
-    }
+//
+//    @Override
+//    public List<NxCommunityGoodsEntity> queryAddCommunityNxGoods(Map<String, Object> map) {
+//
+//		return nxCommunityGoodsDao.queryAddCommunityNxGoods(map);
+//    }
 
     @Override
     public List<NxCommunityGoodsEntity> resQueryComGoodsQuickSearchStr(Map<String, Object> map) {
@@ -135,19 +135,19 @@ public class NxCommunityGoodsServiceImpl implements NxCommunityGoodsService {
 		return nxCommunityGoodsDao.queryComGoodsQuickSearchStr(map);
 	}
 
-	@Override
-	public List<NxCommunityGoodsEntity> queryCgSubNameByFatherId(Map<String, Object> map) {
-		return nxCommunityGoodsDao.queryCgSubNameByFatherId(map);
-	}
+//	@Override
+//	public List<NxCommunityGoodsEntity> queryCgSubNameByFatherId(Map<String, Object> map) {
+//		return nxCommunityGoodsDao.queryCgSubNameByFatherId(map);
+//	}
 
 
-    @Override
-    public List<NxCommunityGoodsEntity> queryComResGoodsByParams(Map<String, Object> map) {
-
-		return  nxCommunityGoodsDao.queryComResGoodsByParams(map);
-
-
-    }
+//    @Override
+//    public List<NxCommunityGoodsEntity> queryComResGoodsByParams(Map<String, Object> map) {
+//
+//		return  nxCommunityGoodsDao.queryComResGoodsByParams(map);
+//
+//
+//    }
 
     @Override
     public List<NxCommunityGoodsEntity> resManQueryComResGoodsQuickSearchStr(Map<String, Object> map) {
@@ -155,11 +155,11 @@ public class NxCommunityGoodsServiceImpl implements NxCommunityGoodsService {
 		return nxCommunityGoodsDao.resManQueryComResGoodsQuickSearchStr(map);
     }
 
-    @Override
-    public List<NxCommunityGoodsEntity> comQueryDisComGoodsByParams(Map<String, Object> map) {
-
-		return nxCommunityGoodsDao.comQueryDisComGoodsByParams(map);
-    }
+//    @Override
+//    public List<NxCommunityGoodsEntity> comQueryDisComGoodsByParams(Map<String, Object> map) {
+//
+//		return nxCommunityGoodsDao.comQueryDisComGoodsByParams(map);
+//    }
 
     @Override
     public List<NxCommunityGoodsEntity> queryComGoodsWithSupplierByParams(Map<String, Object> map) {

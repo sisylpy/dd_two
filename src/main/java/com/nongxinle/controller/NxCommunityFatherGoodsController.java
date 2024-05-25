@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
+import static com.nongxinle.utils.DateUtils.getNowMinute;
+
 
 @RestController
 @RequestMapping("api/nxcommunityfathergoods")
@@ -159,16 +161,21 @@ public class NxCommunityFatherGoodsController {
     //
     @RequestMapping(value = "/getFatherWithGoodsPindan", method = RequestMethod.POST)
     @ResponseBody
-    public R getFatherWithGoodsPindan(Integer commId, Integer orderUserId) {
+    public R getFatherWithGoodsPindan(Integer commId, Integer orderUserId, Integer splicingOrderId) {
 
         System.out.println("idcommdmmdmdmdmdm" + commId);
         Map<String, Object> map = new HashMap<>();
         map.put("commId", commId);
         map.put("level", 2);
+        map.put("nowMinute", getNowMinute());
         if(orderUserId != -1){
             map.put("orderUserId", orderUserId);
             map.put("xiaoyuStatus", 2);
             map.put("dayuType", 3);
+            if(splicingOrderId != -1){
+                map.put("splicingOrderId", splicingOrderId);
+            }
+
 
         }
 
@@ -180,6 +187,10 @@ public class NxCommunityFatherGoodsController {
         mapA.put("orderUserId", orderUserId);
         mapA.put("status", 0);
         mapA.put("dayuType", 3);
+        if(splicingOrderId != -1){
+            mapA.put("splicingOrderId", splicingOrderId);
+        }
+
         System.out.println("fafaslfasfasaaaaaa" + mapA);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
@@ -193,6 +204,25 @@ public class NxCommunityFatherGoodsController {
 
         return R.ok().put("data", mapR);
     }
+
+
+    //
+    @RequestMapping(value = "/getFatherWithGoodsAdmin", method = RequestMethod.POST)
+    @ResponseBody
+    public R getFatherWithGoodsAdmin(Integer commId) {
+
+        System.out.println("idcommdmmdmdmdmdm" + commId);
+        Map<String, Object> map = new HashMap<>();
+        map.put("commId", commId);
+
+        System.out.println("tytytytytytyyt" + map);
+
+        List<NxCommunityFatherGoodsEntity> fatherGoodsEntities =  cfgService.queryGrandGoodsAdmin(map);
+
+
+        return R.ok().put("data", fatherGoodsEntities);
+    }
+
     //
     @RequestMapping(value = "/getFatherWithGoods", method = RequestMethod.POST)
     @ResponseBody
@@ -202,9 +232,9 @@ public class NxCommunityFatherGoodsController {
         Map<String, Object> map = new HashMap<>();
         map.put("commId", commId);
         map.put("level", 2);
+        map.put("nowMinute", getNowMinute());
         if(orderUserId != -1){
             map.put("orderUserId", orderUserId);
-            map.put("xiaoyuStatus", 2);
             map.put("xiaoyuType", 4);
         }
         System.out.println("tytytytytytyyt" + map);
@@ -214,15 +244,12 @@ public class NxCommunityFatherGoodsController {
 //
         Map<String, Object> mapA = new HashMap<>();
         mapA.put("orderUserId", orderUserId);
-        mapA.put("status", 0);
+        mapA.put("status", -1);
         mapA.put("xiaoyuType", 4);
+        System.out.println("apappapap" + mapA);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
-        List<NxCommunityAdsenseEntity> adsenseEntities = nxCommunityAdsenseService.queryAdsenseByNxCommunityId(commId);
-
         Map<String, Object> mapR = new HashMap<>();
-
-        mapR.put("adsense", adsenseEntities);
         mapR.put("arr", fatherGoodsEntities);
         mapR.put("subOrders", nxCommunityOrdersSubEntities);
 
@@ -241,87 +268,87 @@ public class NxCommunityFatherGoodsController {
      * @param comId 批发商id
      * @return 批发商父类列表
      */
-    @RequestMapping(value = "/resGetComGoodsCata", method = RequestMethod.POST)
-    @ResponseBody
-    public R resGetComGoodsCata(Integer comId, Integer level) {
-        System.out.println(comId + level + "abc");
-        Map<String, Object> map = new HashMap<>();
-        map.put("comId", comId);
-        map.put("level", level);
-        List<NxCommunityFatherGoodsEntity> comGoodsCata = cfgService.queryComGoodsCata(map);
-        if (comGoodsCata.size() > 0) {
-//            List<NxCommunityFatherGoodsEntity> newList = new ArrayList<>();
-            for (NxCommunityFatherGoodsEntity greatGrandGoods : comGoodsCata) {
-                for (NxCommunityFatherGoodsEntity grandGoods : greatGrandGoods.getFatherGoodsEntities()) {
-					for (NxCommunityFatherGoodsEntity fatherGoods : grandGoods.getFatherGoodsEntities()) {
-
-						StringBuilder builder = new StringBuilder();
-						Map<String, Object> map1 = new HashMap<>();
-						Integer communityFatherGoodsId = fatherGoods.getNxCommunityFatherGoodsId();
-						map1.put("fatherId", communityFatherGoodsId);
-						map1.put("serviceLevel", level);
-						List<NxCommunityGoodsEntity> goodsEntities = cgService.queryCgSubNameByFatherId(map1);
-
-						for (NxCommunityGoodsEntity goods : goodsEntities) {
-							String nxGoodsName = goods.getNxCgGoodsName();
-							builder.append(nxGoodsName);
-							builder.append(',');
-						}
-						System.out.println(builder + "buildld");
-						fatherGoods.setCgGoodsSubNames(builder.toString());
-//						newList.add(fatherGoods);
-					}
-                }
-            }
-            return R.ok().put("data", comGoodsCata);
-        }
-        return R.ok().put("data", new ArrayList<>());
-    }
+//    @RequestMapping(value = "/resGetComGoodsCata", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R resGetComGoodsCata(Integer comId, Integer level) {
+//        System.out.println(comId + level + "abc");
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("comId", comId);
+//        map.put("level", level);
+//        List<NxCommunityFatherGoodsEntity> comGoodsCata = cfgService.queryComGoodsCata(map);
+//        if (comGoodsCata.size() > 0) {
+////            List<NxCommunityFatherGoodsEntity> newList = new ArrayList<>();
+//            for (NxCommunityFatherGoodsEntity greatGrandGoods : comGoodsCata) {
+//                for (NxCommunityFatherGoodsEntity grandGoods : greatGrandGoods.getFatherGoodsEntities()) {
+//					for (NxCommunityFatherGoodsEntity fatherGoods : grandGoods.getFatherGoodsEntities()) {
+//
+//						StringBuilder builder = new StringBuilder();
+//						Map<String, Object> map1 = new HashMap<>();
+//						Integer communityFatherGoodsId = fatherGoods.getNxCommunityFatherGoodsId();
+//						map1.put("fatherId", communityFatherGoodsId);
+//						map1.put("serviceLevel", level);
+//						List<NxCommunityGoodsEntity> goodsEntities = cgService.queryCgSubNameByFatherId(map1);
+//
+//						for (NxCommunityGoodsEntity goods : goodsEntities) {
+//							String nxGoodsName = goods.getNxCgGoodsName();
+//							builder.append(nxGoodsName);
+//							builder.append(',');
+//						}
+//						System.out.println(builder + "buildld");
+//						fatherGoods.setCgGoodsSubNames(builder.toString());
+////						newList.add(fatherGoods);
+//					}
+//                }
+//            }
+//            return R.ok().put("data", comGoodsCata);
+//        }
+//        return R.ok().put("data", new ArrayList<>());
+//    }
     /**
      * 获取批发商商品的父类列表
-     * @param comId 批发商id
+     * @param
      * @return 批发商父类列表
      */
-    @RequestMapping(value = "/customerGetComGoodsCata/{comId}")
-    @ResponseBody
-    public R customerGetComGoodsCata(@PathVariable Integer comId) {
-        System.out.println("fdfajdajfda???");
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("comId", comId);
-        List<NxCommunityFatherGoodsEntity> comGoodsCata = cfgService.queryComGoodsCata(map);
-        if (comGoodsCata.size() > 0) {
-
-            List<NxCommunityFatherGoodsEntity> newList = new ArrayList<>();
-
-            for (NxCommunityFatherGoodsEntity greatGrandGoods : comGoodsCata) {
-                for (NxCommunityFatherGoodsEntity grandGoods : greatGrandGoods.getFatherGoodsEntities()) {
-                    for (NxCommunityFatherGoodsEntity fatherGoods : grandGoods.getFatherGoodsEntities()) {
-
-                        StringBuilder builder = new StringBuilder();
-                        Map<String, Object> map1 = new HashMap<>();
-                        Integer communityFatherGoodsId = fatherGoods.getNxCommunityFatherGoodsId();
-                        map1.put("fatherId", communityFatherGoodsId);
-                        List<NxCommunityGoodsEntity> goodsEntities = cgService.queryCgSubNameByFatherId(map1);
-
-                        for (NxCommunityGoodsEntity goods : goodsEntities) {
-                            String nxGoodsName = goods.getNxCgGoodsName();
-                            builder.append(nxGoodsName);
-                            builder.append(',');
-                        }
-                        fatherGoods.setCgGoodsSubNames(builder.toString());
-                        newList.add(fatherGoods);
-                    }
-
-                }
-
-            }
-
-
-            return R.ok().put("data", comGoodsCata);
-        }
-        return R.ok().put("data", new ArrayList<>());
-    }
+//    @RequestMapping(value = "/customerGetComGoodsCata/{comId}")
+//    @ResponseBody
+//    public R customerGetComGoodsCata(@PathVariable Integer comId) {
+//        System.out.println("fdfajdajfda???");
+//
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("comId", comId);
+//        List<NxCommunityFatherGoodsEntity> comGoodsCata = cfgService.queryComGoodsCata(map);
+//        if (comGoodsCata.size() > 0) {
+//
+//            List<NxCommunityFatherGoodsEntity> newList = new ArrayList<>();
+//
+//            for (NxCommunityFatherGoodsEntity greatGrandGoods : comGoodsCata) {
+//                for (NxCommunityFatherGoodsEntity grandGoods : greatGrandGoods.getFatherGoodsEntities()) {
+//                    for (NxCommunityFatherGoodsEntity fatherGoods : grandGoods.getFatherGoodsEntities()) {
+//
+//                        StringBuilder builder = new StringBuilder();
+//                        Map<String, Object> map1 = new HashMap<>();
+//                        Integer communityFatherGoodsId = fatherGoods.getNxCommunityFatherGoodsId();
+//                        map1.put("fatherId", communityFatherGoodsId);
+//                        List<NxCommunityGoodsEntity> goodsEntities = cgService.queryCgSubNameByFatherId(map1);
+//
+//                        for (NxCommunityGoodsEntity goods : goodsEntities) {
+//                            String nxGoodsName = goods.getNxCgGoodsName();
+//                            builder.append(nxGoodsName);
+//                            builder.append(',');
+//                        }
+//                        fatherGoods.setCgGoodsSubNames(builder.toString());
+//                        newList.add(fatherGoods);
+//                    }
+//
+//                }
+//
+//            }
+//
+//
+//            return R.ok().put("data", comGoodsCata);
+//        }
+//        return R.ok().put("data", new ArrayList<>());
+//    }
 
 
 

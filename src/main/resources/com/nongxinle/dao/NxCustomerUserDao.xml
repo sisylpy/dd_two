@@ -17,12 +17,36 @@
  	<select id="queryTotal" resultType="int">
 		select count(*) from nx_customer_user 
 	</select>
-	<select id="queryOpenId" resultType="java.lang.String">
 
+    <select id="queryUserByOpenId" resultMap="userInfo">
+		select * from nx_customer_user as ncu
+		left join nx_customer_user_card as ncuc on ncuc.nx_cuca_customer_user_id = ncu.nx_CU_user_id
+		left join nx_community_card as ncc on ncc.nx_community_card_id = ncuc.nx_cuca_card_id
+		where nx_CU_wx_open_id = #{openid}
 	</select>
-    <select id="queryUserByOpenId" resultType="com.nongxinle.entity.NxCustomerUserEntity">
-		select * from nx_customer_user where nx_CU_wx_open_id = #{openid}
-	</select>
+
+	<resultMap id="userCards" type="NxCustomerUserCardEntity">
+		<id property="nxCustomerUserCardId" column="nx_customer_user_card_id"/>
+		<result property="nxCucaCardId" column="nx_cuca_card_id"/>
+		<result property="nxCucaCustomerUserId" column="nx_cuca_customer_user_id"/>
+		<result property="nxCucaStartDate" column="nx_cuca_start_date"/>
+		<result property="nxCucaStopDate" column="nx_cuca_stop_date"/>
+		<result property="nxCucaStatus" column="nx_cuca_status"/>
+		<result property="nxCucaType" column="nx_cuca_type"/>
+		<result property="nxCucaCommunityId" column="nx_cuca_community_id"/>
+	</resultMap>
+
+	<resultMap id="userInfo" type="NxCustomerUserEntity">
+		<id property="nxCuUserId" column="nx_CU_user_id"/>
+		<result property="nxCuOrderTimes" column="nx_CU_order_times"/>
+		<result property="nxCuWxGender" column="nx_CU_wx_gender"/>
+		<result property="nxCuWxPhoneNumber" column="nx_CU_wx_phone_number"/>
+		<result property="nxCuCommunityId" column="nx_CU_community_id"/>
+		<result property="nxCuWxOpenId" column="nx_CU_wx_open_id"/>
+		<result property="nxCuWxAvatarUrl" column="nx_CU_wx_avatar_url"/>
+		<result property="nxCuCustomerId" column="nx_CU_customer_id"/>
+		<collection property="userCardEntityList" resultMap="userCards"/>
+	</resultMap>
 
 	<resultMap id="customer" type="NxCustomerEntity">
 		<id property="nxCustomerId" column="nx_customer_id"/>
@@ -30,13 +54,18 @@
 	</resultMap>
 	<resultMap id="userWithCustomer" type="NxCustomerUserEntity">
 		<id property="nxCuUserId" column="nx_CU_user_id"/>
-		<result property="nxCuWxAvatarUrl" column="nx_CU_wx_avatra_url"/>
+		<result property="nxCuOrderTimes" column="nx_CU_order_times"/>
+		<result property="nxCuWxGender" column="nx_CU_wx_gender"/>
+		<result property="nxCuWxPhoneNumber" column="nx_CU_wx_phone_number"/>
+		<result property="nxCuCommunityId" column="nx_CU_community_id"/>
+		<result property="nxCuWxOpenId" column="nx_CU_wx_open_id"/>
+		<result property="nxCuWxAvatarUrl" column="nx_CU_wx_avatar_url"/>
 		<result property="nxCuCustomerId" column="nx_CU_customer_id"/>
-		<association property="nxCustomerEntity" resultMap="customer"/>
 	</resultMap>
 	<select id="queryCustomerUserInfo" resultMap="userWithCustomer">
 		select * from nx_customer_user as ncu
 		left join nx_customer as nc on nc.nx_customer_id = ncu.nx_CU_customer_id
+
         <where>
 			<if test="userId != null">
 				and ncu.nx_CU_user_id = #{userId}

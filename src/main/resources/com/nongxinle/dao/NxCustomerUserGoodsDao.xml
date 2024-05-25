@@ -25,11 +25,16 @@
 
 	<resultMap id="disGoods" type="NxCommunityGoodsEntity">
 		<id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
-		<result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
+		<result property="nxCgCardId" column="nx_cg_card_id"/>
+		<result property="nxCgStartTime" column="nx_cg_start_time"/>
+		<result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>
+		<result property="nxCgStopTime" column="nx_cg_stop_time"/>
+		<result property="nxCgStopTimeZone" column="nx_cg_stop_time_zone"/>
 		<result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
 		<result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
+		<result property="nxCgGoodsHuaxianPrice" column="nx_cg_goods_huaxian_price"/>
+		<result property="nxCgGoodsHuaxianPriceDifferent" column="nx_cg_goods_huaxian_price_different"/>
 		<result property="nxCgCommunityId" column="nx_cg_community_id"/>
-		<result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
 		<result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
 		<result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
 		<result property="nxCgGoodsName" column="nx_cg_goods_name"/>
@@ -65,6 +70,163 @@
 		<result property="nxCgGoodsType" column="nx_cg_goods_type"/>
 		<result property="nxCgBuyingPrice" column="nx_cg_buying_price"/>
 	</resultMap>
+	<resultMap id="goodsCard" type="NxCommunityCardEntity">
+		<id property="nxCommunityCardId" column="nx_community_card_id"/>
+		<result property="nxCommunityCardName" column="nx_community_card_name"/>
+		<result property="nxCcEffectiveDays" column="nx_cc_effective_days"/>
+		<result property="nxCcFilePath" column="nx_cc_file_path"/>
+		<result property="nxCcPrice" column="nx_cc_price"/>
+		<result property="nxCcWords" column="nx_cc_words"/>
+	</resultMap>
+
+
+	<resultMap id="remakMemberSubOrder" type="NxCommunityOrdersSubEntity">
+		<id property="nxCommunityOrdersSubId" column="memberCosRemark_nx_community_orders_sub_id"/>
+		<result property="nxCosService" column="memberCosRemark_nx_COS_service"/>
+		<result property="nxCosServiceDate" column="memberCosRemark_nx_COS_service_date"/>
+		<result property="nxCosServiceTime" column="memberCosRemark_nx_COS_service_time"/>
+		<result property="nxCosType" column="memberCosRemark_nx_COS_type"/>
+		<result property="nxCosGoodsIndex" column="memberCosRemark_nx_COS_goods_index"/>
+		<result property="nxCosStatus" column="memberCosRemark_nx_COS_status"/>
+		<result property="nxCosOrderUserId" column="memberCosRemark_nx_COS_order_user_id"/>
+		<result property="nxCosHuaxianDifferentPrice" column="memberCosRemark_nx_COS_huaxian_different_price"/>
+		<result property="nxCosHuaxianPrice" column="memberCosRemark_nx_COS_huaxian_price"/>
+		<result property="nxCosCommunityGoodsId" column="memberCosRemark_nx_COS_community_goods_id"/>
+		<result property="nxCosQuantity" column="memberCosRemark_nx_COS_quantity"/>
+		<result property="nxCosStandard" column="memberCosRemark_nx_COS_standard"/>
+		<result property="nxCosPrice" column="memberCosRemark_nx_COS_price"/>
+		<result property="nxCosWeight" column="memberCosRemark_nx_COS_weight"/>
+		<result property="nxCosOrdersId" column="memberCosRemark_nx_COS_orders_id"/>
+		<result property="nxCosSubtotal" column="memberCosRemark_nx_COS_subtotal"/>
+		<result property="nxCosSubWeight" column="memberCosRemark_nx_COS_sub_weight"/>
+		<result property="nxCosRemark" column="memberCosRemark_nx_COS_remark"/>
+	</resultMap>
+
+	<resultMap id="remarkSubOrder" type="NxCommunityOrdersSubEntity">
+		<id property="nxCommunityOrdersSubId" column="ncosRemark_nx_community_orders_sub_id"/>
+		<result property="nxCosService" column="ncosRemark_nx_COS_srvice"/>
+		<result property="nxCosServiceDate" column="ncosRemark_nx_COS_srvice_date"/>
+		<result property="nxCosServiceTime" column="ncosRemark_nx_COS_srvice_time"/>
+		<result property="nxCosType" column="ncosRemark_nx_COS_type"/>
+		<result property="nxCosGoodsIndex" column="ncosRemark_nx_COS_goods_index"/>
+		<result property="nxCosStatus" column="ncosRemark_nx_COS_status"/>
+		<result property="nxCosOrderUserId" column="ncosRemark_nx_COS_order_user_id"/>
+		<result property="nxCosHuaxianDifferentPrice" column="ncosRemark_nx_COS_huaxian_different_price"/>
+		<result property="nxCosHuaxianPrice" column="ncosRemark_nx_COS_huaxian_price"/>
+		<result property="nxCosCommunityGoodsId" column="ncosRemark_nx_COS_community_goods_id"/>
+		<result property="nxCosQuantity" column="ncosRemark_nx_COS_quantity"/>
+		<result property="nxCosStandard" column="ncosRemark_nx_COS_standard"/>
+		<result property="nxCosPrice" column="ncosRemark_nx_COS_price"/>
+		<result property="nxCosWeight" column="ncosRemark_nx_COS_weight"/>
+		<result property="nxCosOrdersId" column="ncosRemark_nx_COS_orders_id"/>
+		<result property="nxCosSubtotal" column="ncosRemark_nx_COS_subtotal"/>
+		<result property="nxCosSubWeight" column="ncosRemark_nx_COS_sub_weight"/>
+		<result property="nxCosRemark" column="ncosRemark_nx_COS_remark"/>
+	</resultMap>
+
+	<resultMap id="memberSubOrder" type="NxCommunityOrdersSubEntity">
+		<id property="nxCommunityOrdersSubId" column="memberCos_nx_community_orders_sub_id"/>
+		<result property="nxCosService" column="memberCos_nx_COS_service"/>
+		<result property="nxCosServiceDate" column="memberCos_nx_COS_service_date"/>
+		<result property="nxCosServiceTime" column="memberCos_nx_COS_service_time"/>
+		<result property="nxCosType" column="memberCos_nx_COS_type"/>
+		<result property="nxCosGoodsIndex" column="memberCos_nx_COS_goods_index"/>
+		<result property="nxCosStatus" column="memberCos_nx_COS_status"/>
+		<result property="nxCosOrderUserId" column="memberCos_nx_COS_order_user_id"/>
+		<result property="nxCosHuaxianDifferentPrice" column="memberCos_nx_COS_huaxian_different_price"/>
+		<result property="nxCosHuaxianPrice" column="memberCos_nx_COS_huaxian_price"/>
+		<result property="nxCosCommunityGoodsId" column="memberCos_nx_COS_community_goods_id"/>
+		<result property="nxCosQuantity" column="memberCos_nx_COS_quantity"/>
+		<result property="nxCosStandard" column="memberCos_nx_COS_standard"/>
+		<result property="nxCosPrice" column="memberCos_nx_COS_price"/>
+		<result property="nxCosWeight" column="memberCos_nx_COS_weight"/>
+		<result property="nxCosOrdersId" column="memberCos_nx_COS_orders_id"/>
+		<result property="nxCosSubtotal" column="memberCos_nx_COS_subtotal"/>
+		<result property="nxCosSubWeight" column="memberCos_nx_COS_sub_weight"/>
+		<result property="nxCosRemark" column="memberCos_nx_COS_remark"/>
+	</resultMap>
+
+	<resultMap id="subOrder" type="NxCommunityOrdersSubEntity">
+		<id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
+		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
+		<result property="nxCosCucId" column="nx_cos_cuc_id"/>
+		<result property="nxCosStatus" column="nx_cos_status"/>
+		<result property="nxCosRemark" column="nx_COS_remark"/>
+		<result property="nxCosType" column="nx_COS_type"/>
+		<result property="nxCosService" column="nx_COS_service"/>
+		<result property="nxCosServiceDate" column="nx_COS_service_date"/>
+		<result property="nxCosServiceTime" column="nx_COS_service_time"/>
+		<result property="nxCosGoodsIndex" column="nx_COS_goods_index"/>
+		<result property="nxCosType" column="nx_COS_type"/>
+		<result property="nxCosStatus" column="nx_COS_status"/>
+		<result property="nxCosOrderUserId" column="nx_COS_order_user_id"/>
+		<result property="nxCosHuaxianDifferentPrice" column="nx_COS_huaxian_different_price"/>
+		<result property="nxCosHuaxianPrice" column="nx_COS_huaxian_price"/>
+		<result property="nxCosCommunityGoodsId" column="nx_COS_community_goods_id"/>
+		<result property="nxCosQuantity" column="nx_COS_quantity"/>
+		<result property="nxCosStandard" column="nx_COS_standard"/>
+		<result property="nxCosPrice" column="nx_COS_price"/>
+		<result property="nxCosWeight" column="nx_COS_weight"/>
+		<result property="nxCosOrdersId" column="nx_COS_orders_id"/>
+		<result property="nxCosSubtotal" column="nx_COS_subtotal"/>
+		<result property="nxCosSubWeight" column="nx_COS_sub_weight"/>
+		<result property="nxCosRemark" column="nx_COS_remark"/>
+	</resultMap>
+
+
+	<resultMap id="comGoodsWithAllOrders" type="NxCommunityGoodsEntity">
+		<id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
+		<result property="nxCgCardId" column="nx_cg_card_id"/>
+		<result property="nxCgStartTime" column="nx_cg_start_time"/>
+		<result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>
+		<result property="nxCgStopTime" column="nx_cg_stop_time"/>
+		<result property="nxCgStopTimeZone" column="nx_cg_stop_time_zone"/>
+		<result property="nxCgGoodsSort" column="nx_cg_goods_sort"/>
+		<result property="nxCgGoodsHuaxianQuantity" column="nx_cg_goods_huaxian_quantity"/>
+		<result property="nxCgGoodsHuaxianPrice" column="nx_cg_goods_huaxian_price"/>
+		<result property="nxCgGoodsHuaxianPriceDifferent" column="nx_cg_goods_huaxian_price_different"/>
+		<result property="nxCgCommunityId" column="nx_cg_community_id"/>
+		<result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
+		<result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
+		<result property="nxCgGoodsName" column="nx_cg_goods_name"/>
+		<result property="nxCgGoodsStandardname" column="nx_cg_goods_standardname"/>
+		<result property="nxCgGoodsBrand" column="nx_cg_goods_brand"/>
+		<result property="nxCgGoodsPlace" column="nx_cg_goods_place"/>
+		<result property="nxCgGoodsDetail" column="nx_cg_goods_detail"/>
+		<result property="nxCgGoodsStandardWeight" column="nx_cg_goods_standard_weight"/>
+		<result property="nxCgGoodsPrice" column="nx_cg_goods_price"/>
+		<result property="nxCgGoodsPriceInteger" column="nx_cg_goods_price_integer"/>
+		<result property="nxCgGoodsPriceDecimal" column="nx_cg_goods_price_decimal"/>
+		<result property="nxCgGoodsTwoPrice" column="nx_cg_goods_two_price"/>
+		<result property="nxCgGoodsThreePrice" column="nx_cg_goods_three_price"/>
+		<result property="nxCgGoodsIsWeight" column="nx_cg_goods_is_weight"/>
+		<result property="nxCgGoodsStatus" column="nx_cg_goods_status"/>
+		<result property="nxCgPurchaseQuantity" column="nx_cg_purchase_quantity"/>
+		<result property="nxCgBuyStatus" column="nx_cg_buy_status"/>
+		<result property="nxCgGoodsTotalHits" column="nx_cg_goods_total_hits"/>
+		<result property="nxCgGoodsStandardType" column="nx_cg_goods_standard_type"/>
+		<result property="nxCgCfgGoodsFatherId" column="nx_cg_cfg_goods_father_id"/>
+		<result property="nxCgPullOff" column="nx_cg_pull_off"/>
+		<result property="nxCgGoodsPriceExchange" column="nx_cg_goods_price_exchange"/>
+		<result property="nxCgGoodsPriceExchangeDate" column="nx_cg_goods_price_exchange_date"/>
+		<result property="nxCgGoodsTwoPriceExchange" column="nx_cg_goods_two_price_exchange"/>
+		<result property="nxCgGoodsTwoPriceExchangeDate" column="nx_cg_goods_two_price_exchange_date"/>
+		<result property="nxCgGoodsThreePriceExchange" column="nx_cg_goods_three_price_exchange"/>
+		<result property="nxCgGoodsThreePriceExchangeDate" column="nx_cg_goods_three_price_exchange_date"/>
+		<result property="nxCgBuyingPriceExchange" column="nx_cg_buying_price_exchange"/>
+		<result property="nxCgBuyingPriceExchangeDate" column="nx_cg_buying_price_exchange_date"/>
+		<result property="nxCgCommunitySupplierId" column="nx_cg_community_supplier_id"/>
+		<result property="nxCgDistributerId" column="nx_cg_distributer_id"/>
+		<result property="nxCgDistributerGoodsId" column="nx_cg_distributer_goods_id"/>
+		<result property="nxCgGoodsType" column="nx_cg_goods_type"/>
+		<result property="nxCgBuyingPrice" column="nx_cg_buying_price"/>
+		<result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
+		<association property="nxCommunityCardEntity" resultMap="goodsCard"/>
+		<association property="ordersSubEntity" resultMap="subOrder"/>
+		<association property="memberOrdersSubEntity" resultMap="memberSubOrder"/>
+		<collection property="remarkOrdersSubEntities" resultMap="remarkSubOrder"/>
+		<collection property="remarkMemberOrdersSubEntities" resultMap="remakMemberSubOrder"/>
+	</resultMap>
 
 	<resultMap id="customerGoods" type="NxCustomerUserGoodsEntity">
 		<id property="nxCugGoodsId" column="nx_CUG_goods_id"/>
@@ -75,13 +237,82 @@
 		<result property="nxCugOrderStandard" column="nx_CUG_order_standard"/>
 		<result property="nxCugGoodsColor" column="nx_CUG_goods_color"/>
 		<result property="nxCugType" column="nx_CUG_type"/>
-		<association property="nxCommunityGoodsEntity" resultMap="disGoods"/>
+		<association property="nxCommunityGoodsEntity" resultMap="comGoodsWithAllOrders"/>
 	</resultMap>
 
 	<select id="queryUserGoods" resultMap="customerGoods">
-		select * from nx_customer_user_goods as cug
-			left join nx_community_goods as dg on dg.nx_community_goods_id = cug.nx_CUG_community_goods_id
-		<where>
+		select *,
+		memberCos.nx_community_orders_sub_id 'memberCos_nx_community_orders_sub_id',
+		memberCos.nx_COS_service 'memberCos_nx_COS_service',
+		memberCos.nx_COS_service_date 'memberCos_nx_COS_service_date',
+		memberCos.nx_COS_service_time 'memberCos_nx_COS_service_time',
+		memberCos.nx_COS_goods_index 'memberCos_nx_COS_goods_index',
+		memberCos.nx_COS_community_goods_id 'memberCos_nx_COS_community_goods_id',
+		memberCos.nx_COS_order_user_id 'memberCos_nx_COS_order_user_id',
+		memberCos.nx_COS_status 'memberCos_nx_COS_status',
+		memberCos.nx_COS_type 'memberCos_nx_COS_type',
+		memberCos.nx_COS_orders_id 'memberCos_nx_COS_orders_id',
+		memberCos.nx_COS_huaxian_different_price 'memberCos_nx_COS_huaxian_different_price',
+		memberCos.nx_COS_huaxian_price 'memberCos_nx_COS_huaxian_price',
+		memberCos.nx_COS_price 'memberCos_nx_COS_price',
+		memberCos.nx_COS_quantity 'memberCos_nx_COS_quantity',
+		memberCos.nx_COS_subtotal 'memberCos_nx_COS_subtotal',
+		memberCos.nx_COS_remark 'memberCos_nx_COS_remark',
+
+		ncosRemark.nx_community_orders_sub_id 'ncosRemark_nx_community_orders_sub_id',
+		ncosRemark.nx_COS_service 'ncosRemark_nx_COS_service',
+		ncosRemark.nx_COS_service_date 'ncosRemark_nx_COS_service_date',
+		ncosRemark.nx_COS_service_time 'ncosRemark_nx_COS_service_time',
+		ncosRemark.nx_COS_goods_index 'ncosRemark_nx_COS_goods_index',
+		ncosRemark.nx_COS_community_goods_id 'ncosRemark_nx_COS_community_goods_id',
+		ncosRemark.nx_COS_order_user_id 'ncosRemark_nx_COS_order_user_id',
+		ncosRemark.nx_COS_status 'ncosRemark_nx_COS_status',
+		ncosRemark.nx_COS_type 'ncosRemark_nx_COS_type',
+		ncosRemark.nx_COS_orders_id 'ncosRemark_nx_COS_orders_id',
+		ncosRemark.nx_COS_huaxian_different_price 'ncosRemark_nx_COS_huaxian_different_price',
+		ncosRemark.nx_COS_huaxian_price 'ncosRemark_nx_COS_huaxian_price',
+		ncosRemark.nx_COS_price 'ncosRemark_nx_COS_price',
+		ncosRemark.nx_COS_quantity 'ncosRemark_nx_COS_quantity',
+		ncosRemark.nx_COS_subtotal 'ncosRemark_nx_COS_subtotal',
+		ncosRemark.nx_COS_remark 'ncosRemark_nx_COS_remark',
+
+		memberCosRemark.nx_community_orders_sub_id 'memberCosRemark_nx_community_orders_sub_id',
+		memberCosRemark.nx_COS_service 'memberCosRemark_nx_COS_service',
+		memberCosRemark.nx_COS_service_date 'memberCosRemark_nx_COS_service_date',
+		memberCosRemark.nx_COS_service_time 'memberCosRemark_nx_COS_service_time',
+		memberCosRemark.nx_COS_goods_index 'memberCosRemark_nx_COS_goods_index',
+		memberCosRemark.nx_COS_community_goods_id 'memberCosRemark_nx_COS_community_goods_id',
+		memberCosRemark.nx_COS_order_user_id 'memberCosRemark_nx_COS_order_user_id',
+		memberCosRemark.nx_COS_status 'memberCosRemark_nx_COS_status',
+		memberCosRemark.nx_COS_type 'memberCosRemark_nx_COS_type',
+		memberCosRemark.nx_COS_orders_id 'memberCosRemark_nx_COS_orders_id',
+		memberCosRemark.nx_COS_huaxian_different_price 'memberCosRemark_nx_COS_huaxian_different_price',
+		memberCosRemark.nx_COS_huaxian_price 'memberCosRemark_nx_COS_huaxian_price',
+		memberCosRemark.nx_COS_price 'memberCosRemark_nx_COS_price',
+		memberCosRemark.nx_COS_quantity 'memberCosRemark_nx_COS_quantity',
+		memberCosRemark.nx_COS_subtotal 'memberCosRemark_nxv_COS_subtotal',
+		memberCosRemark.nx_COS_remark 'memberCosRemark_nx_COS_remark'
+		from nx_customer_user_goods as cug
+			left join nx_community_goods as ncg on ncg.nx_community_goods_id = cug.nx_CUG_community_goods_id
+		left join nx_community_card as ncc on ncc.nx_community_card_id = ncg.nx_cg_card_id
+
+		left join nx_community_orders_sub as ncos on ncos.nx_COS_community_goods_id = ncg.nx_community_goods_id
+		and ncos.nx_COS_order_user_id = #{userId} and ncos.nx_COS_status = -1
+		and ncos.nx_COS_huaxian_different_price = 0
+		left join nx_community_orders_sub as memberCos on memberCos.nx_COS_community_goods_id =
+		ncg.nx_community_goods_id
+		and memberCos.nx_COS_order_user_id = #{userId} and memberCos.nx_COS_status = -1
+		and memberCos.nx_COS_huaxian_different_price &gt; 0
+
+		left join nx_community_orders_sub as ncosRemark on ncosRemark.nx_COS_community_goods_id =
+		ncg.nx_community_goods_id
+		and ncosRemark.nx_COS_order_user_id = #{userId} and ncosRemark.nx_COS_status = -1
+		and ncosRemark.nx_COS_huaxian_different_price = 0
+		left join nx_community_orders_sub as memberCosRemark on memberCosRemark.nx_COS_community_goods_id =
+		ncg.nx_community_goods_id
+		and memberCosRemark.nx_COS_order_user_id = #{userId} and memberCosRemark.nx_COS_status = -1
+		and memberCosRemark.nx_COS_huaxian_different_price &gt; 0
+			<where>
 			<if test="userId != null">
 				and nx_CUG_user_id = #{userId}
 			</if>

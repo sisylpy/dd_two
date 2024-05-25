@@ -74,6 +74,7 @@ public class NxCommunityOrdersEntity implements Serializable {
 	 * zidingdan
 	 */
 	private List<NxCommunityOrdersSubEntity> nxOrdersSubEntities;
+	private List<NxCustomerUserCardEntity> nxCustomerUserCardEntities;
 
 	/**
 	 * kehu
@@ -109,6 +110,7 @@ public class NxCommunityOrdersEntity implements Serializable {
 	private NxCustomerUserEntity deliveryUser;
 	private NxCommunitySplicingOrdersEntity orderUserSplicingOrder;
 	private List<NxCommunitySplicingOrdersEntity> allSplicingOrders;
+	private List<NxCommunityCardEntity> nxCommunityCardEntities;
 
 
 
