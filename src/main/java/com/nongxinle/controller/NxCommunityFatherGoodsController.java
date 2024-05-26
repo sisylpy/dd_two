@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
+import static com.nongxinle.utils.DateUtils.formatWhatDay;
 import static com.nongxinle.utils.DateUtils.getNowMinute;
 
 
@@ -40,6 +41,8 @@ public class NxCommunityFatherGoodsController {
     private NxCommunityGoodsService cgService;
     @Autowired
     private NxCommunityOrdersSubService nxCommunityOrdersSubService;
+    @Autowired
+    private NxCustomerUserCardService nxCustomerUserCardService;
 
 
 
@@ -235,7 +238,7 @@ public class NxCommunityFatherGoodsController {
         map.put("nowMinute", getNowMinute());
         if(orderUserId != -1){
             map.put("orderUserId", orderUserId);
-            map.put("xiaoyuType", 4);
+            map.put("xiaoyuGoodsType", 4);
         }
         System.out.println("tytytytytytyyt" + map);
 
@@ -245,13 +248,19 @@ public class NxCommunityFatherGoodsController {
         Map<String, Object> mapA = new HashMap<>();
         mapA.put("orderUserId", orderUserId);
         mapA.put("status", -1);
-        mapA.put("xiaoyuType", 4);
+        mapA.put("xiaoyuGoodsType", 4);
         System.out.println("apappapap" + mapA);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
         Map<String, Object> mapR = new HashMap<>();
         mapR.put("arr", fatherGoodsEntities);
         mapR.put("subOrders", nxCommunityOrdersSubEntities);
+
+        Map<String, Object> mapC = new HashMap<>();
+        mapC.put("userId", orderUserId);
+        mapC.put("status", -1);
+        List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
+        mapR.put("cardList", cardEntities);
 
         return R.ok().put("data", mapR);
     }

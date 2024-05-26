@@ -32,4 +32,10 @@ public interface NxCommunityOrdersSubDao extends BaseDao<NxCommunityOrdersSubEnt
     List<NxCommunityOrdersSubEntity> querySubOrdersByParams(Map<String, Object> map);
 
     List<NxCommunityPrintOrdersSubEntity> queryPrintSubOrders(Map<String, Object> map);
+
+    NxCommunityOrdersSubEntity queryChangeSubOrderByParams(Map<String, Object> map);
+
+    int querySubOrderTotalHuaxianQuantity(Map<String, Object> mapT);
+
+    int querySubOrderCount(Map<String, Object> mapT);
 }

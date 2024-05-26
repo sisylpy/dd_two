@@ -44,6 +44,7 @@ public class NxCustomerUserCardEntity implements Serializable {
 	 */
 	private Integer nxCucaType;
 	private Integer nxCucaComOrderId;
+	private Integer nxCucaIsSelected;
 	/**
 	 *  
 	 */

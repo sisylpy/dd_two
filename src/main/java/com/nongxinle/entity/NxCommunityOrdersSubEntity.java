@@ -64,6 +64,7 @@ public class NxCommunityOrdersSubEntity implements Serializable, Comparable {
 	 */
 	private Integer nxCosStatus;
 	private Integer nxCosType;
+	private Integer nxCosPindanOrdersId;
 	/**
 	 *  子订单商品称重用户id
 	 */

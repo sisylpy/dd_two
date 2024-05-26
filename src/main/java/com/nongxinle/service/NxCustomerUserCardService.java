@@ -29,4 +29,6 @@ public interface NxCustomerUserCardService {
 	void deleteBatch(Integer[] nxCustomerUserCardIds);
 
     List<NxCustomerUserCardEntity> queryUserCardByParams(Map<String, Object> map);
+
+    NxCustomerUserCardEntity queryUserGoodsCard(Map<String, Object> map);
 }

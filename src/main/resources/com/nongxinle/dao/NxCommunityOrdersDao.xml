@@ -70,7 +70,8 @@
 	</resultMap>
 	<!-- subOrders -->
 	<resultMap id="subOrders" type="NxCommunityOrdersSubEntity">
-		<id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
+		 <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
+        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
 		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
 		<result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
 		<result property="nxCosStatus" column="nx_COS_status"/>
@@ -313,6 +314,7 @@
 	</resultMap>
 	<resultMap id="userCard" type="NxCustomerUserCardEntity">
 		<id property="nxCustomerUserCardId" column="nx_customer_user_card_id"/>
+		<result property="nxCucaIsSelected" column="nx_cuca_is_selected"/>
 		<result property="nxCucaCardId" column="nx_cuca_card_id"/>
 		<result property="nxCucaCustomerUserId" column="nx_cuca_customer_user_id"/>
 		<result property="nxCucaStartDate" column="nx_cuca_start_date"/>
@@ -465,7 +467,8 @@
 
 
 	<resultMap id="splicingSubOrders" type="NxCommunityOrdersSubEntity">
-		<id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
+		 <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
+        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
 		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
 		<result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
 		<result property="nxCosStatus" column="nx_COS_status"/>

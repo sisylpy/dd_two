@@ -98,7 +98,8 @@
     </resultMap>
 
     <resultMap id="subOrders" type="NxCommunityOrdersSubEntity">
-        <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
+         <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
+        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
 		<result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
 		<result property="nxCosCucId" column="nx_cos_cuc_id"/>
 		<result property="nxCosStatus" column="nx_cos_status"/>
@@ -111,7 +112,8 @@
         <result property="nxCosStatus" column="nx_COS_status"/>
         <result property="nxCosOrderUserId" column="nx_COS_order_user_id"/>
         <result property="nxCosGoodsIndex" column="nx_COS_goods_index"/>
-        <result property="nxCosType" column="nx_COS_type"/>
+        <result property="nxCosGoodsSellType" column="nx_COS_sell_type"/>
+        <result property="nxCosGoodsType" column="nx_COS_goods_type"/>
         <result property="nxCosHuaxianDifferentPrice" column="nx_COS_huaxian_different_price"/>
         <result property="nxCosHuaxianPrice" column="nx_COS_huaxian_price"/>
         <result property="nxCosPrice" column="nx_COS_price"/>
@@ -244,8 +246,8 @@
             <if test="type != null">
                 and  s.nx_COS_type = #{type}
             </if>
-            <if test="xiaoyuType != null">
-                and  s.nx_COS_type &lt; #{xiaoyuType}
+            <if test="xiaoyuGoodsType != null">
+                and  s.nx_COS_goods_type &lt; #{xiaoyuGoodsType}
             </if>
             <if test="dayuType != null">
                 and  s.nx_COS_type &gt; #{dayuType}
@@ -310,6 +312,171 @@
          limit 1
     </select>
 
+    <select id="queryChangeSubOrderByParams" resultMap="subOrders">
+        select *,
+        ncgsiGoods.nx_community_goods_set_item_id 'goods_nx_community_goods_set_item_id',
+        ncgsiGoods.nx_cgsi_item_name 'goods_nx_cgsi_item_name',
+        ncgsiGoods.nx_cgsi_item_status 'goods_nx_cgsi_item_status',
+        ncgsiGoods.nx_cgsi_item_cg_goods_id 'goods_nx_cgsi_item_cg_goods_id',
+        ncgsiGoods.nx_cgsi_item_type 'goods_nx_cgsi_item_type',
+        ncgsiGoods.nx_cgsi_item_file_path 'goods_nx_cgsi_item_file_path',
+        ncgsiGoods.nx_cgsi_item_price 'goods_nx_cgsi_item_price',
+        ncgsiGoods.nx_cgsi_item_quantity 'goods_nx_cgsi_item_quantity'
+        from nx_community_orders_sub  as s
+        left join nx_community_goods as cg on s.nx_COS_community_goods_id = cg.nx_community_goods_id
+        left join nx_community_card as ncc on ncc.nx_community_card_id = cg.nx_cg_card_id
+        left join nx_community_goods_set_item as ncgsiGoods on ncgsiGoods.nx_cgsi_item_cg_goods_id =
+        cg.nx_community_goods_id
+        <where>
+            <if test="fatherId != null">
+                and  nx_COS_community_goods_father_id = #{fatherId}
+            </if>
+            <if test="diffPrice != null">
+                and  s.nx_COS_huaxian_different_price =  #{diffPrice}
+            </if>
+            <if test="dayuDiffPrice != null">
+                and  s.nx_COS_huaxian_different_price &gt;  #{dayuDiffPrice}
+            </if>
+            <if test="goodsId != null">
+                and  nx_COS_community_goods_id = #{goodsId}
+            </if>
+            <if test="orderId != null">
+                and  nx_COS_orders_id = #{orderId}
+            </if>
+            <if test="splicingOrderId != null">
+                and  nx_COS_orders_id = #{splicingOrderId}
+            </if>
+            <if test="orderUserId != null">
+                and  nx_COS_order_user_id = #{orderUserId}
+            </if>
+            <if test="type != null">
+                and  s.nx_COS_type = #{type}
+            </if>
+            <if test="xiaoyuType != null">
+                and  s.nx_COS_type &lt; #{xiaoyuType}
+            </if>
+            <if test="dayuType != null">
+                and  s.nx_COS_type &gt; #{dayuType}
+            </if>
+            <if test="xiaoyuStatus != null">
+                and  s.nx_COS_status &lt; #{xiaoyuStatus}
+            </if>
+            <if test="dayuStatus != null">
+                and  s.nx_COS_status &gt; #{dayuStatus}
+            </if>
+            <if test="status != null">
+                and  s.nx_COS_status =  #{status}
+            </if>
+            <if test="remark != null">
+                and  s.nx_COS_remark =  #{remark}
+            </if>
+        </where>
+    </select>
+    <select id="querySubOrderTotalHuaxianQuantity" resultType="java.lang.Integer">
+        select SUM(nx_COS_quantity)
+        from nx_community_orders_sub  as s
+        left join nx_community_goods as cg on s.nx_COS_community_goods_id = cg.nx_community_goods_id
+        left join nx_community_card as ncc on ncc.nx_community_card_id = cg.nx_cg_card_id
+        left join nx_community_goods_set_item as ncgsiGoods on ncgsiGoods.nx_cgsi_item_cg_goods_id =
+        cg.nx_community_goods_id
+        <where>
+            <if test="fatherId != null">
+                and  nx_COS_community_goods_father_id = #{fatherId}
+            </if>
+            <if test="diffPrice != null">
+                and  s.nx_COS_huaxian_different_price =  #{diffPrice}
+            </if>
+            <if test="dayuDiffPrice != null">
+                and  s.nx_COS_huaxian_different_price &gt;  #{dayuDiffPrice}
+            </if>
+            <if test="goodsId != null">
+                and  nx_COS_community_goods_id = #{goodsId}
+            </if>
+            <if test="orderId != null">
+                and  nx_COS_orders_id = #{orderId}
+            </if>
+            <if test="splicingOrderId != null">
+                and  nx_COS_orders_id = #{splicingOrderId}
+            </if>
+            <if test="orderUserId != null">
+                and  nx_COS_order_user_id = #{orderUserId}
+            </if>
+            <if test="type != null">
+                and  s.nx_COS_type = #{type}
+            </if>
+            <if test="xiaoyuType != null">
+                and  s.nx_COS_type &lt; #{xiaoyuType}
+            </if>
+            <if test="dayuType != null">
+                and  s.nx_COS_type &gt; #{dayuType}
+            </if>
+            <if test="xiaoyuStatus != null">
+                and  s.nx_COS_status &lt; #{xiaoyuStatus}
+            </if>
+            <if test="dayuStatus != null">
+                and  s.nx_COS_status &gt; #{dayuStatus}
+            </if>
+            <if test="status != null">
+                and  s.nx_COS_status =  #{status}
+            </if>
+            <if test="remark != null">
+                and  s.nx_COS_remark =  #{remark}
+            </if>
+        </where>
+    </select>
+    <select id="querySubOrderCount" resultType="java.lang.Integer">
+        select COUNT(*)
+        from nx_community_orders_sub  as s
+        left join nx_community_goods as cg on s.nx_COS_community_goods_id = cg.nx_community_goods_id
+        left join nx_community_card as ncc on ncc.nx_community_card_id = cg.nx_cg_card_id
+        left join nx_community_goods_set_item as ncgsiGoods on ncgsiGoods.nx_cgsi_item_cg_goods_id =
+        cg.nx_community_goods_id
+        <where>
+            <if test="fatherId != null">
+                and  nx_COS_community_goods_father_id = #{fatherId}
+            </if>
+            <if test="diffPrice != null">
+                and  s.nx_COS_huaxian_different_price =  #{diffPrice}
+            </if>
+            <if test="dayuDiffPrice != null">
+                and  s.nx_COS_huaxian_different_price &gt;  #{dayuDiffPrice}
+            </if>
+            <if test="goodsId != null">
+                and  nx_COS_community_goods_id = #{goodsId}
+            </if>
+            <if test="orderId != null">
+                and  nx_COS_orders_id = #{orderId}
+            </if>
+            <if test="splicingOrderId != null">
+                and  nx_COS_orders_id = #{splicingOrderId}
+            </if>
+            <if test="orderUserId != null">
+                and  nx_COS_order_user_id = #{orderUserId}
+            </if>
+            <if test="type != null">
+                and  s.nx_COS_type = #{type}
+            </if>
+            <if test="xiaoyuType != null">
+                and  s.nx_COS_type &lt; #{xiaoyuType}
+            </if>
+            <if test="dayuType != null">
+                and  s.nx_COS_type &gt; #{dayuType}
+            </if>
+            <if test="xiaoyuStatus != null">
+                and  s.nx_COS_status &lt; #{xiaoyuStatus}
+            </if>
+            <if test="dayuStatus != null">
+                and  s.nx_COS_status &gt; #{dayuStatus}
+            </if>
+            <if test="status != null">
+                and  s.nx_COS_status =  #{status}
+            </if>
+            <if test="remark != null">
+                and  s.nx_COS_remark =  #{remark}
+            </if>
+        </where>
+    </select>
+
 
     <insert id="save" parameterType="com.nongxinle.entity.NxCommunityOrdersSubEntity" useGeneratedKeys="true"
     keyProperty="nxCommunityOrdersSubId">
@@ -346,7 +513,8 @@
          `nx_COS_print_time`,
          `nx_COS_print_log`,
          `nx_COS_cuc_id`,
-         `nx_COS_huaxian_subtotal`
+         `nx_COS_huaxian_subtotal`,
+         `nx_COS_pindan_orders_id`
          )
         values (#{nxCommunityOrdersSubId},
                 #{nxCosNxGoodsId},
@@ -380,7 +548,9 @@
                 #{nxCosPrintTime},
                 #{nxCosPrintLog},
                 #{nxCosCucId},
-                #{nxCosHuaxianSubtotal}
+                #{nxCosHuaxianSubtotal},
+                #{nxCosPindanOrdersId}
+
                 )
     </insert>
 
@@ -417,6 +587,7 @@
             <if test="nxCosPrintTime != null">`nx_COS_print_time` = #{nxCosPrintTime},</if>
             <if test="nxCosPrintLog != null">`nx_COS_print_log` = #{nxCosPrintLog},</if>
             <if test="nxCosCucId != null">`nx_COS_cuc_id` = #{nxCosCucId},</if>
+            <if test="nxCosPindanOrdersId != null">`nx_COS_pindan_orders_id` = #{nxCosPindanOrdersId},</if>
             <if test="nxCosHuaxianSubtotal != null">`nx_COS_huaxian_subtotal` = #{nxCosHuaxianSubtotal},</if>
             <if test="nxCosAccountUserId != null">`nx_COS_account_user_id` = #{nxCosAccountUserId}</if>
         </set>

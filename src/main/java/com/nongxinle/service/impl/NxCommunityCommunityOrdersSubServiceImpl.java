@@ -76,5 +76,22 @@ public class NxCommunityCommunityOrdersSubServiceImpl implements NxCommunityOrde
 		return nxCommunityOrdersSubDao.queryPrintSubOrders(map);
     }
 
+    @Override
+    public NxCommunityOrdersSubEntity queryChangeSubOrderByParams(Map<String, Object> map) {
+
+		return nxCommunityOrdersSubDao.queryChangeSubOrderByParams(map);
+    }
+
+    @Override
+    public int querySubOrderTotalHuaxianQuantity(Map<String, Object> mapT) {
+
+		return nxCommunityOrdersSubDao.querySubOrderTotalHuaxianQuantity(mapT);
+    }
+
+	@Override
+	public int querySubOrderCount(Map<String, Object> mapT) {
+		return nxCommunityOrdersSubDao.querySubOrderCount(mapT);
+	}
+
 
 }

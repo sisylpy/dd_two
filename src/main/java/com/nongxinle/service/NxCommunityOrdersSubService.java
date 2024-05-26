@@ -1,7 +1,7 @@
 package com.nongxinle.service;
 
 /**
- * 
+ *
  *
  * @author lpy
  * @date 2020-03-22 18:07:28
@@ -37,4 +37,10 @@ public interface NxCommunityOrdersSubService {
     List<NxCommunityOrdersSubEntity> querySubOrdersByParams(Map<String, Object> map);
 
     List<NxCommunityPrintOrdersSubEntity> queryPrintSubOrders(Map<String, Object> map);
+
+    NxCommunityOrdersSubEntity queryChangeSubOrderByParams(Map<String, Object> map);
+
+	int querySubOrderTotalHuaxianQuantity(Map<String, Object> mapT);
+
+    int querySubOrderCount(Map<String, Object> mapT);
 }

@@ -27,6 +27,7 @@
 
 	<resultMap id="userCards" type="NxCustomerUserCardEntity">
 		<id property="nxCustomerUserCardId" column="nx_customer_user_card_id"/>
+		<result property="nxCucaIsSelected" column="nx_cuca_is_selected"/>
 		<result property="nxCucaCardId" column="nx_cuca_card_id"/>
 		<result property="nxCucaCustomerUserId" column="nx_cuca_customer_user_id"/>
 		<result property="nxCucaStartDate" column="nx_cuca_start_date"/>

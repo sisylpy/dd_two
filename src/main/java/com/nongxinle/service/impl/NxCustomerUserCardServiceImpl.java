@@ -58,4 +58,10 @@ public class NxCustomerUserCardServiceImpl implements NxCustomerUserCardService 
 		return nxCustomerUserCardDao.queryUserCardByParams(map);
     }
 
+    @Override
+    public NxCustomerUserCardEntity queryUserGoodsCard(Map<String, Object> map) {
+
+		return nxCustomerUserCardDao.queryUserGoodsCard(map);
+    }
+
 }

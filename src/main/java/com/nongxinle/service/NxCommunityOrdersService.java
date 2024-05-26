@@ -19,9 +19,7 @@ public interface NxCommunityOrdersService {
 	List<NxCommunityOrdersEntity> queryList(Map<String, Object> map);
 	
 	int queryTotal(Map<String, Object> map);
-	
-	void save(NxCommunityOrdersEntity nxOrders);
-	
+
 	void update(NxCommunityOrdersEntity nxOrders);
 	
 	void delete(Integer nxOrdersId);
@@ -29,15 +27,7 @@ public interface NxCommunityOrdersService {
 	void deleteBatch(Integer[] nxOrdersIds);
 
 
-	List<NxCommunityOrdersEntity> queryOrdersToWeigh(Map<String, Object> map);
-
-	void updateSub(NxCommunityOrdersEntity arr);
-
 	List<NxCommunityOrdersEntity> queryOrdersDetail(Map<String, Object> map);
-
-	List<NxCommunityOrdersEntity> queryOrdersPaymentInformation(Map<String, Object> map);
-
-	Integer  updatePaymentStatus(Map<String, Object> map);
 
 	List<NxCommunityOrdersEntity> queryCustomerOrder(Map<String, Object> map);
 

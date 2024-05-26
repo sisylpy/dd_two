@@ -51,6 +51,8 @@ public class NxCommunityGoodsController {
     private NxCommunityCouponService nxCommunityCouponService;
     @Autowired
     private NxCommunityCardService nxCommunityCardService;
+    @Autowired
+    private NxCustomerUserCardService nxCustomerUserCardService;
 
 //
 
@@ -665,7 +667,18 @@ public class NxCommunityGoodsController {
         map.put("goodsId", goodsId);
         map.put("type", type);
         NxCommunityGoodsEntity communityGoodsEntity = cgService.queryRemarkComGoodsDetail(map);
-        return R.ok().put("data", communityGoodsEntity);
+
+        Map<String, Object> mapC = new HashMap<>();
+        mapC.put("userId", orderUserId);
+        mapC.put("goodsId", goodsId);
+        mapC.put("stopTime", formatWhatDay(0));
+        mapC.put("status", 0);
+        System.out.println("cccckckkckkckc" + mapC);
+        NxCustomerUserCardEntity card = nxCustomerUserCardService.queryUserGoodsCard(mapC);
+        Map<String, Object> mapR = new HashMap<>();
+        mapR.put("goods",communityGoodsEntity);
+        mapR.put("card", card);
+        return R.ok().put("data", mapR);
     }
 
 

@@ -121,7 +121,7 @@ public class NxCommunityOrdersController {
         List<NxCommunityOrdersSubEntity> subEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
         if (subEntities.size() > 0) {
             for (NxCommunityOrdersSubEntity subEntity : subEntities) {
-                subEntity.setNxCosStatus(5);
+                subEntity.setNxCosStatus(4);
                 nxCommunityOrdersSubService.update(subEntity);
                 if(subEntity.getNxCosCucId() != null){
                     NxCustomerUserCouponEntity customerUserCouponEntity = nxCustomerUserCouponService.equalObject(subEntity.getNxCosCucId());
@@ -139,6 +139,7 @@ public class NxCommunityOrdersController {
             if(cardEntities.size() > 0){
                 for(NxCustomerUserCardEntity userCardEntity: cardEntities){
                     userCardEntity.setNxCucaStatus(0);
+                    userCardEntity.setNxCucaComOrderId(orders.getNxCommunityOrdersId());
                     nxCustomerUserCardService.update(userCardEntity);
                 }
             }
@@ -155,7 +156,7 @@ public class NxCommunityOrdersController {
         List<NxCommunityOrdersSubEntity> subEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
         if (subEntities.size() > 0) {
             for (NxCommunityOrdersSubEntity subEntity : subEntities) {
-                subEntity.setNxCosStatus(4);
+                subEntity.setNxCosStatus(3);
                 nxCommunityOrdersSubService.update(subEntity);
             }
         }
@@ -620,21 +621,12 @@ public class NxCommunityOrdersController {
             }
         }
 
-
         if (nxOrders.getNxCoBuyMemberCardTime() > 0) {
-            List<NxCommunityCardEntity> nxCommunityCardEntities = nxOrders.getNxCommunityCardEntities();
-            for(NxCommunityCardEntity cardEntity: nxCommunityCardEntities){
-                NxCustomerUserCardEntity userCardEntity = new NxCustomerUserCardEntity();
-                userCardEntity.setNxCucaCardId(cardEntity.getNxCommunityCardId());
-                userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
-                userCardEntity.setNxCucaCustomerUserId(nxOrders.getNxCoUserId());
-                userCardEntity.setNxCucaStartDate(formatWhatDay(0));
-                userCardEntity.setNxCucaStopDate(formatWhatDay(Integer.valueOf(cardEntity.getNxCcEffectiveDays())));
+            List<NxCustomerUserCardEntity> nxCustomerUserCardEntities = nxOrders.getNxCustomerUserCardEntities();
+            for(NxCustomerUserCardEntity userCardEntity: nxCustomerUserCardEntities){
                 userCardEntity.setNxCucaComOrderId(nxOrders.getNxCommunityOrdersId());
-                userCardEntity.setNxCucaStatus(-1);
-                nxCustomerUserCardService.save(userCardEntity);
+                nxCustomerUserCardService.update(userCardEntity);
             }
-
         }
 
         return R.ok().put("data", nxOrders.getNxCommunityOrdersId());
@@ -737,7 +729,6 @@ public class NxCommunityOrdersController {
                 List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
                 if (nxCommunityOrdersSubEntities.size() > 0) {
                     for (NxCommunityOrdersSubEntity subEntity : nxCommunityOrdersSubEntities) {
-                        subEntity.setNxCosBuyStatus(1);
                         subEntity.setNxCosStatus(1);
                         subEntity.setNxCosServiceTime(billEntity.getNxCoServiceTime());
                         subEntity.setNxCosPickUpCode(billEntity.getNxCoWeighNumber());
