@@ -71,6 +71,7 @@
 
 	<resultMap id="comGoods" type="NxCommunityGoodsEntity">
 		<id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
+		<result property="nxCgSellType" column="nx_cg_sell_type"/>
 		<result property="nxCgCardId" column="nx_cg_card_id"/>
 		<result property="nxCgStartTime" column="nx_cg_start_time"/>
 		<result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>

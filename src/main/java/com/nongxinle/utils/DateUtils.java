@@ -381,7 +381,7 @@ public class DateUtils {
         BigDecimal hourMinute = new BigDecimal(hour).multiply(new BigDecimal(60));
         BigDecimal totalMinute = hourMinute.add(new BigDecimal(minute));
         System.out.println("totoamii------------" + totalMinute);
-        BigDecimal printMinute = totalMinute.add(new BigDecimal(what + 1));
+        BigDecimal printMinute = totalMinute.add(new BigDecimal(what));
         System.out.println("printMinuteprintMinuteprintMinute" + printMinute);
 
         return printMinute.toString();

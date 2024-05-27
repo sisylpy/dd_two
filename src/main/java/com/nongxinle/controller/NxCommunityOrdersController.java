@@ -293,7 +293,6 @@ public class NxCommunityOrdersController {
 
         Map<String, Object> map = new HashMap<>();
         map.put("orderId", nxOrdersId);
-        System.out.println("delelelle" + map);
         List<NxCommunityOrdersSubEntity> subEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
         if (subEntities.size() > 0) {
             for (NxCommunityOrdersSubEntity subEntity : subEntities) {
@@ -302,7 +301,8 @@ public class NxCommunityOrdersController {
                     customerUserCouponEntity.setNxCucStatus(0);
                     nxCustomerUserCouponService.update(customerUserCouponEntity);
                 }
-                nxCommunityOrdersSubService.delete(subEntity.getNxCommunityOrdersSubId());
+                subEntity.setNxCosStatus(99);
+                nxCommunityOrdersSubService.update(subEntity);
 
             }
         }
@@ -313,7 +313,10 @@ public class NxCommunityOrdersController {
                 nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
             }
         }
-        nxCommunityOrdersService.delete(nxOrdersId);
+
+        NxCommunityOrdersEntity nxCommunityOrdersEntity = nxCommunityOrdersService.queryObject(nxOrdersId);
+        nxCommunityOrdersEntity.setNxCoStatus(99);
+        nxCommunityOrdersService.update(nxCommunityOrdersEntity);
 
         return R.ok();
     }
@@ -326,7 +329,6 @@ public class NxCommunityOrdersController {
         map.put("offset", (page - 1) * limit);
         map.put("limit", limit);
         map.put("orderUserId", nxOrdersUserId);
-//        map.put("dayuStatus", 1);
         List<NxCommunityOrdersEntity> ordersEntityList = nxCommunityOrdersService.queryCustomerOrder(map);
         int total = nxCommunityOrdersService.queryTotal(map);
 
@@ -413,6 +415,8 @@ public class NxCommunityOrdersController {
 
         Map<String, Object> map = new HashMap<>();
         map.put("id", orderId);
+        map.put("orderType", 1);
+        System.out.println("pinddnddid" + map);
         NxCommunityOrdersEntity ordersEntity = nxCommunityOrdersService.queryPindanDetail(map);
         return R.ok().put("data", ordersEntity);
     }

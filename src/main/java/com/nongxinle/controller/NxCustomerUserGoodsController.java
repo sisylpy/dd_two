@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.nongxinle.entity.NxCommunityGoodsEntity;
+import com.nongxinle.entity.NxCommunityOrdersSubEntity;
+import com.nongxinle.entity.NxCustomerUserCardEntity;
+import com.nongxinle.service.NxCommunityOrdersSubService;
+import com.nongxinle.service.NxCustomerUserCardService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +30,11 @@ public class NxCustomerUserGoodsController {
 
     @Autowired
     private NxCustomerUserGoodsService nxCustomerUserGoodsService;
+    @Autowired
+    private NxCommunityOrdersSubService nxCommunityOrdersSubService;
 
+    @Autowired
+    private NxCustomerUserCardService nxCustomerUserCardService;
 
     @RequestMapping(value = "/userAddLoveGoods", method = RequestMethod.POST)
     @ResponseBody
@@ -76,8 +84,25 @@ public class NxCustomerUserGoodsController {
         map.put("type", 1);
 
         List<NxCustomerUserGoodsEntity> nxCustomerUserGoodsEntities = nxCustomerUserGoodsService.queryUserGoods(map);
+        Map<String, Object> mapA = new HashMap<>();
+        mapA.put("orderUserId", userId);
+        mapA.put("status", -1);
+        mapA.put("orderType", 0);
+        List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
-        return R.ok().put("data", nxCustomerUserGoodsEntities);
+        Map<String, Object> mapC = new HashMap<>();
+        mapC.put("userId", userId);
+        mapC.put("status", -1);
+        mapC.put("type", 0);
+        List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
+
+        Map<String, Object> mapR = new HashMap<>();
+        mapR.put("subOrders", nxCommunityOrdersSubEntities);
+        mapR.put("cardList", cardEntities);
+        mapR.put("goodsArr", nxCustomerUserGoodsEntities);
+        return R.ok().put("data", mapR);
+
+//        return R.ok().put("data", nxCustomerUserGoodsEntities);
     }
 
 //

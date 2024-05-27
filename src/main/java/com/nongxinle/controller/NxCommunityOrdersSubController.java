@@ -12,7 +12,6 @@ import java.util.*;
 
 import com.nongxinle.entity.*;
 import com.nongxinle.service.*;
-import jdk.internal.org.objectweb.asm.tree.IincInsnNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +37,7 @@ public class NxCommunityOrdersSubController {
     private NxCommunityCardService nxCommunityCardService;
     @Autowired
     private NxCustomerUserCardService nxCustomerUserCardService;
+
 
 
     @RequestMapping(value = "/printSubOrders", method = RequestMethod.POST)
@@ -84,7 +84,7 @@ public class NxCommunityOrdersSubController {
 
         map.put("service", 1);
         map.put("date", formatWhatDate(0));
-        map.put("time", formatWhatDayMinute(50));
+        map.put("time", formatWhatDayMinute(30));
         System.out.println("kadnkafdanfdkameiieirpiriririrmap" + map);
         List<NxCommunityPrintOrdersSubEntity> subEntities1 = nxCommunityOrdersSubService.queryPrintSubOrders(map);
         subEntities.addAll(subEntities1);
@@ -101,60 +101,6 @@ public class NxCommunityOrdersSubController {
         return R.ok().put("data", subEntities);
     }
 
-
-//    @RequestMapping(value = "/updateSplicingOrder/{id}")
-//    @ResponseBody
-//    public R updateSplicingOrder(@PathVariable Integer id) {
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("id", id);
-//        map.put("dayuType", 3);
-//        List<NxCommunityOrdersSubEntity> subEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
-//        BigDecimal total = new BigDecimal(0);
-//        BigDecimal youhuiTotal = new BigDecimal(0);
-//        if (subEntities.size() > 0) {
-//            for (NxCommunityOrdersSubEntity subEntity : subEntities) {
-//                BigDecimal subtotal = new BigDecimal(subEntity.getNxCosSubtotal());
-//                total = total.add(subtotal);
-//                if (!subEntity.getNxCosHuaxianDifferentPrice().equals("0")) {
-//                    BigDecimal diffTotal = new BigDecimal(subEntity.getNxCosQuantity()).multiply(new BigDecimal(subEntity.getNxCosHuaxianDifferentPrice()));
-//                    BigDecimal dif = diffTotal.setScale(1, BigDecimal.ROUND_HALF_UP);
-//                    youhuiTotal = youhuiTotal.add(dif);
-//                }
-//            }
-//        }
-//        NxCommunitySplicingOrdersEntity splicingOrdersEntity = nxCommSplicingOrdersService.queryObject(id);
-//        splicingOrdersEntity.setNxCsoTotal(total.toString());
-//        splicingOrdersEntity.setNxCsoYouhuiTotal(youhuiTotal.toString());
-//        nxCommSplicingOrdersService.update(splicingOrdersEntity);
-//
-//        return R.ok();
-//    }
-
-//
-//    @ResponseBody
-//    @RequestMapping("/saveSubOrderPindan")
-//    public R saveSubOrderPindan(@RequestBody NxCommunityOrdersSubEntity nxOrdersSub) {
-//        nxCommunityOrdersSubService.save(nxOrdersSub);
-//        Integer nxCosOrdersId = nxOrdersSub.getNxCosOrdersId();
-//
-//        NxCommunitySplicingOrdersEntity splicingOrdersEntity = nxCommSplicingOrdersService.queryObject(nxCosOrdersId);
-//        BigDecimal decimal = new BigDecimal(splicingOrdersEntity.getNxCsoTotal());
-//        BigDecimal decimal1 = new BigDecimal(nxOrdersSub.getNxCosSubtotal());
-//        BigDecimal total = decimal.add(decimal1).setScale(1, BigDecimal.ROUND_HALF_UP);
-//        splicingOrdersEntity.setNxCsoTotal(total.toString());
-//
-//        if (!nxOrdersSub.getNxCosHuaxianDifferentPrice().equals("0")) {
-//            BigDecimal diffTotal = new BigDecimal(nxOrdersSub.getNxCosQuantity()).multiply(new BigDecimal(nxOrdersSub.getNxCosHuaxianDifferentPrice()));
-//            BigDecimal decimal2 = diffTotal.setScale(1, BigDecimal.ROUND_HALF_UP);
-//            BigDecimal add = new BigDecimal(splicingOrdersEntity.getNxCsoYouhuiTotal()).add(decimal2);
-//            splicingOrdersEntity.setNxCsoYouhuiTotal(add.toString());
-//        }
-//
-//        splicingOrdersEntity.setNxCsoStatus(1);
-//        nxCommSplicingOrdersService.update(splicingOrdersEntity);
-//
-//        return R.ok().put("data", nxOrdersSub);
-//    }
 
 
 
@@ -351,17 +297,16 @@ public class NxCommunityOrdersSubController {
         mapA.put("orderUserId", orderUserId);
         mapA.put("status", -1);
         mapA.put("orderType", orderType);
-        System.out.println("apappapap" + mapA);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
-
-        Map<String, Object> mapR = new HashMap<>();
-        mapR.put("subOrders", nxCommunityOrdersSubEntities);
 
         Map<String, Object> mapC = new HashMap<>();
         mapC.put("userId", orderUserId);
         mapC.put("status", -1);
         mapC.put("type", orderType);
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
+
+        Map<String, Object> mapR = new HashMap<>();
+        mapR.put("subOrders", nxCommunityOrdersSubEntities);
         mapR.put("cardList", cardEntities);
         return R.ok().put("data", mapR);
     }
@@ -372,7 +317,7 @@ public class NxCommunityOrdersSubController {
 
     @ResponseBody
     @RequestMapping(value = "/saveSubOrder", method = RequestMethod.POST)
-    public R saveSubOrder(Integer goodsId, Integer orderUserId, Integer spId, Integer orderType) {
+    public R saveSubOrder(Integer goodsId, Integer orderUserId, Integer spId, Integer orderType, Integer pindanId) {
 
         NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
         NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
@@ -398,6 +343,7 @@ public class NxCommunityOrdersSubController {
         subEntity.setNxCosStatus(-1);
         subEntity.setNxCosType(orderType);
         subEntity.setNxCosSplicingOrdersId(spId);
+        subEntity.setNxCosOrdersId(pindanId);
         nxCommunityOrdersSubService.save(subEntity);
 
         //判断是否是会员卡商品
@@ -405,24 +351,38 @@ public class NxCommunityOrdersSubController {
 
             Map<String, Object> map = new HashMap<>();
             map.put("cardId", goodsEntity.getNxCgCardId());
-            map.put("stopTime", formatWhatDay(0));
             map.put("userId", orderUserId);
             map.put("type", orderType);
+            map.put("status", -1);
+            System.out.println("checkckckckdkusrcarr-1-1--1-1-1-1-1" + map);
             List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(map);
             if (cardEntities.size() == 0) {
-                NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(goodsEntity.getNxCgCardId());
-                NxCustomerUserCardEntity userCardEntity = new NxCustomerUserCardEntity();
-                userCardEntity.setNxCucaStatus(-1);
-                userCardEntity.setNxCucaCustomerUserId(orderUserId);
-                userCardEntity.setNxCucaStartDate(formatWhatDay(0));
-                userCardEntity.setNxCucaStopDate(formatWhatDay(Integer.valueOf(cardEntity.getNxCcEffectiveDays())));
-                userCardEntity.setNxCucaCardId(cardEntity.getNxCommunityCardId());
-                userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
-                userCardEntity.setNxCucaIsSelected(1);
-                userCardEntity.setNxCucaType(orderType);
-                nxCustomerUserCardService.save(userCardEntity);
+                Map<String, Object> mapU = new HashMap<>();
+                mapU.put("cardId", goodsEntity.getNxCgCardId());
+                mapU.put("stopTime", formatWhatDay(0));
+                mapU.put("userId", orderUserId);
+                mapU.put("type", orderType);
+                System.out.println("checkckckckdkusrcarr222222" + mapU);
+                List<NxCustomerUserCardEntity> cardEntitiesU = nxCustomerUserCardService.queryUserCardByParams(mapU);
+                if(cardEntitiesU.size() == 0){
+                    NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(goodsEntity.getNxCgCardId());
+                    NxCustomerUserCardEntity userCardEntity = new NxCustomerUserCardEntity();
+                    userCardEntity.setNxCucaStatus(-1);
+                    userCardEntity.setNxCucaCustomerUserId(orderUserId);
+                    userCardEntity.setNxCucaStartDate(formatWhatDay(0));
+                    userCardEntity.setNxCucaStopDate(formatWhatDay(Integer.valueOf(cardEntity.getNxCcEffectiveDays())));
+                    userCardEntity.setNxCucaCardId(cardEntity.getNxCommunityCardId());
+                    userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
+                    userCardEntity.setNxCucaIsSelected(1);
+                    userCardEntity.setNxCucaType(orderType);
+                    nxCustomerUserCardService.save(userCardEntity);
+
+                }
+
             }
+
         }
+
 
         return R.ok().put("data", subEntity);
 
@@ -431,7 +391,7 @@ public class NxCommunityOrdersSubController {
 
     @RequestMapping(value = "/memberSaveMemberOrderRemark", method = RequestMethod.POST)
     @ResponseBody
-    public R memberSaveMemberOrderRemark (Integer goodsId, Integer orderUserId, String remark, Integer orderType,Integer spId) {
+    public R memberSaveMemberOrderRemark (Integer goodsId, Integer orderUserId, String remark, Integer orderType,Integer spId, Integer pindanId) {
         NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
         Map<String, Object> mapC = new HashMap<>();
         mapC.put("orderUserId", orderUserId);
@@ -504,9 +464,6 @@ public class NxCommunityOrdersSubController {
 
                     } else {
                         //添加信息普通订单
-                        System.out.println("whgoodsnewCommmonssssss" + goodsEntity.getNxCgGoodsName());
-                        System.out.println("idigyigeeiieaaaa");
-
                         NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
                         subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
                         subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
@@ -523,13 +480,14 @@ public class NxCommunityOrdersSubController {
                         subEntity.setNxCosRemark(remark);
                         subEntity.setNxCosType(orderType);
                         subEntity.setNxCosSplicingOrdersId(spId);
+                        subEntity.setNxCosOrdersId(pindanId);
                         nxCommunityOrdersSubService.save(subEntity);
                     }
                 }
             }else{
                 //diyige
                 System.out.println("idigyigeeiie111111111");
-                System.out.println("whgoodsnewCommmonssssss" + goodsEntity.getNxCgGoodsName());
+                System.out.println("whgoodsnewCommmonssssssaa" + goodsEntity.getNxCgGoodsName());
                 NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
                 subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
                 subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
@@ -539,13 +497,15 @@ public class NxCommunityOrdersSubController {
                 subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
                 subEntity.setNxCosQuantity("1");
                 subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-                subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-                subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
-                subEntity.setNxCosHuaxianDifferentPrice("0");
+                subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+                subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+                subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
                 subEntity.setNxCosStatus(-1);
                 subEntity.setNxCosRemark(remark);
                 subEntity.setNxCosType(orderType);
                 subEntity.setNxCosSplicingOrdersId(spId);
+                subEntity.setNxCosOrdersId(pindanId);
+                System.out.println("fakdfalfjaslfjsafahfahef");
                 nxCommunityOrdersSubService.save(subEntity);
             }
 
@@ -556,7 +516,7 @@ public class NxCommunityOrdersSubController {
 
     @ResponseBody
     @RequestMapping(value = "/saveSubOrderRemark", method = RequestMethod.POST)
-    public R saveSubOrderRemark(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId) {
+    public R saveSubOrderRemark(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
 
         NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
         Map<String, Object> map = new HashMap<>();
@@ -566,6 +526,7 @@ public class NxCommunityOrdersSubController {
         map.put("goodsId", goodsId);
         map.put("status", -1);
         map.put("type", orderType);
+        System.out.println("wkwkjekejrelqelwqrekr" + map);
         NxCustomerUserCardEntity userCardEntitys = nxCustomerUserCardService.queryUserGoodsCard(map);
         // 一，如果已经有会员卡
         if (userCardEntitys != null) {
@@ -629,7 +590,7 @@ public class NxCommunityOrdersSubController {
 
                             } else {
                                 //添加信息普通订单
-                                System.out.println("whgoodsnewCommmonssssss" + goodsEntity.getNxCgGoodsName());
+                                System.out.println("whgoodsnewCommmonssssss111" + goodsEntity.getNxCgGoodsName());
                                 NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
                                 subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
                                 subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
@@ -646,6 +607,7 @@ public class NxCommunityOrdersSubController {
                                 subEntity.setNxCosRemark(remark);
                                 subEntity.setNxCosType(orderType);
                                 subEntity.setNxCosSplicingOrdersId(spId);
+                                subEntity.setNxCosOrdersId(pindanId);
                                 nxCommunityOrdersSubService.save(subEntity);
                             }
                         }
@@ -706,6 +668,7 @@ public class NxCommunityOrdersSubController {
                                 subEntity.setNxCosType(orderType);
                                 subEntity.setNxCosSplicingOrdersId(spId);
                                 subEntity.setNxCosRemark(remark);
+                                subEntity.setNxCosOrdersId(pindanId);
                                 nxCommunityOrdersSubService.save(subEntity);
                             } else {
                                 NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
@@ -724,9 +687,32 @@ public class NxCommunityOrdersSubController {
                                 subEntity.setNxCosRemark(remark);
                                 subEntity.setNxCosType(orderType);
                                 subEntity.setNxCosSplicingOrdersId(spId);
+                                subEntity.setNxCosOrdersId(pindanId);
                                 nxCommunityOrdersSubService.save(subEntity);
                             }
 
+                        }else{
+                            //diyige
+                            NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                            subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                            subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                            subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                            subEntity.setNxCosOrderUserId(orderUserId);
+                            subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                            subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                            subEntity.setNxCosQuantity("1");
+                            subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                            subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+                            subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+                            subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                            subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
+                            subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                            subEntity.setNxCosStatus(-1);
+                            subEntity.setNxCosType(orderType);
+                            subEntity.setNxCosSplicingOrdersId(spId);
+                            subEntity.setNxCosRemark(remark);
+                            subEntity.setNxCosOrdersId(pindanId);
+                            nxCommunityOrdersSubService.save(subEntity);
                         }
 
 
@@ -775,6 +761,7 @@ public class NxCommunityOrdersSubController {
                     subEntity.setNxCosRemark(remark);
                     subEntity.setNxCosType(orderType);
                     subEntity.setNxCosSplicingOrdersId(spId);
+                    subEntity.setNxCosOrdersId(pindanId);
                     nxCommunityOrdersSubService.save(subEntity);
                 }
             }
@@ -802,6 +789,7 @@ public class NxCommunityOrdersSubController {
             subEntity.setNxCosRemark(remark);
             subEntity.setNxCosType(orderType);
             subEntity.setNxCosSplicingOrdersId(spId);
+            subEntity.setNxCosOrdersId(pindanId);
             nxCommunityOrdersSubService.save(subEntity);
 
             NxCustomerUserCardEntity userCardEntity = new NxCustomerUserCardEntity();
@@ -834,7 +822,7 @@ public class NxCommunityOrdersSubController {
 
     @ResponseBody
     @RequestMapping(value = "/saveSubOrderRemarkHuaxian", method = RequestMethod.POST)
-    public R saveSubOrderRemarkHuaxian(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId) {
+    public R saveSubOrderRemarkHuaxian(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
         NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
         //一，如果已经有会员卡，则按照优惠订单保存
 
@@ -927,6 +915,7 @@ public class NxCommunityOrdersSubController {
                             subEntity.setNxCosRemark(remark);
                             subEntity.setNxCosType(orderType);
                             subEntity.setNxCosSplicingOrdersId(spId);
+                            subEntity.setNxCosOrdersId(pindanId);
                             nxCommunityOrdersSubService.save(subEntity);
                             //todo zehliyouwent 111
                         }
@@ -969,6 +958,7 @@ public class NxCommunityOrdersSubController {
                             subEntity.setNxCosRemark(remark);
                             subEntity.setNxCosType(orderType);
                             subEntity.setNxCosSplicingOrdersId(spId);
+                            subEntity.setNxCosOrdersId(pindanId);
                             nxCommunityOrdersSubService.save(subEntity);
                         } else {
 
@@ -1008,6 +998,7 @@ public class NxCommunityOrdersSubController {
                                 subEntity.setNxCosRemark(remark);
                                 subEntity.setNxCosType(orderType);
                                 subEntity.setNxCosSplicingOrdersId(spId);
+                                subEntity.setNxCosOrdersId(pindanId);
                                 nxCommunityOrdersSubService.save(subEntity);
                             }
                         }
@@ -1033,6 +1024,7 @@ public class NxCommunityOrdersSubController {
                     subEntity.setNxCosRemark(remark);
                     subEntity.setNxCosType(orderType);
                     subEntity.setNxCosSplicingOrdersId(spId);
+                    subEntity.setNxCosOrdersId(pindanId);
                         nxCommunityOrdersSubService.save(subEntity);
                     }
                 }
@@ -1076,6 +1068,7 @@ public class NxCommunityOrdersSubController {
                     subEntity.setNxCosRemark(remark);
                     subEntity.setNxCosType(orderType);
                     subEntity.setNxCosSplicingOrdersId(spId);
+                    subEntity.setNxCosOrdersId(pindanId);
                     nxCommunityOrdersSubService.save(subEntity);
                 }
             }
@@ -1103,6 +1096,7 @@ public class NxCommunityOrdersSubController {
             subEntity.setNxCosRemark(remark);
             subEntity.setNxCosType(orderType);
             subEntity.setNxCosSplicingOrdersId(spId);
+            subEntity.setNxCosOrdersId(pindanId);
             nxCommunityOrdersSubService.save(subEntity);
 
             NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(goodsEntity.getNxCgCardId());
@@ -1128,7 +1122,7 @@ public class NxCommunityOrdersSubController {
 
     @ResponseBody
     @RequestMapping(value = "/addGoodsOrder", method = RequestMethod.POST)
-    public R addGoodsOrder(Integer goodsId, Integer orderUserId, Integer orderType, Integer spId) {
+    public R addGoodsOrder(Integer goodsId, Integer orderUserId, Integer orderType, Integer spId, Integer pindanId) {
 
         NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
         if (goodsEntity.getNxCgGoodsHuaxianPrice() == null) {
@@ -1213,6 +1207,7 @@ public class NxCommunityOrdersSubController {
                         subEntity.setNxCosStatus(-1);
                         subEntity.setNxCosType(orderType);
                         subEntity.setNxCosSplicingOrdersId(spId);
+                        subEntity.setNxCosOrdersId(pindanId);
                         nxCommunityOrdersSubService.save(subEntity);
                     }
                 }
@@ -1223,7 +1218,7 @@ public class NxCommunityOrdersSubController {
         Map<String, Object> mapA = new HashMap<>();
         mapA.put("orderUserId", orderUserId);
         mapA.put("status", -1);
-        mapA.put("xiaoyuGoodsType", 4);
+        mapA.put("oderType", orderType);
         System.out.println("apappapap" + mapA);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
@@ -1315,7 +1310,6 @@ public class NxCommunityOrdersSubController {
         Map<String, Object> mapA = new HashMap<>();
         mapA.put("orderUserId", orderUserId);
         mapA.put("status", -1);
-        mapA.put("xiaoyuGoodsType", 4);
         mapA.put("orderType", orderType);
         System.out.println("apappapap" + mapA);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);

@@ -103,6 +103,14 @@ public class NxCommunitySplicingOrdersController {
 
 
 
+	@RequestMapping(value = "/editSplicingOrder/{id}")
+	@ResponseBody
+	public R editSplicingOrder(@PathVariable Integer id) {
+		NxCommunitySplicingOrdersEntity splicingOrdersEntity = nxCommSplicingOrdersService.queryObject(id);
+		splicingOrdersEntity.setNxCsoStatus(1);
+		nxCommSplicingOrdersService.update(splicingOrdersEntity);
+		return R.ok();
+	}
 
 	@RequestMapping(value = "/saveSplincingOrder", method = RequestMethod.POST)
 	@ResponseBody

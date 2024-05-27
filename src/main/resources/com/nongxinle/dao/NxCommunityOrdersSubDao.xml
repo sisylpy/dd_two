@@ -42,6 +42,7 @@
     </resultMap>
     <resultMap id="commGoods" type="NxCommunityGoodsEntity">
         <id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
+		<result property="nxCgSellType" column="nx_cg_sell_type"/>
         <result property="nxCgCardId" column="nx_cg_card_id"/>
         <result property="nxCgStartTime" column="nx_cg_start_time"/>
         <result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>
@@ -309,7 +310,7 @@
                 and  s.nx_COS_service =  #{service}
             </if>
             <if test="time != null">
-                and  s.nx_COS_service_time &lt;  #{time}
+                and  s.nx_COS_service_time &gt;  #{time}
             </if>
         </where>
          limit 1

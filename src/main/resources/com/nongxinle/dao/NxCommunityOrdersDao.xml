@@ -11,6 +11,7 @@
 
 	<resultMap id="commGoods" type="NxCommunityGoodsEntity">
 		<id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
+		<result property="nxCgSellType" column="nx_cg_sell_type"/>
 		<result property="nxCgCardId" column="nx_cg_card_id"/>
 		<result property="nxCgStartTime" column="nx_cg_start_time"/>
 		<result property="nxCgStartTimeZone" column="nx_cg_start_time_zone"/>
@@ -248,9 +249,20 @@
     </select>
 
 	<select id="queryCustomerOrder" resultMap="ordersInformation">
-		select * from nx_community_orders as o
+		select * ,
+		deliveryUser.nx_CU_user_id 'delivery_nx_CU_user_id',
+		deliveryUser.nx_CU_customer_id 'delivery_nx_CU_customer_id',
+		deliveryUser.nx_CU_wx_avatar_url 'delivery_nx_CU_wx_avatar_url',
+		deliveryUser.nx_CU_wx_nick_name 'delivery_nx_CU_wx_nick_name',
+		deliveryCus.nx_customer_id 'delivery_nx_customer_id',
+		deliveryCus.nx_customer_card_waste_date 'delivery_nx_customer_card_waste_date'
+		from nx_community_orders as o
+		left join nx_community_splicing_orders as sp on sp.nx_cso_co_order_id = o.nx_community_orders_id
 			left join nx_community_orders_sub as s on s.nx_COS_orders_id = o.nx_community_orders_id
-			left join nx_community_goods as ncg  on ncg.nx_community_goods_id = s.nx_COS_community_goods_id
+		    left join nx_customer_user as deliveryUser on deliveryUser.nx_CU_user_id = o.nx_CO_user_id
+		left join nx_customer   as deliveryCus on deliveryCus.nx_customer_id = deliveryUser.nx_CU_customer_id
+
+		left join nx_community_goods as ncg  on ncg.nx_community_goods_id = s.nx_COS_community_goods_id
 		left join nx_customer_user_card as ncuc on ncuc.nx_cuca_com_order_id = o.nx_community_orders_id
 		left join nx_community_card as ncc  on ncc.nx_community_card_id = ncuc.nx_cuca_card_id
 
@@ -352,7 +364,6 @@
 		<result property="nxCoWeighNumber" column="nx_CO_weigh_number"/>
 		<result property="nxCoWxOutTradeNo" column="nx_CO_wx_out_trade_no"/>
 		<result property="nxCoTotal" column="nx_CO_total"/>
-
 		<association property="deliveryUser" resultMap="deliveryUser"/>
 		<collection property="nxOrdersSubEntities" resultMap="subOrders"/>
 		<collection property="allSplicingOrders" resultMap="orderUserSplicingOrder"/>
@@ -586,8 +597,8 @@
 		and spSub.nx_COS_type = #{orderType}
 		 left join nx_customer_user as asOrderUser on asOrderUser.nx_CU_user_id = ncso.nx_cso_user_id
 		  left join nx_customer as asOrderCus    on asOrderCus.nx_customer_id = asOrderUser.nx_CU_customer_id
-		left join nx_customer_user_card as nccc  on   nccc.nx_cuca_status = -1 and nccc.nx_cuca_type = 1
-		           and nccc.nx_cuca_customer_user_id = ncso.nx_cso_user_id
+		left join nx_customer_user_card as nccc  on   nccc.nx_cuca_status = -1 and nccc.nx_cuca_status = -1
+		           and nccc.nx_cuca_customer_user_id = ncso.nx_cso_user_id and nccc.nx_cuca_type = #{orderType}
 		left join nx_community_card as ncc  on ncc.nx_community_card_id = nccc.nx_cuca_card_id
 		 left join nx_community_goods as ncg on ncg.nx_community_goods_id = spSub.nx_COS_community_goods_id
 
