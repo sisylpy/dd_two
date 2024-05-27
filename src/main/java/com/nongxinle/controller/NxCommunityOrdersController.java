@@ -67,8 +67,8 @@ public class NxCommunityOrdersController {
         Map<String, Object> map = new HashMap<>();
         map.put("id", id);
         List<NxCommunityOrdersSubEntity> subEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
-        if(subEntities.size() > 0){
-            for(NxCommunityOrdersSubEntity subEntity: subEntities){
+        if (subEntities.size() > 0) {
+            for (NxCommunityOrdersSubEntity subEntity : subEntities) {
                 subEntity.setNxCosService("0");
                 subEntity.setNxCosServiceDate(formatWhatDate(0));
                 subEntity.setNxCosServiceTime(add.toString());
@@ -123,7 +123,7 @@ public class NxCommunityOrdersController {
             for (NxCommunityOrdersSubEntity subEntity : subEntities) {
                 subEntity.setNxCosStatus(4);
                 nxCommunityOrdersSubService.update(subEntity);
-                if(subEntity.getNxCosCucId() != null){
+                if (subEntity.getNxCosCucId() != null) {
                     NxCustomerUserCouponEntity customerUserCouponEntity = nxCustomerUserCouponService.equalObject(subEntity.getNxCosCucId());
                     customerUserCouponEntity.setNxCucStatus(3);
                     nxCustomerUserCouponService.update(customerUserCouponEntity);
@@ -132,12 +132,12 @@ public class NxCommunityOrdersController {
         }
         orders.setNxCoStatus(5);
         nxCommunityOrdersService.update(orders);
-        if(orders.getNxCoBuyMemberCardTime() == 1){
+        if (orders.getNxCoBuyMemberCardTime() == 1) {
             Map<String, Object> mapC = new HashMap<>();
             mapC.put("orderId", orders.getNxCommunityOrdersId());
             List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
-            if(cardEntities.size() > 0){
-                for(NxCustomerUserCardEntity userCardEntity: cardEntities){
+            if (cardEntities.size() > 0) {
+                for (NxCustomerUserCardEntity userCardEntity : cardEntities) {
                     userCardEntity.setNxCucaStatus(0);
                     userCardEntity.setNxCucaComOrderId(orders.getNxCommunityOrdersId());
                     nxCustomerUserCardService.update(userCardEntity);
@@ -186,7 +186,7 @@ public class NxCommunityOrdersController {
         nxCommunityOrdersService.delete(id);
         Map<String, Object> map = new HashMap<>();
         map.put("id", id);
-        System.out.println("iddiididid"+map);
+        System.out.println("iddiididid" + map);
         List<NxCommunitySplicingOrdersEntity> splicingOrdersEntities = nxCommunitySplicingOrdersService.querySplicingListByParams(map);
         if (splicingOrdersEntities.size() > 0) {
             for (NxCommunitySplicingOrdersEntity splicingOrdersEntity : splicingOrdersEntities) {
@@ -197,6 +197,16 @@ public class NxCommunityOrdersController {
                 if (subEntities.size() > 0) {
                     for (NxCommunityOrdersSubEntity subEntity : subEntities) {
                         nxCommunityOrdersSubService.delete(subEntity.getNxCommunityOrdersSubId());
+                    }
+                }
+                Map<String, Object> mapC = new HashMap<>();
+                mapC.put("status", -1);
+                mapC.put("type", 1);
+                mapC.put("userId", splicingOrdersEntity.getNxCsoUserId());
+                List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
+                if (cardEntities.size() > 0) {
+                    for (NxCustomerUserCardEntity userCardEntity : cardEntities) {
+                        nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
                     }
                 }
             }
@@ -232,52 +242,6 @@ public class NxCommunityOrdersController {
     }
 
 
-    @RequestMapping(value = "/getMyPindanDetail", method = RequestMethod.POST)
-    @ResponseBody
-    public R getMyPindanDetail(Integer pindanId, Integer orderUserId) {
-
-        NxCommunitySplicingOrdersEntity splicingOrdersEntity = new NxCommunitySplicingOrdersEntity();
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", pindanId);
-        System.out.println("pindfiaifajfamamma" + map);
-        NxCommunityOrdersEntity nxCommunityOrdersEntity = nxCommunityOrdersService.queryPindanDetail(map);
-        if (nxCommunityOrdersEntity != null) {
-            Map<String, Object> mapO = new HashMap<>();
-            mapO.put("id", pindanId);
-            mapO.put("orderUserId", orderUserId);
-            System.out.println("spsoosmappa" + mapO);
-            NxCommunitySplicingOrdersEntity deliverySplicingOrder = nxCommunitySplicingOrdersService.queryNewPindan(mapO);
-            if (deliverySplicingOrder == null) {
-                NxCustomerUserEntity userEntity = nxCustomerUserService.queryObject(orderUserId);
-                splicingOrdersEntity.setNxCsoCustomerId(userEntity.getNxCuCustomerId());
-                splicingOrdersEntity.setNxCsoUserId(orderUserId);
-                splicingOrdersEntity.setNxCsoCoOrderId(pindanId);
-                splicingOrdersEntity.setNxCsoStatus(0);
-                splicingOrdersEntity.setNxCsoCustomerId(userEntity.getNxCuCustomerId());
-                splicingOrdersEntity.setNxCsoYouhuiTotal("0");
-                splicingOrdersEntity.setNxCsoTotal("0");
-                splicingOrdersEntity.setNxCsoCommunityId(nxCommunityOrdersEntity.getNxCoCommunityId());
-                splicingOrdersEntity.setNxCsoDate(formatWhatDate(0));
-                nxCommunitySplicingOrdersService.save(splicingOrdersEntity);
-
-                splicingOrdersEntity.setOrderUser(userEntity);
-                nxCommunityOrdersEntity = nxCommunityOrdersService.queryPindanDetail(map);
-                nxCommunityOrdersEntity.setOrderUserSplicingOrder(splicingOrdersEntity);
-
-            } else {
-                NxCustomerUserEntity userEntity = nxCustomerUserService.queryObject(orderUserId);
-                deliverySplicingOrder.setOrderUser(userEntity);
-                nxCommunityOrdersEntity.setOrderUserSplicingOrder(deliverySplicingOrder);
-            }
-
-            return R.ok().put("data", nxCommunityOrdersEntity);
-        } else {
-            return R.error(-1, "拼单取消");
-        }
-
-
-    }
-
     @RequestMapping(value = "/customerIndexData", method = RequestMethod.POST)
     @ResponseBody
     public R customerIndexData(Integer commId, Integer orderUserId) {
@@ -299,59 +263,21 @@ public class NxCommunityOrdersController {
         Map<String, Object> mapC = new HashMap<>();
         mapC.put("commId", commId);
         mapC.put("status", 0);
-        NxCommunityCouponEntity communityCouponEntity =  nxCommunityCouponService.queryCustomerShowCoupon(mapC);
-        if(communityCouponEntity != null){
+        NxCommunityCouponEntity communityCouponEntity = nxCommunityCouponService.queryCustomerShowCoupon(mapC);
+        if (communityCouponEntity != null) {
             Map<String, Object> mapIF = new HashMap<>();
             mapIF.put("coupId", communityCouponEntity.getNxCommunityCouponId());
             mapIF.put("userId", orderUserId);
             List<NxCustomerUserCouponEntity> nxCustomerUserCouponEntities = nxCustomerUserCouponService.queryUserCouponListByParams(mapIF);
-            if(nxCustomerUserCouponEntities.size() == 0){
+            if (nxCustomerUserCouponEntities.size() == 0) {
                 map.put("coupon", communityCouponEntity);
-            }else{
+            } else {
                 map.put("coupon", null);
             }
-        }else{
+        } else {
             map.put("coupon", null);
         }
         return R.ok().put("data", map);
-    }
-
-
-    @RequestMapping(value = "/deliverySavePindan", method = RequestMethod.POST)
-    @ResponseBody
-    public R deliverySavePindan(Integer commId, Integer deliveryUserId) {
-
-        NxCommunityOrdersEntity ordersEntity = new NxCommunityOrdersEntity();
-        ordersEntity.setNxCoUserId(deliveryUserId);
-        ordersEntity.setNxCoDeliveryUserId(deliveryUserId);
-        ordersEntity.setNxCoCommunityId(commId);
-        ordersEntity.setNxCoType(4);
-        ordersEntity.setNxCoStatus(0);
-        nxCommunityOrdersService.justSave(ordersEntity);
-
-
-        NxCustomerUserEntity userEntity = nxCustomerUserService.queryObject(deliveryUserId);
-        NxCommunitySplicingOrdersEntity splicingOrdersEntity = new NxCommunitySplicingOrdersEntity();
-        splicingOrdersEntity.setNxCsoUserId(deliveryUserId);
-        splicingOrdersEntity.setNxCsoCoOrderId(ordersEntity.getNxCommunityOrdersId());
-        splicingOrdersEntity.setNxCsoStatus(0);
-        splicingOrdersEntity.setNxCsoCommunityId(userEntity.getNxCuCommunityId());
-        splicingOrdersEntity.setNxCsoCustomerId(userEntity.getNxCuCustomerId());
-        splicingOrdersEntity.setNxCsoTotal("0");
-        splicingOrdersEntity.setNxCsoYouhuiTotal("0");
-        splicingOrdersEntity.setNxCsoDate(formatWhatDate(0));
-        nxCommunitySplicingOrdersService.save(splicingOrdersEntity);
-        splicingOrdersEntity.setOrderUser(userEntity);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", ordersEntity.getNxCommunityOrdersId());
-        System.out.println("dfadfasfsa" + map);
-        ordersEntity = nxCommunityOrdersService.queryPindanDetail(map);
-        ordersEntity.setOrderUserSplicingOrder(splicingOrdersEntity);
-
-//        System.out.println("fdkfalskfjas;f" + ordersEntity.getAllSplicingOrders().size()) ;
-//        webSocketEndPoint.sendWarnToComAllUser(ordersEntity.getNxCoCommunityId().toString(), ordersEntity.getNxCommunityOrdersId().toString());
-        return R.ok().put("data", ordersEntity);
     }
 
 
@@ -371,7 +297,7 @@ public class NxCommunityOrdersController {
         List<NxCommunityOrdersSubEntity> subEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
         if (subEntities.size() > 0) {
             for (NxCommunityOrdersSubEntity subEntity : subEntities) {
-                if(subEntity.getNxCosCucId() != null){
+                if (subEntity.getNxCosCucId() != null) {
                     NxCustomerUserCouponEntity customerUserCouponEntity = nxCustomerUserCouponService.equalObject(subEntity.getNxCosCucId());
                     customerUserCouponEntity.setNxCucStatus(0);
                     nxCustomerUserCouponService.update(customerUserCouponEntity);
@@ -382,16 +308,12 @@ public class NxCommunityOrdersController {
         }
 
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(map);
-        if(cardEntities.size() > 0){
-            for(NxCustomerUserCardEntity userCardEntity: cardEntities){
+        if (cardEntities.size() > 0) {
+            for (NxCustomerUserCardEntity userCardEntity : cardEntities) {
                 nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
             }
         }
         nxCommunityOrdersService.delete(nxOrdersId);
-
-        //todo
-        //wxtuikuan
-
 
         return R.ok();
     }
@@ -478,7 +400,7 @@ public class NxCommunityOrdersController {
     public R getOrderDetail(@PathVariable Integer orderId) {
 
         Map<String, Object> map = new HashMap<>();
-        map.put("id",orderId );
+        map.put("id", orderId);
         System.out.println("dfodaof" + map);
         NxCommunityOrdersEntity ordersEntity = nxCommunityOrdersService.queryOrdersItemDetail(map);
         System.out.println("wwwhwhhwhwhwhhwhw" + ordersEntity);
@@ -594,6 +516,137 @@ public class NxCommunityOrdersController {
     }
 
 
+    @RequestMapping(value = "/deliverySavePindan", method = RequestMethod.POST)
+    @ResponseBody
+    public R deliverySavePindan(Integer commId, Integer deliveryUserId) {
+
+        NxCustomerUserEntity userEntity = nxCustomerUserService.queryObject(deliveryUserId);
+        NxCommunityOrdersEntity ordersEntity = new NxCommunityOrdersEntity();
+        ordersEntity.setNxCoUserId(deliveryUserId);
+        ordersEntity.setNxCoDeliveryUserId(deliveryUserId);
+        ordersEntity.setNxCoCommunityId(commId);
+        ordersEntity.setNxCoCustomerId(userEntity.getNxCuCustomerId());
+        ordersEntity.setNxCoType(1);
+        ordersEntity.setNxCoStatus(-1);
+        nxCommunityOrdersService.justSave(ordersEntity);
+
+
+        NxCommunitySplicingOrdersEntity splicingOrdersEntity = new NxCommunitySplicingOrdersEntity();
+        splicingOrdersEntity.setNxCsoUserId(deliveryUserId);
+        splicingOrdersEntity.setNxCsoCoOrderId(ordersEntity.getNxCommunityOrdersId());
+        splicingOrdersEntity.setNxCsoStatus(0);
+        splicingOrdersEntity.setNxCsoCommunityId(userEntity.getNxCuCommunityId());
+        splicingOrdersEntity.setNxCsoCustomerId(userEntity.getNxCuCustomerId());
+        splicingOrdersEntity.setNxCsoTotal("0");
+        splicingOrdersEntity.setNxCsoYouhuiTotal("0");
+        splicingOrdersEntity.setNxCsoDate(formatWhatDate(0));
+        nxCommunitySplicingOrdersService.save(splicingOrdersEntity);
+        splicingOrdersEntity.setOrderUser(userEntity);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", ordersEntity.getNxCommunityOrdersId());
+        System.out.println("dfadfasfsa" + map);
+        ordersEntity = nxCommunityOrdersService.queryPindanDetail(map);
+        ordersEntity.setOrderUserSplicingOrder(splicingOrdersEntity);
+
+        return R.ok().put("data", ordersEntity);
+    }
+
+
+    @RequestMapping(value = "/getMyPindanDetail", method = RequestMethod.POST)
+    @ResponseBody
+    public R getMyPindanDetail(Integer pindanId, Integer orderUserId) {
+
+        NxCommunitySplicingOrdersEntity splicingOrdersEntity = new NxCommunitySplicingOrdersEntity();
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", pindanId);
+        map.put("orderType", 1);
+        System.out.println("pindfiaifajfamamma" + map);
+        NxCommunityOrdersEntity nxCommunityOrdersEntity = nxCommunityOrdersService.queryPindanDetail(map);
+        if (nxCommunityOrdersEntity != null) {
+            Map<String, Object> mapO = new HashMap<>();
+            mapO.put("id", pindanId);
+            mapO.put("orderUserId", orderUserId);
+            mapO.put("orderType", 1);
+            System.out.println("spsoosmappa" + mapO);
+            NxCommunitySplicingOrdersEntity deliverySplicingOrder = nxCommunitySplicingOrdersService.queryNewPindan(mapO);
+            if (deliverySplicingOrder == null) {
+                NxCustomerUserEntity userEntity = nxCustomerUserService.queryObject(orderUserId);
+                splicingOrdersEntity.setNxCsoCustomerId(userEntity.getNxCuCustomerId());
+                splicingOrdersEntity.setNxCsoUserId(orderUserId);
+                splicingOrdersEntity.setNxCsoCoOrderId(pindanId);
+                splicingOrdersEntity.setNxCsoStatus(0);
+                splicingOrdersEntity.setNxCsoCustomerId(userEntity.getNxCuCustomerId());
+                splicingOrdersEntity.setNxCsoYouhuiTotal("0");
+                splicingOrdersEntity.setNxCsoTotal("0");
+                splicingOrdersEntity.setNxCsoCommunityId(nxCommunityOrdersEntity.getNxCoCommunityId());
+                splicingOrdersEntity.setNxCsoDate(formatWhatDate(0));
+                nxCommunitySplicingOrdersService.save(splicingOrdersEntity);
+
+                splicingOrdersEntity.setOrderUser(userEntity);
+                nxCommunityOrdersEntity = nxCommunityOrdersService.queryPindanDetail(map);
+                nxCommunityOrdersEntity.setOrderUserSplicingOrder(splicingOrdersEntity);
+
+            } else {
+                NxCustomerUserEntity userEntity = nxCustomerUserService.queryObject(orderUserId);
+                deliverySplicingOrder.setOrderUser(userEntity);
+                nxCommunityOrdersEntity.setOrderUserSplicingOrder(deliverySplicingOrder);
+            }
+
+            return R.ok().put("data", nxCommunityOrdersEntity);
+        } else {
+            return R.error(-1, "拼单取消");
+        }
+
+
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/pindanSaveOrder", method = RequestMethod.POST)
+    public R pindanSaveOrder(@RequestBody NxCommunityOrdersEntity nxOrders) {
+
+        System.out.println(nxOrders);
+        nxOrders.setNxCoDate(formatWhatDate(0));
+        nxOrders.setNxCoStatus(0);
+        String pickUpCode = generatePickNumber(3);
+        nxOrders.setNxCoWeighNumber(pickUpCode);
+        BigDecimal multiply = new BigDecimal(nxOrders.getNxCoServiceHour()).multiply(new BigDecimal(60));
+        BigDecimal add = multiply.add(new BigDecimal(nxOrders.getNxCoServiceMinute()));
+        nxOrders.setNxCoServiceTime(add.toString());
+        nxOrders.setNxCoDate(formatWhatDate(0));
+        nxCommunityOrdersService.update(nxOrders);
+
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", nxOrders.getNxCommunityOrdersId());
+
+        List<NxCommunitySplicingOrdersEntity> nxCommunitySplicingOrdersEntities = nxCommunitySplicingOrdersService.querySplicingListByParams(map);
+        if (nxCommunitySplicingOrdersEntities.size() > 0) {
+            for (NxCommunitySplicingOrdersEntity splicingOrdersEntity : nxCommunitySplicingOrdersEntities) {
+
+                splicingOrdersEntity.setNxCsoStatus(3);
+                nxCommunitySplicingOrdersService.update(splicingOrdersEntity);
+
+                Map<String, Object> mapSp = new HashMap<>();
+                mapSp.put("splicingOrderId", splicingOrdersEntity.getNxCommunitySplicingOrdersId());
+                List<NxCommunityOrdersSubEntity> nxOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapSp);
+                if (nxOrdersSubEntities.size() > 0) {
+                    for (NxCommunityOrdersSubEntity subEntity : nxOrdersSubEntities) {
+                        subEntity.setNxCosOrdersId(nxOrders.getNxCommunityOrdersId());
+                        subEntity.setNxCosStatus(0);
+                        nxCommunityOrdersSubService.update(subEntity);
+                    }
+                }
+
+            }
+        }
+
+
+        return R.ok().put("data", nxOrders.getNxCommunityOrdersId());
+
+    }
+
     @ResponseBody
     @RequestMapping(value = "/customerSaveOrder", method = RequestMethod.POST)
     public R customerSaveOrder(@RequestBody NxCommunityOrdersEntity nxOrders) {
@@ -602,7 +655,6 @@ public class NxCommunityOrdersController {
         nxOrders.setNxCoDate(formatWhatDate(0));
         nxOrders.setNxCoStatus(0);
         nxOrders.setNxCoType(0);
-        nxOrders.setNxCoPaymentStatus(0);
         String pickUpCode = generatePickNumber(3);
         nxOrders.setNxCoWeighNumber(pickUpCode);
         BigDecimal multiply = new BigDecimal(nxOrders.getNxCoServiceHour()).multiply(new BigDecimal(60));
@@ -612,18 +664,17 @@ public class NxCommunityOrdersController {
         nxCommunityOrdersService.justSaveWithUserGoods(nxOrders);
 
         List<NxCommunityOrdersSubEntity> nxOrdersSubEntities = nxOrders.getNxOrdersSubEntities();
-        if(nxOrdersSubEntities.size() > 0){
-            for(NxCommunityOrdersSubEntity subEntity: nxOrdersSubEntities){
+        if (nxOrdersSubEntities.size() > 0) {
+            for (NxCommunityOrdersSubEntity subEntity : nxOrdersSubEntities) {
                 subEntity.setNxCosOrdersId(nxOrders.getNxCommunityOrdersId());
                 subEntity.setNxCosStatus(0);
-                subEntity.setNxCosType(0);
                 nxCommunityOrdersSubService.update(subEntity);
             }
         }
 
         if (nxOrders.getNxCoBuyMemberCardTime() > 0) {
             List<NxCustomerUserCardEntity> nxCustomerUserCardEntities = nxOrders.getNxCustomerUserCardEntities();
-            for(NxCustomerUserCardEntity userCardEntity: nxCustomerUserCardEntities){
+            for (NxCustomerUserCardEntity userCardEntity : nxCustomerUserCardEntities) {
                 userCardEntity.setNxCucaComOrderId(nxOrders.getNxCommunityOrdersId());
                 nxCustomerUserCardService.update(userCardEntity);
             }
@@ -677,6 +728,8 @@ public class NxCommunityOrdersController {
             String s = WxPayUtils.creatSign(reMap, config.getKey());
             reMap.put("paySign", s);
 
+            nxOrders.setNxCoStatus(1);
+            nxOrders.setNxCoPaymentStatus(0);
             nxOrders.setNxCoWxOutTradeNo(tradeNo);
             nxCommunityOrdersService.update(nxOrders);
             reMap.put("orderId", nxOrders.getNxCommunityOrdersId().toString());
@@ -723,7 +776,6 @@ public class NxCommunityOrdersController {
 
                 nxCommunityOrdersService.update(billEntity);
 
-
                 Map<String, Object> map = new HashMap<>();
                 map.put("orderId", billEntity.getNxCommunityOrdersId());
                 List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
@@ -736,13 +788,15 @@ public class NxCommunityOrdersController {
                         subEntity.setNxCosServiceDate(billEntity.getNxCoServiceDate());
                         subEntity.setNxCosServiceTime(billEntity.getNxCoServiceTime());
                         nxCommunityOrdersSubService.update(subEntity);
-                        if(subEntity.getNxCosCucId() != null){
+                        if (subEntity.getNxCosCucId() != null) {
                             NxCustomerUserCouponEntity customerUserCouponEntity = nxCustomerUserCouponService.equalObject(subEntity.getNxCosCucId());
                             customerUserCouponEntity.setNxCucStatus(2);
                             nxCustomerUserCouponService.update(customerUserCouponEntity);
                         }
                     }
                 }
+
+
             }
 
             // 告诉微信服务器收到信息了，不要在调用回调action了========这里很重要回复微信服务器信息用流发送一个xml即可

@@ -99,7 +99,7 @@
 
     <resultMap id="subOrders" type="NxCommunityOrdersSubEntity">
          <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
-        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
+        <result property="nxCosSplicingOrdersId" column="nx_COS_splicing_orders_id"/>
 		<result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
 		<result property="nxCosCucId" column="nx_cos_cuc_id"/>
 		<result property="nxCosStatus" column="nx_cos_status"/>
@@ -238,19 +238,19 @@
                 and  nx_COS_orders_id = #{orderId}
             </if>
             <if test="splicingOrderId != null">
-                and  nx_COS_orders_id = #{splicingOrderId}
+                and  s.nx_COS_splicing_orders_id = #{splicingOrderId}
             </if>
             <if test="orderUserId != null">
                 and  nx_COS_order_user_id = #{orderUserId}
             </if>
-            <if test="type != null">
-                and  s.nx_COS_type = #{type}
+            <if test="orderType != null">
+                and  s.nx_COS_type = #{orderType}
             </if>
-            <if test="xiaoyuGoodsType != null">
-                and  s.nx_COS_goods_type &lt; #{xiaoyuGoodsType}
+            <if test="diffPrice != null">
+                and  s.nx_COS_huaxian_different_price =  #{diffPrice}
             </if>
-            <if test="dayuType != null">
-                and  s.nx_COS_type &gt; #{dayuType}
+            <if test="dayuDiffPrice != null">
+                and  s.nx_COS_huaxian_different_price &gt;  #{dayuDiffPrice}
             </if>
             <if test="xiaoyuStatus != null">
                 and  s.nx_COS_status &lt; #{xiaoyuStatus}
@@ -260,6 +260,9 @@
             </if>
             <if test="status != null">
                 and  s.nx_COS_status =  #{status}
+            </if>
+            <if test="cardId != null">
+                and  cg.nx_cg_card_id =  #{cardId}
             </if>
         </where>
     </select>
@@ -337,6 +340,7 @@
             <if test="dayuDiffPrice != null">
                 and  s.nx_COS_huaxian_different_price &gt;  #{dayuDiffPrice}
             </if>
+
             <if test="goodsId != null">
                 and  nx_COS_community_goods_id = #{goodsId}
             </if>
@@ -349,15 +353,10 @@
             <if test="orderUserId != null">
                 and  nx_COS_order_user_id = #{orderUserId}
             </if>
-            <if test="type != null">
-                and  s.nx_COS_type = #{type}
+            <if test="orderType != null">
+                and  s.nx_COS_type = #{orderType}
             </if>
-            <if test="xiaoyuType != null">
-                and  s.nx_COS_type &lt; #{xiaoyuType}
-            </if>
-            <if test="dayuType != null">
-                and  s.nx_COS_type &gt; #{dayuType}
-            </if>
+
             <if test="xiaoyuStatus != null">
                 and  s.nx_COS_status &lt; #{xiaoyuStatus}
             </if>
@@ -514,7 +513,7 @@
          `nx_COS_print_log`,
          `nx_COS_cuc_id`,
          `nx_COS_huaxian_subtotal`,
-         `nx_COS_pindan_orders_id`
+         `nx_COS_splicing_orders_id`
          )
         values (#{nxCommunityOrdersSubId},
                 #{nxCosNxGoodsId},
@@ -549,7 +548,7 @@
                 #{nxCosPrintLog},
                 #{nxCosCucId},
                 #{nxCosHuaxianSubtotal},
-                #{nxCosPindanOrdersId}
+                #{nxCosSplicingOrdersId}
 
                 )
     </insert>
@@ -587,7 +586,7 @@
             <if test="nxCosPrintTime != null">`nx_COS_print_time` = #{nxCosPrintTime},</if>
             <if test="nxCosPrintLog != null">`nx_COS_print_log` = #{nxCosPrintLog},</if>
             <if test="nxCosCucId != null">`nx_COS_cuc_id` = #{nxCosCucId},</if>
-            <if test="nxCosPindanOrdersId != null">`nx_COS_pindan_orders_id` = #{nxCosPindanOrdersId},</if>
+            <if test="nxCosSplicingOrdersId != null">`nx_COS_splicing_orders_id` = #{nxCosSplicingOrdersId},</if>
             <if test="nxCosHuaxianSubtotal != null">`nx_COS_huaxian_subtotal` = #{nxCosHuaxianSubtotal},</if>
             <if test="nxCosAccountUserId != null">`nx_COS_account_user_id` = #{nxCosAccountUserId}</if>
         </set>

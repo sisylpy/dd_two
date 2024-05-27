@@ -229,7 +229,7 @@ public class NxCommunityFatherGoodsController {
     //
     @RequestMapping(value = "/getFatherWithGoods", method = RequestMethod.POST)
     @ResponseBody
-    public R getFatherWithGoods(Integer commId, Integer orderUserId) {
+    public R getFatherWithGoods(Integer commId, Integer orderUserId,Integer orderType) {
 
         System.out.println("idcommdmmdmdmdmdm" + commId);
         Map<String, Object> map = new HashMap<>();
@@ -238,7 +238,7 @@ public class NxCommunityFatherGoodsController {
         map.put("nowMinute", getNowMinute());
         if(orderUserId != -1){
             map.put("orderUserId", orderUserId);
-            map.put("xiaoyuGoodsType", 4);
+            map.put("orderType", orderType);
         }
         System.out.println("tytytytytytyyt" + map);
 
@@ -248,7 +248,7 @@ public class NxCommunityFatherGoodsController {
         Map<String, Object> mapA = new HashMap<>();
         mapA.put("orderUserId", orderUserId);
         mapA.put("status", -1);
-        mapA.put("xiaoyuGoodsType", 4);
+        mapA.put("orderType", orderType);
         System.out.println("apappapap" + mapA);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
@@ -259,6 +259,7 @@ public class NxCommunityFatherGoodsController {
         Map<String, Object> mapC = new HashMap<>();
         mapC.put("userId", orderUserId);
         mapC.put("status", -1);
+        mapC.put("type", orderType);
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
         mapR.put("cardList", cardEntities);
 

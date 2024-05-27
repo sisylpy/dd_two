@@ -71,7 +71,7 @@
 	<!-- subOrders -->
 	<resultMap id="subOrders" type="NxCommunityOrdersSubEntity">
 		 <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
-        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
+        <result property="nxCosSplicingOrdersId" column="nx_COS_splicing_orders_id"/>
 		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
 		<result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
 		<result property="nxCosStatus" column="nx_COS_status"/>
@@ -468,7 +468,7 @@
 
 	<resultMap id="splicingSubOrders" type="NxCommunityOrdersSubEntity">
 		 <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
-        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
+        <result property="nxCosSplicingOrdersId" column="nx_COS_splicing_orders_id"/>
 		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
 		<result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
 		<result property="nxCosStatus" column="nx_COS_status"/>
@@ -506,6 +506,7 @@
 		<result property="nxCustomerCardWasteDate" column="splicing_nx_customer_card_waste_date"/>
 	</resultMap>
 
+
 	<resultMap id="orderUserSplicingOrder" type="NxCommunitySplicingOrdersEntity">
 		<id property="nxCommunitySplicingOrdersId" column="nx_community_splicing_orders_id"/>
 		<result property="nxCsoCoOrderId" column="nx_cso_co_order_id"/>
@@ -526,6 +527,7 @@
 		<result property="nxCsoTotal" column="nx_cso_total"/>
 		<result property="nxCsoYouhuiTotal" column="nx_cso_youhui_total"/>
 		<association property="orderUser" resultMap="splicingUser"/>
+		<collection property="nxCustomerUserCardEntities" resultMap="userCard"/>
 		<collection property="nxCommunityOrdersSubEntities" resultMap="splicingSubOrders"/>
 	</resultMap>
 
@@ -578,31 +580,37 @@
 		asOrderCus.nx_customer_id 'splicing_nx_customer_id',
 		asOrderCus.nx_customer_card_waste_date 'splicing_nx_customer_card_waste_date'
 
-
 		       from nx_community_orders as nco
-		 left join nx_community_splicing_orders as allSplicingOrder on allSplicingOrder.nx_cso_co_order_id = nco.nx_community_orders_id
-
-		left join nx_community_orders_sub as  asSub on asSub.nx_COS_orders_id = allSplicingOrder.nx_community_splicing_orders_id
-		                                                     and asSub.nx_COS_status = 0 and asSub.nx_COS_type &gt; 3
-		 left join nx_customer_user as asOrderUser on asOrderUser.nx_CU_user_id = allSplicingOrder.nx_cso_user_id
+		 left join nx_community_splicing_orders as ncso on ncso.nx_cso_co_order_id = nco.nx_community_orders_id
+		left join nx_community_orders_sub as  spSub on spSub.nx_COS_splicing_orders_id = ncso.nx_community_splicing_orders_id
+		and spSub.nx_COS_type = #{orderType}
+		 left join nx_customer_user as asOrderUser on asOrderUser.nx_CU_user_id = ncso.nx_cso_user_id
 		  left join nx_customer as asOrderCus    on asOrderCus.nx_customer_id = asOrderUser.nx_CU_customer_id
-		 left join nx_community_goods as ncg on ncg.nx_community_goods_id = asSub.nx_COS_community_goods_id
+		left join nx_customer_user_card as nccc  on   nccc.nx_cuca_status = -1 and nccc.nx_cuca_type = 1
+		           and nccc.nx_cuca_customer_user_id = ncso.nx_cso_user_id
+		left join nx_community_card as ncc  on ncc.nx_community_card_id = nccc.nx_cuca_card_id
+		 left join nx_community_goods as ncg on ncg.nx_community_goods_id = spSub.nx_COS_community_goods_id
+
+		  left join nx_community_splicing_orders as orderUserSp on orderUserSp.nx_cso_co_order_id = nco.nx_community_orders_id
+		  left join nx_community_orders_sub as orderUserSub on orderUserSub.nx_COS_splicing_orders_id = orderUserSp.nx_community_splicing_orders_id
 		 left join nx_customer_user as deliveryUser on deliveryUser.nx_CU_user_id = nco.nx_CO_delivery_user_id
 		   left join nx_customer   as deliveryCus on deliveryCus.nx_customer_id = deliveryUser.nx_CU_customer_id
+
 
 		<where>
 			<if test="id != null">
 				and nco.nx_community_orders_id = #{id}
 			</if>
+
 			<if test="deliveryUserId != null">
 				and nco.nx_CO_delivery_user_id = #{deliveryUserId}
 			</if>
 			<if test="notEqualOrderUserId != null">
-				and allSplicingOrder.nx_cso_user_id != #{notEqualOrderUserId}
+				and ncso.nx_cso_user_id != #{notEqualOrderUserId}
 			</if>
-			<if test="type != null">
-				and nco.nx_CO_type = #{type}
-			</if>
+<!--			<if test="orderType != null">-->
+<!--				and spSub.nx_COS_type = #{orderType}-->
+<!--			</if>-->
 			<if test="status != null">
 				and nco.nx_CO_status = #{status}
 			</if>

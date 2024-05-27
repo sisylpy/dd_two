@@ -120,8 +120,8 @@
 
     <resultMap id="subOrders" type="NxCommunityOrdersSubEntity">
          <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
-        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
-        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
+        <result property="nxCosSplicingOrdersId" column="nx_COS_splicing_orders_id"/>
+        <result property="nxCosSplicingOrdersId" column="nx_COS_splicing_orders_id"/>
 		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
         <result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
         <result property="nxCosStatus" column="nx_cos_status"/>
@@ -690,7 +690,7 @@
 
     <resultMap id="subOrder" type="NxCommunityOrdersSubEntity">
          <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
-        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
+        <result property="nxCosSplicingOrdersId" column="nx_COS_splicing_orders_id"/>
 		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
         <result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
 		<result property="nxCosStatus" column="nx_cos_status"/>
@@ -899,8 +899,6 @@
         <result property="nxCgBuyingPriceExchange" column="nx_cg_buying_price_exchange"/>
         <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
         <association property="nxCommunityCardEntity" resultMap="goodsCard"/>
-        <collection property="remarkOrdersSubEntities" resultMap="subOrders"/>
-        <collection property="remarkMemberOrdersSubEntities" resultMap="memberSubOrder"/>
         <collection property="nxCommunityGoodsSetItemEntities" resultMap="goodsItemGoods"/>
         <collection property="nxCommunityGoodsSetPropertyEntities" resultMap="cgGoodProperty"/>
     </resultMap>
@@ -984,20 +982,8 @@
         ncgsi.nx_cgsi_item_type 'p_nx_cgsi_item_type',
         ncgsi.nx_cgsi_item_file_path 'p_nx_cgsi_item_file_path',
         ncgsi.nx_cgsi_item_price 'p_nx_cgsi_item_price',
-        ncgsi.nx_cgsi_item_sort 'p_nx_cgsi_item_sort',
+        ncgsi.nx_cgsi_item_sort 'p_nx_cgsi_item_sort'
 
-        huaxianCos.nx_community_orders_sub_id 'huaxianCos_nx_community_orders_sub_id',
-        huaxianCos.nx_COS_community_goods_id 'huaxianCos_nx_COS_community_goods_id',
-        huaxianCos.nx_COS_order_user_id 'huaxianCos_nx_COS_order_user_id',
-        huaxianCos.nx_COS_status 'huaxianCos_nx_COS_status',
-        huaxianCos.nx_COS_type 'huaxianCos_nx_COS_type',
-        huaxianCos.nx_COS_orders_id 'huaxianCos_nx_COS_orders_id',
-        huaxianCos.nx_COS_huaxian_different_price 'huaxianCos_nx_COS_huaxian_different_price',
-        huaxianCos.nx_COS_huaxian_price 'huaxianCos_nx_COS_huaxian_price',
-        huaxianCos.nx_COS_price 'huaxianCos_nx_COS_price',
-        huaxianCos.nx_COS_quantity 'huaxianCos_nx_COS_quantity',
-        huaxianCos.nx_COS_subtotal 'huaxianCos_nx_COS_subtotal',
-        huaxianCos.nx_COS_remark 'huaxianCos_nx_COS_remark'
         from nx_community_goods as ncg
         left join nx_community_card as ncc on ncc.nx_community_card_id = ncg.nx_cg_card_id
         left join nx_community_goods_set_item as ncgsiGoods on ncgsiGoods.nx_cgsi_item_cg_goods_id =
@@ -1005,12 +991,6 @@
         left join nx_community_goods_set_property as ncgsp on ncgsp.nx_cgsp_cg_goods_id = ncg.nx_community_goods_id
         left join nx_community_goods_set_item as ncgsi on ncgsi.nx_cgsi_cg_property_id =
         ncgsp.nx_community_goods_set_property_id
-        left join nx_community_orders_sub as ncos on ncos.nx_COS_community_goods_id = ncg.nx_community_goods_id
-        and ncos.nx_COS_order_user_id = #{orderUserId} and ncos.nx_COS_status = 0 and ncos.nx_COS_type = #{type}
-                                                         and ncos.nx_COS_huaxian_different_price = 0
-       left join nx_community_orders_sub as huaxianCos on huaxianCos.nx_COS_community_goods_id = ncg.nx_community_goods_id
-        and huaxianCos.nx_COS_order_user_id = #{orderUserId} and huaxianCos.nx_COS_status = 0 and huaxianCos.nx_COS_type = #{type}
-        and huaxianCos.nx_COS_huaxian_different_price &gt; 0
         <where>
             <if test="goodsId != null">
                 and ncg.nx_community_goods_id = #{goodsId}

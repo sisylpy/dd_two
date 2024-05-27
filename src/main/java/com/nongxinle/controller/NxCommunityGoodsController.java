@@ -661,11 +661,9 @@ public class NxCommunityGoodsController {
 
     @RequestMapping(value = "/getRemarkCommunityGoodsDetail", method = RequestMethod.POST)
     @ResponseBody
-    public R getRemarkCommunityGoodsDetail(Integer goodsId, Integer orderUserId,Integer type) {
+    public R getRemarkCommunityGoodsDetail(Integer goodsId, Integer orderUserId) {
         Map<String, Object> map = new HashMap<>();
-        map.put("orderUserId", orderUserId);
         map.put("goodsId", goodsId);
-        map.put("type", type);
         NxCommunityGoodsEntity communityGoodsEntity = cgService.queryRemarkComGoodsDetail(map);
 
         Map<String, Object> mapC = new HashMap<>();

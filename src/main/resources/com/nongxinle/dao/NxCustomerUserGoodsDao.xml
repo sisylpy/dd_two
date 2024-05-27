@@ -148,7 +148,7 @@
 
 	<resultMap id="subOrder" type="NxCommunityOrdersSubEntity">
 		 <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
-        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
+        <result property="nxCosSplicingOrdersId" column="nx_COS_splicing_orders_id"/>
 		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
 		<result property="nxCosCucId" column="nx_cos_cuc_id"/>
 		<result property="nxCosStatus" column="nx_cos_status"/>

@@ -20,9 +20,14 @@
 
 	<select id="queryNewPindan" resultMap="splicingOrderDetail">
 		select * from nx_community_splicing_orders as ncso
-		left join nx_community_orders_sub as ncos on ncos.nx_COS_orders_id = ncso.nx_community_splicing_orders_id
-		    and  ncos.nx_COS_order_user_id = #{orderUserId} and ncos.nx_COS_type &gt; 3 and ncos.nx_COS_status = 0
-		left join nx_community_goods as ncg on ncg.nx_community_goods_id = ncos.nx_COS_community_goods_id
+		left join nx_community_orders_sub as spSub on spSub.nx_COS_splicing_orders_id = ncso.nx_community_splicing_orders_id
+		    and  spSub.nx_COS_order_user_id = #{orderUserId} and spSub.nx_cos_type = #{orderType}
+		left join nx_customer_user as ncu on ncu.nx_CU_user_id = spSub.nx_COS_order_user_id
+		left join nx_customer_user_card as nccc on nccc.nx_cuca_customer_user_id = #{orderUserId} and
+		                                           nccc.nx_cuca_status = -1 and nccc.nx_cuca_type = 1
+		left join nx_community_card as ncc  on ncc.nx_community_card_id = nccc.nx_cuca_card_id
+		left join nx_community_goods as ncg on ncg.nx_community_goods_id = spSub.nx_COS_community_goods_id
+
 		<where>
 			<if test="id != null">
 				and ncso.nx_cso_co_order_id = #{id}
@@ -37,7 +42,7 @@
 		</where>
 	</select>
 
-	<select id="querySplicingListByParams" resultMap="splicingOrderDetail">
+	<select id="querySplicingListByParams" resultType="com.nongxinle.entity.NxCommunitySplicingOrdersEntity">
 		select * from nx_community_splicing_orders
 		<where>
 			<if test="id != null">
@@ -50,11 +55,15 @@
 		<id property="nxCustomerId" column="nx_customer_id"/>
 		<result property="nxCustomerCardWasteDate" column="nx_customer_card_waste_date"/>
 	</resultMap>
-	<resultMap id="shareUser" type="NxCustomerUserEntity">
-		<id property="nxCuUserId" column="share_nx_CU_user_id"/>
-		<result property="nxCuWxAvatarUrl" column="share_nx_CU_wx_avatra_url"/>
-		<result property="nxCuCustomerId" column="share_nx_CU_customer_id"/>
-		<association property="nxCustomerEntity" resultMap="customer"/>
+	<resultMap id="customerUser" type="NxCustomerUserEntity">
+		<id property="nxCuUserId" column="nx_CU_user_id"/>
+		<result property="nxCuOrderTimes" column="nx_CU_order_times"/>
+		<result property="nxCuWxGender" column="nx_CU_wx_gender"/>
+		<result property="nxCuWxPhoneNumber" column="nx_CU_wx_phone_number"/>
+		<result property="nxCuCommunityId" column="nx_CU_community_id"/>
+		<result property="nxCuWxOpenId" column="nx_CU_wx_open_id"/>
+		<result property="nxCuWxAvatarUrl" column="nx_CU_wx_avatra_url"/>
+		<result property="nxCuCustomerId" column="nx_CU_customer_id"/>
 	</resultMap>
 	<resultMap id="deliveryUser" type="NxCustomerUserEntity">
 		<id property="nxCuUserId" column="nx_CU_user_id"/>
@@ -116,7 +125,7 @@
 	<!-- subOrders -->
 	<resultMap id="subOrders" type="NxCommunityOrdersSubEntity">
 		 <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
-        <result property="nxCosPindanOrdersId" column="nx_COS_pindan_orders_id"/>
+        <result property="nxCosSplicingOrdersId" column="nx_COS_splicing_orders_id"/>
 		<result property="nxCosCucId" column="nx_COS_cuc_id"/>
 		<result property="nxCosHuaxianSubtotal" column="nx_cos_huaxian_subtotal"/>
 		<result property="nxCosCucId" column="nx_cos_cuc_id"/>
@@ -144,6 +153,26 @@
 		<association property="nxCommunityGoodsEntity" resultMap="commGoods"/>
 	</resultMap>
 
+	<resultMap id="goodsCard" type="NxCommunityCardEntity">
+		<id property="nxCommunityCardId" column="nx_community_card_id"/>
+		<result property="nxCommunityCardName" column="nx_community_card_name"/>
+		<result property="nxCcEffectiveDays" column="nx_cc_effective_days"/>
+		<result property="nxCcFilePath" column="nx_cc_file_path"/>
+		<result property="nxCcPrice" column="nx_cc_price"/>
+		<result property="nxCcWords" column="nx_cc_words"/>
+	</resultMap>
+	<resultMap id="userCard" type="NxCustomerUserCardEntity">
+		<id property="nxCustomerUserCardId" column="nx_customer_user_card_id"/>
+		<result property="nxCucaIsSelected" column="nx_cuca_is_selected"/>
+		<result property="nxCucaCardId" column="nx_cuca_card_id"/>
+		<result property="nxCucaCustomerUserId" column="nx_cuca_customer_user_id"/>
+		<result property="nxCucaStartDate" column="nx_cuca_start_date"/>
+		<result property="nxCucaStopDate" column="nx_cuca_stop_date"/>
+		<result property="nxCucaStatus" column="nx_cuca_status"/>
+		<result property="nxCucaType" column="nx_cuca_type"/>
+		<result property="nxCucaCommunityId" column="nx_cuca_community_id"/>
+		<association property="nxCommunityCardEntity" resultMap="goodsCard"/>
+	</resultMap>
 	<resultMap id="splicingOrderDetail" type="NxCommunitySplicingOrdersEntity">
 		<id property="nxCommunitySplicingOrdersId" column="nx_community_splicing_orders_id"/>
 		<result property="nxCsoBuyMemberCardTime" column="nx_cso_buy_member_card_time"/>
@@ -161,7 +190,9 @@
 		<result property="nxCsoServiceDate" column="nx_cso_service_date"/>
 		<result property="nxCsoTotal" column="nx_cso_total"/>
 		<result property="nxCsoYouhuiTotal" column="nx_cso_youhui_total"/>
-		<collection property="nxCommunityOrdersSubEntities" resultMap="subOrders"/>
+		<association property="orderUser" resultMap="customerUser"/>
+ 		<collection property="nxCommunityOrdersSubEntities" resultMap="subOrders"/>
+		<collection property="nxCustomerUserCardEntities" resultMap="userCard"/>
 	</resultMap>
 
 
