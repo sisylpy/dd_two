@@ -409,72 +409,56 @@ public class NxCommunityGoodsController {
 
 
 
-    @RequestMapping(value = "/getTodayPriceGoods/{comId}")
-    @ResponseBody
-    public R getTodayPriceGoods(@PathVariable Integer comId) {
 
-        return R.ok();
-    }
 
-//    @RequestMapping(value = "/comGetDistributerComGoods", method = RequestMethod.POST)
+//    @RequestMapping(value = "/resManQueryComResGoodsInFatherId", method = RequestMethod.POST)
 //    @ResponseBody
-//    public R comGetDistributerComGoods(Integer comId, Integer disId) {
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("comId", comId);
-//        map.put("disId", disId);
-//        List<NxCommunityGoodsEntity> communityGoodsEntities = cgService.comQueryDisComGoodsByParams(map);
+//    public R resManQueryComResGoodsInFatherId(Integer resFatherId, String searchStr,
+//                                              Integer comId, Integer goodsFatherId, Integer serviceLevel) {
 //
-//        return R.ok().put("data", communityGoodsEntities);
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("resFatherId", resFatherId);
+////        map.put("goodsFatherId", goodsFatherId);
+//        map.put("comId", comId);
+//        map.put("serviceLevel", serviceLevel);
+//        for (int i = 0; i < searchStr.length(); i++) {
+//            String str = searchStr.substring(i, i + 1);
+//            if (str.matches("[\u4E00-\u9FFF]")) {
+//                String pinyin = hanziToPinyin(searchStr);
+//                map.put("searchStr", searchStr);
+//                map.put("searchStrPinyin", pinyin);
+//            } else {
+//                map.put("searchPinyin", searchStr);
+//            }
+//        }
+//
+//        List<NxCommunityGoodsEntity> goodsEntities = cgService.resManQueryComResGoodsQuickSearchStr(map);
+//        return R.ok().put("data", goodsEntities);
 //    }
 
-    @RequestMapping(value = "/resManQueryComResGoodsInFatherId", method = RequestMethod.POST)
-    @ResponseBody
-    public R resManQueryComResGoodsInFatherId(Integer resFatherId, String searchStr,
-                                              Integer comId, Integer goodsFatherId, Integer serviceLevel) {
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("resFatherId", resFatherId);
-//        map.put("goodsFatherId", goodsFatherId);
-        map.put("comId", comId);
-        map.put("serviceLevel", serviceLevel);
-        for (int i = 0; i < searchStr.length(); i++) {
-            String str = searchStr.substring(i, i + 1);
-            if (str.matches("[\u4E00-\u9FFF]")) {
-                String pinyin = hanziToPinyin(searchStr);
-                map.put("searchStr", searchStr);
-                map.put("searchStrPinyin", pinyin);
-            } else {
-                map.put("searchPinyin", searchStr);
-            }
-        }
-
-        List<NxCommunityGoodsEntity> goodsEntities = cgService.resManQueryComResGoodsQuickSearchStr(map);
-        return R.ok().put("data", goodsEntities);
-    }
-
-    @RequestMapping(value = "/resManQueryComResGoods", method = RequestMethod.POST)
-    @ResponseBody
-    public R resManQueryComResGoods(Integer resFatherId, String searchStr, Integer comId, Integer serviceLevel) {
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("resFatherId", resFatherId);
-        map.put("comId", comId);
-        map.put("serviceLevel", serviceLevel);
-        for (int i = 0; i < searchStr.length(); i++) {
-            String str = searchStr.substring(i, i + 1);
-            if (str.matches("[\u4E00-\u9FFF]")) {
-                String pinyin = hanziToPinyin(searchStr);
-                map.put("searchStr", searchStr);
-                map.put("searchStrPinyin", pinyin);
-            } else {
-                map.put("searchPinyin", searchStr);
-            }
-        }
-
-        List<NxCommunityGoodsEntity> goodsEntities = cgService.resManQueryComResGoodsQuickSearchStr(map);
-
-        return R.ok().put("data", goodsEntities);
-    }
+//    @RequestMapping(value = "/resManQueryComResGoods", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R resManQueryComResGoods(Integer resFatherId, String searchStr, Integer comId, Integer serviceLevel) {
+//
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("resFatherId", resFatherId);
+//        map.put("comId", comId);
+//        map.put("serviceLevel", serviceLevel);
+//        for (int i = 0; i < searchStr.length(); i++) {
+//            String str = searchStr.substring(i, i + 1);
+//            if (str.matches("[\u4E00-\u9FFF]")) {
+//                String pinyin = hanziToPinyin(searchStr);
+//                map.put("searchStr", searchStr);
+//                map.put("searchStrPinyin", pinyin);
+//            } else {
+//                map.put("searchPinyin", searchStr);
+//            }
+//        }
+//
+//        List<NxCommunityGoodsEntity> goodsEntities = cgService.resManQueryComResGoodsQuickSearchStr(map);
+//
+//        return R.ok().put("data", goodsEntities);
+//    }
 
 
 //    @RequestMapping(value = "/getCgGoodsSubNamesByFatherId", method = RequestMethod.POST)
@@ -555,6 +539,11 @@ public class NxCommunityGoodsController {
         NxCommunityGoodsEntity comGoods = cgService.queryComGoodsDetail(map);
         return R.ok().put("data", comGoods);
     }
+
+
+
+
+
 
 
 
@@ -649,15 +638,15 @@ public class NxCommunityGoodsController {
         return R.ok().put("data", communityGoodsEntity);
     }
 
-    @RequestMapping(value = "/getPropertyCommunityGoodsDetail", method = RequestMethod.POST)
-    @ResponseBody
-    public R getPropertyCommunityGoodsDetail(Integer goodsId, Integer orderUserId) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("orderUserId", orderUserId);
-        map.put("goodsId", goodsId);
-        NxCommunityGoodsEntity communityGoodsEntity = cgService.queryPropertyComGoodsDetail(map);
-        return R.ok().put("data", communityGoodsEntity);
-    }
+//    @RequestMapping(value = "/getPropertyCommunityGoodsDetail", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R getPropertyCommunityGoodsDetail(Integer goodsId, Integer orderUserId) {
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("orderUserId", orderUserId);
+//        map.put("goodsId", goodsId);
+//        NxCommunityGoodsEntity communityGoodsEntity = cgService.queryPropertyComGoodsDetail(map);
+//        return R.ok().put("data", communityGoodsEntity);
+//    }
 
     @RequestMapping(value = "/getRemarkCommunityGoodsDetail", method = RequestMethod.POST)
     @ResponseBody

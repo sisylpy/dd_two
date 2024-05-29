@@ -50,20 +50,20 @@ public interface NxCommunityGoodsDao extends BaseDao<NxCommunityGoodsEntity> {
 
     List<NxCommunityGoodsEntity> queryComResGoodsByParams(Map<String, Object> map);
 
-    List<NxCommunityGoodsEntity> resManQueryComResGoodsQuickSearchStr(Map<String, Object> map);
+//    List<NxCommunityGoodsEntity> resManQueryComResGoodsQuickSearchStr(Map<String, Object> map);
 
 //    List<NxCommunityGoodsEntity> comQueryDisComGoodsByParams(Map<String, Object> map);
 
-    List<NxCommunityGoodsEntity> queryComGoodsWithSupplierByParams(Map<String, Object> map);
+//    List<NxCommunityGoodsEntity> queryComGoodsWithSupplierByParams(Map<String, Object> map);
 
 //    List<NxCommunityGoodsEntity> queryChainComResGoodsByParams(Map<String, Object> map);
 
-    List<NxCommunityGoodsEntity> resQueryComExchangePriceGoodsByDate(Map<String, Object> map7);
+//    List<NxCommunityGoodsEntity> resQueryComExchangePriceGoodsByDate(Map<String, Object> map7);
 
-    List<NxCommunityGoodsEntity> cgQueryCgMangementGoodsQuickSearchStr(Map<String, Object> map);
+//    List<NxCommunityGoodsEntity> cgQueryCgMangementGoodsQuickSearchStr(Map<String, Object> map);
 
 
     NxCommunityGoodsEntity queryRemarkComGoodsDetail(Map<String, Object> map);
 
-    NxCommunityGoodsEntity queryPropertyComGoodsDetail(Map<String, Object> map);
+//    NxCommunityGoodsEntity queryPropertyComGoodsDetail(Map<String, Object> map);
 }

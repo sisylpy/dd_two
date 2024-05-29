@@ -64,5 +64,11 @@ public class NxCustomerUserGoodsServiceImpl implements NxCustomerUserGoodsServic
 		return nxCustomerUserGoodsDao.queryUserGoodsByParams(map);
     }
 
+    @Override
+    public List<NxCommunityGoodsEntity> userQueryCommGoods(Map<String, Object> map) {
+
+		return nxCustomerUserGoodsDao.userQueryCommGoods(map);
+    }
+
 
 }

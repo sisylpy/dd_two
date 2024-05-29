@@ -33,4 +33,6 @@ public interface NxCustomerUserGoodsService {
 
     NxCustomerUserGoodsEntity queryUserGoodsByParams(Map<String, Object> map);
 
+    List<NxCommunityGoodsEntity> userQueryCommGoods(Map<String, Object> map);
+
 }

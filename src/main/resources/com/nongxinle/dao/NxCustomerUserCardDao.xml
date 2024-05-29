@@ -68,7 +68,7 @@
 					and nx_cuca_type = #{type}
 				</if>
 				<if test="stopTime != null">
-					and nx_cuca_start_date &lt;= #{stopTime}
+					and nx_cuca_stop_date &gt;= #{stopTime}
 				</if>
 			</where>
 	</select>

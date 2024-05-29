@@ -598,7 +598,7 @@
 		 left join nx_customer_user as asOrderUser on asOrderUser.nx_CU_user_id = ncso.nx_cso_user_id
 		  left join nx_customer as asOrderCus    on asOrderCus.nx_customer_id = asOrderUser.nx_CU_customer_id
 		left join nx_customer_user_card as nccc  on   nccc.nx_cuca_status = -1 and nccc.nx_cuca_status = -1
-		           and nccc.nx_cuca_customer_user_id = ncso.nx_cso_user_id and nccc.nx_cuca_type = #{orderType}
+		           and nccc.nx_cuca_customer_user_id = ncso.nx_cso_user_id
 		left join nx_community_card as ncc  on ncc.nx_community_card_id = nccc.nx_cuca_card_id
 		 left join nx_community_goods as ncg on ncg.nx_community_goods_id = spSub.nx_COS_community_goods_id
 

@@ -50,19 +50,9 @@ public class WeChatService {
 
     public String pushOneUser(String openid, String templateId) {
 
-        //如果access_token为空则从新获取
-//        if(StringUtils.isEmpty(access_token)){
-//            access_token = getAccess_token();
-//        }
         String access_token = getAccess_token();
 
         String url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + access_token;
-
-//        HttpHeaders headers = new HttpHeaders();
-//        MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
-//        headers.setContentType(type);
-//        headers.add("Accept", MediaType.APPLICATION_JSON.toString());
-
 
 
         //拼接推送的模版
@@ -128,6 +118,76 @@ public class WeChatService {
     }
 
 
+
+    public String pushToCustomer(String openid, String templateId) {
+
+        String access_token = getAccess_token();
+
+        String url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + access_token;
+
+
+        //拼接推送的模版
+        WxMssVo wxMssVo = new WxMssVo();
+        wxMssVo.setTouser(openid);
+        wxMssVo.setTemplate_id(templateId);
+        wxMssVo.setPage("/pages/index/index");
+        wxMssVo.setLang("zh_CN");
+        wxMssVo.setMiniprogram_state("trial");
+        Map<String, String> mapRR = new HashMap<>();
+        mapRR.put("msg", "发消息了");
+
+
+        MultiValueMap<String, Object> m = new LinkedMultiValueMap<String, Object>();
+        MultiValueMap<String, Object> km1 = new LinkedMultiValueMap<String, Object>();
+        MultiValueMap<String, Object> km2 = new LinkedMultiValueMap<String, Object>();
+        MultiValueMap<String, Object> km3 = new LinkedMultiValueMap<String, Object>();
+        MultiValueMap<String, Object> km4 = new LinkedMultiValueMap<String, Object>();
+        MultiValueMap<String, Object> km5 = new LinkedMultiValueMap<String, Object>();
+
+
+        km1.add("value", "PL000001");
+        km2.add("value", "999");
+        km3.add("value", "已到货");
+        km4.add("value", "caidi");
+        km5.add("value", "1");
+
+
+        m.add("character_string1", km1);
+        m.add("amount2", km2);
+        m.add("phrase3", km3);
+        m.add("thing6", km4);
+        m.add("number7", km5);
+
+
+        if(restTemplate==null){
+            restTemplate = new RestTemplate();
+        }
+
+        MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
+        map.add("touser", openid);
+        map.add("template_id", templateId);
+        map.add("page", "pages/index/index");
+        map.add("miniprogram_state", "trial");
+        map.add("lang", "zh_CN");
+        map.add("data",m);
+
+        System.out.println("00000000");
+        System.out.println(url);
+//        System.out.println(map);
+        String json = JSONObject.toJSONString(map);
+
+        System.out.println("111111");
+        System.out.println("111111"+json);
+
+
+
+        ResponseEntity<String> responseEntity =
+                restTemplate.postForEntity(url, wxMssVo, String.class);
+        log.error("小程序推送结果={}", responseEntity.getBody());
+        return responseEntity.getBody();
+//        return "11";
+    }
+
     public String getAccess_token() {
         //获取access_token
         String appid = "wx159c5a46d80e4500";
@@ -146,8 +206,9 @@ public class WeChatService {
 
         WeChatService weChatUtil = new WeChatService();
 //        String values[] ={"111","100","03-21","菜地","1"};
-        weChatUtil.pushOneUser("orWDh5HwYg0CefPuW9r5wnVnuZsiw","Mq8GjNw0x3DpB08nySeGuMiglKOiR5yRSYHkLTgb0_A"
+        weChatUtil.pushOneUser("orWDh5HwYg0CefPuW9r5wnVnuZiw","7x-z_S7NQdD3wAn8qVmQAbAaCbK_j2aA7CRbZWDPGuw"
                 );
+
     }
 
 

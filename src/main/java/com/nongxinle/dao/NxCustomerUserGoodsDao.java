@@ -23,4 +23,6 @@ public interface NxCustomerUserGoodsDao extends BaseDao<NxCustomerUserGoodsEntit
     NxCustomerUserGoodsEntity queryUserGoodsByParams(Map<String, Object> map);
 
     List<NxCommunityGoodsEntity> queryUserLoveGoods(Map<String, Object> map);
+
+    List<NxCommunityGoodsEntity> userQueryCommGoods(Map<String, Object> map);
 }

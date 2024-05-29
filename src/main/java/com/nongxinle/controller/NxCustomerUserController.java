@@ -82,7 +82,7 @@ public class NxCustomerUserController {
 			ServletContext servletContext = session.getServletContext();
 			String realPath1 = servletContext.getRealPath(userEntity.getNxCuWxAvatarUrl());
 			File file1 = new File(realPath1);
-			if (file1.exists()) {
+			if (file1.exists() && !realPath1.equals("userImage/myUrl.png")) {
 				file1.delete();
 			}
 		}

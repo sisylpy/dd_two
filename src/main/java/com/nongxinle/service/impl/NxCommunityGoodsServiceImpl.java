@@ -149,11 +149,11 @@ public class NxCommunityGoodsServiceImpl implements NxCommunityGoodsService {
 //
 //    }
 
-    @Override
-    public List<NxCommunityGoodsEntity> resManQueryComResGoodsQuickSearchStr(Map<String, Object> map) {
-
-		return nxCommunityGoodsDao.resManQueryComResGoodsQuickSearchStr(map);
-    }
+//    @Override
+//    public List<NxCommunityGoodsEntity> resManQueryComResGoodsQuickSearchStr(Map<String, Object> map) {
+//
+//		return nxCommunityGoodsDao.resManQueryComResGoodsQuickSearchStr(map);
+//    }
 
 //    @Override
 //    public List<NxCommunityGoodsEntity> comQueryDisComGoodsByParams(Map<String, Object> map) {
@@ -161,11 +161,11 @@ public class NxCommunityGoodsServiceImpl implements NxCommunityGoodsService {
 //		return nxCommunityGoodsDao.comQueryDisComGoodsByParams(map);
 //    }
 
-    @Override
-    public List<NxCommunityGoodsEntity> queryComGoodsWithSupplierByParams(Map<String, Object> map) {
-
-		return nxCommunityGoodsDao.queryComGoodsWithSupplierByParams(map);
-    }
+//    @Override
+//    public List<NxCommunityGoodsEntity> queryComGoodsWithSupplierByParams(Map<String, Object> map) {
+//
+//		return nxCommunityGoodsDao.queryComGoodsWithSupplierByParams(map);
+//    }
 
 
     @Override
@@ -173,12 +173,12 @@ public class NxCommunityGoodsServiceImpl implements NxCommunityGoodsService {
 
 		return nxCommunityGoodsDao.queryRemarkComGoodsDetail(map);
     }
-
-    @Override
-    public NxCommunityGoodsEntity queryPropertyComGoodsDetail(Map<String, Object> map) {
-
-		return nxCommunityGoodsDao.queryPropertyComGoodsDetail(map);
-    }
+//
+//    @Override
+//    public NxCommunityGoodsEntity queryPropertyComGoodsDetail(Map<String, Object> map) {
+//
+//		return nxCommunityGoodsDao.queryPropertyComGoodsDetail(map);
+//    }
 
 
 }

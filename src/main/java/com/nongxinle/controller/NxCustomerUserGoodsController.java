@@ -23,6 +23,8 @@ import com.nongxinle.service.NxCustomerUserGoodsService;
 import com.nongxinle.utils.PageUtils;
 import com.nongxinle.utils.R;
 
+import static com.nongxinle.utils.DateUtils.getNowMinute;
+
 
 @RestController
 @RequestMapping("api/nxcustomerusergoods")
@@ -93,7 +95,7 @@ public class NxCustomerUserGoodsController {
         Map<String, Object> mapC = new HashMap<>();
         mapC.put("userId", userId);
         mapC.put("status", -1);
-        mapC.put("type", 0);
+//        mapC.put("type", 0);
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
 
         Map<String, Object> mapR = new HashMap<>();
@@ -103,6 +105,39 @@ public class NxCustomerUserGoodsController {
         return R.ok().put("data", mapR);
 
 //        return R.ok().put("data", nxCustomerUserGoodsEntities);
+    }
+
+
+
+    @RequestMapping(value = "/customerSearchGoods", method = RequestMethod.POST)
+    @ResponseBody
+    public R customerSearchGoods(Integer commId, String searchStr, Integer userId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("comId", commId);
+        map.put("searchStr", searchStr);
+        map.put("userId", userId);
+        map.put("nowMinute", getNowMinute());
+        System.out.println("searee" + map);
+        List<NxCommunityGoodsEntity> communityGoodsEntities = nxCustomerUserGoodsService.userQueryCommGoods(map);
+
+
+        Map<String, Object> mapA = new HashMap<>();
+        mapA.put("orderUserId", userId);
+        mapA.put("status", -1);
+//        mapA.put("orderType", 0);
+        List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
+
+        Map<String, Object> mapC = new HashMap<>();
+        mapC.put("userId", userId);
+        mapC.put("status", -1);
+        mapC.put("type", 0);
+        List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
+
+        Map<String, Object> mapR = new HashMap<>();
+        mapR.put("subOrders", nxCommunityOrdersSubEntities);
+        mapR.put("cardList", cardEntities);
+        mapR.put("goodsArr", communityGoodsEntities);
+        return R.ok().put("data", mapR);
     }
 
 //

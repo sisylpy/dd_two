@@ -62,13 +62,13 @@ public interface NxCommunityGoodsService {
 
 //    List<NxCommunityGoodsEntity> queryComResGoodsByParams(Map<String, Object> map);
 
-    List<NxCommunityGoodsEntity> resManQueryComResGoodsQuickSearchStr(Map<String, Object> map);
+//    List<NxCommunityGoodsEntity> resManQueryComResGoodsQuickSearchStr(Map<String, Object> map);
 
 //	List<NxCommunityGoodsEntity> comQueryDisComGoodsByParams(Map<String, Object> map);
 
-    List<NxCommunityGoodsEntity> queryComGoodsWithSupplierByParams(Map<String, Object> map);
+//    List<NxCommunityGoodsEntity> queryComGoodsWithSupplierByParams(Map<String, Object> map);
 
     NxCommunityGoodsEntity queryRemarkComGoodsDetail(Map<String, Object> map);
 
-    NxCommunityGoodsEntity queryPropertyComGoodsDetail(Map<String, Object> map);
+//    NxCommunityGoodsEntity queryPropertyComGoodsDetail(Map<String, Object> map);
 }

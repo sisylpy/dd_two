@@ -302,7 +302,7 @@ public class NxCommunityOrdersSubController {
         Map<String, Object> mapC = new HashMap<>();
         mapC.put("userId", orderUserId);
         mapC.put("status", -1);
-        mapC.put("type", orderType);
+//        mapC.put("type", orderType);
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
 
         Map<String, Object> mapR = new HashMap<>();
@@ -352,7 +352,7 @@ public class NxCommunityOrdersSubController {
             Map<String, Object> map = new HashMap<>();
             map.put("cardId", goodsEntity.getNxCgCardId());
             map.put("userId", orderUserId);
-            map.put("type", orderType);
+//            map.put("type", orderType);
             map.put("status", -1);
             System.out.println("checkckckckdkusrcarr-1-1--1-1-1-1-1" + map);
             List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(map);
@@ -361,7 +361,7 @@ public class NxCommunityOrdersSubController {
                 mapU.put("cardId", goodsEntity.getNxCgCardId());
                 mapU.put("stopTime", formatWhatDay(0));
                 mapU.put("userId", orderUserId);
-                mapU.put("type", orderType);
+//                mapU.put("type", orderType);
                 System.out.println("checkckckckdkusrcarr222222" + mapU);
                 List<NxCustomerUserCardEntity> cardEntitiesU = nxCustomerUserCardService.queryUserCardByParams(mapU);
                 if(cardEntitiesU.size() == 0){
@@ -375,6 +375,8 @@ public class NxCommunityOrdersSubController {
                     userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
                     userCardEntity.setNxCucaIsSelected(1);
                     userCardEntity.setNxCucaType(orderType);
+                    userCardEntity.setNxCucaComSplicingOrderId(spId);
+                    userCardEntity.setNxCucaComOrderId(pindanId);
                     nxCustomerUserCardService.save(userCardEntity);
 
                 }
@@ -400,6 +402,7 @@ public class NxCommunityOrdersSubController {
         mapC.put("diffPrice", 0);
         mapC.put("remark", remark);
         mapC.put("orderType", orderType);
+        mapC.put("splicingOrderId", spId);
         //1.1.1 先查询优惠订单是否超过数量
         System.out.println("ccccccccccaaaammmmmmmmmm" + mapC);
         NxCommunityOrdersSubEntity communityOrdersSubEntityC = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
@@ -417,6 +420,7 @@ public class NxCommunityOrdersSubController {
             map.put("dayuDiffPrice", 0);
             map.put("remark", remark);
             map.put("orderType", orderType);
+            map.put("splicingOrderId", spId);
             System.out.println("ccccccccccaaaa" + map);
             NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
             if (communityOrdersSubEntity != null) {
@@ -428,6 +432,7 @@ public class NxCommunityOrdersSubController {
                 mapT.put("status", -1);
                 mapT.put("dayuDiffPrice", 0);
                 mapT.put("orderType", orderType);
+                mapT.put("splicingOrderId", spId);
                 int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
                 BigDecimal restQuantity = huaxianQuantity.subtract(new BigDecimal(total)); //剩余可用划线后优惠价格的数量
                 //1.1.1.1剩余数量大于 1，则加1
@@ -449,6 +454,7 @@ public class NxCommunityOrdersSubController {
                     mapZ.put("diffPrice", 0);
                     mapZ.put("remark", remark);
                     mapZ.put("orderType", orderType);
+                    mapZ.put("splicingOrderId", spId);
                     System.out.println("mappppzzzzzzRRRRRRRRRR" + mapZ);
                     NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
                     //已经有了普通订单，则修改数量
@@ -526,6 +532,7 @@ public class NxCommunityOrdersSubController {
         map.put("goodsId", goodsId);
         map.put("status", -1);
         map.put("type", orderType);
+        map.put("splicingOrderId", spId);
         System.out.println("wkwkjekejrelqelwqrekr" + map);
         NxCustomerUserCardEntity userCardEntitys = nxCustomerUserCardService.queryUserGoodsCard(map);
         // 一，如果已经有会员卡
@@ -539,6 +546,7 @@ public class NxCommunityOrdersSubController {
                 mapC.put("dayuDiffPrice", 0);
                 mapC.put("remark", remark);
                 mapC.put("orderType", orderType);
+                mapC.put("splicingOrderId", spId);
                 //1.1.1 先查询优惠订单是否超过数量
                 System.out.println("ccccccccccaaaa" + mapC);
                 NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
@@ -551,7 +559,7 @@ public class NxCommunityOrdersSubController {
                     mapT.put("status", -1);
                     mapT.put("dayuDiffPrice", 0);
                     mapT.put("orderType", orderType);
-
+                    mapT.put("splicingOrderId", spId);
 
                     int count = nxCommunityOrdersSubService.querySubOrderCount(mapT);
                     if (count > 0) {
@@ -575,6 +583,7 @@ public class NxCommunityOrdersSubController {
                             mapZ.put("diffPrice", 0);
                             mapZ.put("remark", remark);
                             mapZ.put("orderType", orderType);
+                            mapZ.put("splicingOrderId", spId);
                             System.out.println("mappppzzzzzzRRRRRRRRRR" + mapZ);
                             NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
                             //已经有了普通订单，则修改数量
@@ -624,6 +633,7 @@ public class NxCommunityOrdersSubController {
                     mapZ.put("diffPrice", 0);
                     mapZ.put("remark", remark);
                     mapZ.put("orderType", orderType);
+                    mapZ.put("splicingOrderId", spId);
                     System.out.println("mappppzzzzzz" + mapZ);
                     NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
                     if (communityOrdersSubZero != null) {
@@ -643,6 +653,7 @@ public class NxCommunityOrdersSubController {
                         mapT.put("status", -1);
                         mapT.put("dayuDiffPrice", 0);
                         mapT.put("orderType", orderType);
+                        mapT.put("splicingOrderId", spId);
                         int count = nxCommunityOrdersSubService.querySubOrderCount(mapT);
                         if (count > 0) {
                             int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
@@ -714,13 +725,6 @@ public class NxCommunityOrdersSubController {
                             subEntity.setNxCosOrdersId(pindanId);
                             nxCommunityOrdersSubService.save(subEntity);
                         }
-
-
-                        //todo zehliyouwent
-                        System.out.println("whgoodsnewCommmonssssss" + goodsEntity.getNxCgGoodsName());
-//
-
-
                     }
                 }
 
@@ -733,6 +737,7 @@ public class NxCommunityOrdersSubController {
                 mapS.put("remark", remark);
                 mapS.put("diffPrice", 0);
                 mapS.put("orderType", orderType);
+                mapS.put("splicingOrderId", spId);
                 NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapS);
                 if (subOrderEntity != null) {
                     BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
@@ -801,6 +806,8 @@ public class NxCommunityOrdersSubController {
             userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
             userCardEntity.setNxCucaIsSelected(1);
             userCardEntity.setNxCucaType(orderType);
+            userCardEntity.setNxCucaComSplicingOrderId(spId);
+            userCardEntity.setNxCucaComOrderId(pindanId);
             System.out.println("nimeiieyeoeueoueoeu" + userCardEntity.getNxCucaIsSelected());
             nxCustomerUserCardService.save(userCardEntity);
 
@@ -812,6 +819,7 @@ public class NxCommunityOrdersSubController {
         mapA.put("orderUserId", orderUserId);
         mapA.put("status", -1);
         mapA.put("orderType", orderType);
+        mapA.put("splicingOrderId", spId);
         System.out.println("apappapap" + mapA);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
@@ -833,6 +841,7 @@ public class NxCommunityOrdersSubController {
         map.put("goodsId", goodsId);
         map.put("status", -1);
         map.put("type", orderType);
+        map.put("splicingOrderId", spId);
         System.out.println("zehlieyoeucarddddddd" + map);
         NxCustomerUserCardEntity userCardEntitys = nxCustomerUserCardService.queryUserGoodsCard(map);
         // 一，如果已经有会员卡
@@ -848,6 +857,7 @@ public class NxCommunityOrdersSubController {
                 mapC.put("dayuDiffPrice", 0);
                 mapC.put("remark", remark);
                 mapC.put("orderType", orderType);
+                mapC.put("splicingOrderId", spId);
                 //1.1.1 先查询优惠订单是否超过数量
                 NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
                 System.out.println("wwwhwiiwiwiwiwwiiwiiwiiw" + communityOrdersSubEntity);
@@ -862,6 +872,7 @@ public class NxCommunityOrdersSubController {
                     mapT.put("status", -1);
                     mapT.put("dayuDiffPrice", 0);
                     mapT.put("orderType", orderType);
+                    mapT.put("splicingOrderId", spId);
                     int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
                     BigDecimal restQuantity = huaxianQuantity.subtract(new BigDecimal(total)); //剩余可用划线后优惠价格的数量
                     //1.1.1.1剩余数量大于 1，则加1
@@ -882,6 +893,7 @@ public class NxCommunityOrdersSubController {
                         mapZ.put("diffPrice", 0);
                         mapZ.put("remark", remark);
                         mapZ.put("orderType", orderType);
+                        mapZ.put("splicingOrderId", spId);
                         System.out.println("mappppzzzzzz" + mapZ);
                         NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
                         //已经有了普通订单，则修改数量
@@ -917,20 +929,17 @@ public class NxCommunityOrdersSubController {
                             subEntity.setNxCosSplicingOrdersId(spId);
                             subEntity.setNxCosOrdersId(pindanId);
                             nxCommunityOrdersSubService.save(subEntity);
-                            //todo zehliyouwent 111
                         }
                     }
 
                 } else {
-
-
-                    //todo  ooo ooooo2222
                     Map<String, Object> mapT = new HashMap<>();
                     mapT.put("orderUserId", orderUserId);
                     mapT.put("goodsId", goodsId);
                     mapT.put("status", -1);
                     mapT.put("dayuDiffPrice", 0);
                     mapT.put("orderType", orderType);
+                    mapT.put("splicingOrderId", spId);
                     int count = nxCommunityOrdersSubService.querySubOrderCount(mapT);
                     if (count > 0) {
                         int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
@@ -970,6 +979,7 @@ public class NxCommunityOrdersSubController {
                             mapS.put("remark", remark);
                             mapS.put("diffPrice", 0);
                             mapS.put("orderType", orderType);
+                            mapS.put("splicingOrderId", spId);
                             NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapS);
                             if (subOrderEntity != null) {
                                 BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
@@ -1039,6 +1049,7 @@ public class NxCommunityOrdersSubController {
                 mapS.put("remark", remark);
                 mapS.put("diffPrice", 0);
                 mapS.put("orderType", orderType);
+                mapS.put("splicingOrderId", spId);
                 NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapS);
                 if (subOrderEntity != null) {
                     System.out.println("neexxxx222");
@@ -1109,6 +1120,8 @@ public class NxCommunityOrdersSubController {
             userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
             userCardEntity.setNxCucaIsSelected(0);
             userCardEntity.setNxCucaType(orderType);
+            userCardEntity.setNxCucaComSplicingOrderId(spId);
+            userCardEntity.setNxCucaComOrderId(pindanId);
             System.out.println("nimeiieyeoeueoueoeu" + userCardEntity.getNxCucaIsSelected());
             nxCustomerUserCardService.save(userCardEntity);
 
@@ -1132,6 +1145,7 @@ public class NxCommunityOrdersSubController {
             map.put("goodsId", goodsId);
             map.put("orderType", orderType);
             map.put("status", -1);
+            map.put("splicingOrderId", spId);
             NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
             if (subOrderEntity != null) {
                 BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
@@ -1150,6 +1164,7 @@ public class NxCommunityOrdersSubController {
             map.put("orderType", orderType);
             map.put("status", -1);
             map.put("diffPrice", 0);
+            map.put("splicingOrderId", spId);
             //先查是否有普通订单
             System.out.println("addddddd" + map);
             NxCommunityOrdersSubEntity putongSubOrder = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
@@ -1171,6 +1186,7 @@ public class NxCommunityOrdersSubController {
                 mapC.put("status", -1);
                 mapC.put("orderType", orderType);
                 mapC.put("dayuDiffPrice", 0);
+                mapC.put("splicingOrderId", spId);
                 //先查询优惠订单是否超过数量
                 System.out.println("youhuidiadddddd" + mapC);
                 NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
@@ -1180,7 +1196,7 @@ public class NxCommunityOrdersSubController {
                     BigDecimal orderQuantity = new BigDecimal(communityOrdersSubEntity.getNxCosQuantity());
                     //剩余可用划线后优惠价格的数量
                     BigDecimal restQuantity = huaxianQuantity.subtract(orderQuantity);
-                    System.out.println("resssddfsadsfdafaf" + restQuantity);
+                    System.out.println("resssddfsadsfdafafaaa" + restQuantity);
                     //剩余数量大于 1，则加1
                     if (restQuantity.compareTo(new BigDecimal(0)) == 1) {
                         BigDecimal add = orderQuantity.add(new BigDecimal(1));
@@ -1219,9 +1235,8 @@ public class NxCommunityOrdersSubController {
         mapA.put("orderUserId", orderUserId);
         mapA.put("status", -1);
         mapA.put("oderType", orderType);
-        System.out.println("apappapap" + mapA);
+        mapA.put("splicingOrderId", spId);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
-
         return R.ok().put("data", nxCommunityOrdersSubEntities);
 
 
@@ -1230,7 +1245,7 @@ public class NxCommunityOrdersSubController {
 
     @ResponseBody
     @RequestMapping(value = "/reduceGoodsOrder", method = RequestMethod.POST)
-    public R reduceGoodsOrder(Integer goodsId, Integer orderUserId, Integer orderType) {
+    public R reduceGoodsOrder(Integer goodsId, Integer orderUserId, Integer orderType, Integer spId) {
 
         NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
         if (goodsEntity.getNxCgGoodsHuaxianPrice() != null) {
@@ -1241,6 +1256,7 @@ public class NxCommunityOrdersSubController {
             map.put("status", -1);
             map.put("diffPrice", 0);
             map.put("orderType", orderType);
+            map.put("splicingOrderId", spId);
             NxCommunityOrdersSubEntity diffZeroSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
             if (diffZeroSubOrderEntity != null) {
                 BigDecimal orderQuantity = new BigDecimal(diffZeroSubOrderEntity.getNxCosQuantity());
@@ -1261,6 +1277,7 @@ public class NxCommunityOrdersSubController {
                 mapD.put("status", -1);
                 mapD.put("dayuDiffPrice", 0);
                 mapD.put("orderType", orderType);
+                mapD.put("splicingOrderId", spId);
                 System.out.println("dayoouuiiuiououo" + mapD);
                 //有优惠的订单
                 NxCommunityOrdersSubEntity diffSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapD);
@@ -1288,6 +1305,7 @@ public class NxCommunityOrdersSubController {
             map.put("goodsId", goodsId);
             map.put("status", -1);
             map.put("orderType", orderType);
+            map.put("splicingOrderId", spId);
             NxCommunityOrdersSubEntity commSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
             if (commSubOrderEntity != null) {
                 BigDecimal orderQuantity = new BigDecimal(commSubOrderEntity.getNxCosQuantity());
@@ -1311,30 +1329,38 @@ public class NxCommunityOrdersSubController {
         mapA.put("orderUserId", orderUserId);
         mapA.put("status", -1);
         mapA.put("orderType", orderType);
-        System.out.println("apappapap" + mapA);
+        mapA.put("splicingOrderId", spId);
+        System.out.println("aaaaaaaaa" + mapA);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
         if(nxCommunityOrdersSubEntities.size() > 0){
 
             Map<String, Object> mapCard = new HashMap<>();
             mapCard.put("status", -1);
-            mapCard.put("orderUserId",orderUserId);
-            mapCard.put("type",orderType);
+            mapCard.put("userId",orderUserId);
+//            mapCard.put("type",orderType);
+            System.out.println("bbbbbbbbbbbbb" + mapCard);
             List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
-            int hasApply = 0;
-            for(NxCustomerUserCardEntity userCardEntity: cardEntities){
 
+            for(NxCustomerUserCardEntity userCardEntity: cardEntities){
+                int hasApply = 0;
                 NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(userCardEntity.getNxCucaCardId());
                 Integer nxCommunityCardId = cardEntity.getNxCommunityCardId();
+                System.out.println("commdmdcairriidid" + nxCommunityCardId);
+                System.out.println("commdmdcairriidid" + cardEntity.getNxCommunityCardName());
                 for(NxCommunityOrdersSubEntity subEntity: nxCommunityOrdersSubEntities){
+
                     Integer nxCosCommunityGoodsId = subEntity.getNxCosCommunityGoodsId();
+
                     NxCommunityGoodsEntity goodsEntityS = nxCommunityGoodsService.queryObject(nxCosCommunityGoodsId);
                     if(goodsEntityS.getNxCgCardId() != null){
+
                         if(goodsEntityS.getNxCgCardId().equals(nxCommunityCardId)){
                             hasApply = 1;
                         }
                     }
                 }
+                System.out.println("carddddndnhasapapaply" + hasApply);
                 if(hasApply == 0){
                     nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
                 }
@@ -1344,8 +1370,8 @@ public class NxCommunityOrdersSubController {
         else{
             Map<String, Object> mapCard = new HashMap<>();
             mapCard.put("status", -1);
-            mapCard.put("orderUserId",orderUserId);
-            mapCard.put("type",orderType);
+            mapCard.put("userId",orderUserId);
+//            mapCard.put("type",orderType);
             List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
             for(NxCustomerUserCardEntity userCardEntity: cardEntities){
                 nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
@@ -1357,8 +1383,8 @@ public class NxCommunityOrdersSubController {
 
         Map<String, Object> mapCard = new HashMap<>();
         mapCard.put("status", -1);
-        mapCard.put("orderUserId",orderUserId);
-        mapCard.put("type",orderType);
+        mapCard.put("userId",orderUserId);
+//        mapCard.put("type",orderType);
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
 
         Map<String, Object> mapData = new HashMap<>();
@@ -1436,8 +1462,8 @@ public class NxCommunityOrdersSubController {
 
             Map<String, Object> mapCard = new HashMap<>();
             mapCard.put("status", -1);
-            mapCard.put("orderUserId",orderUserId);
-            mapCard.put("type",orderType);
+            mapCard.put("userId",orderUserId);
+//            mapCard.put("type",orderType);
             List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
             int hasApply = 0;
             for(NxCustomerUserCardEntity userCardEntity: cardEntities){
@@ -1462,8 +1488,8 @@ public class NxCommunityOrdersSubController {
         else{
             Map<String, Object> mapCard = new HashMap<>();
             mapCard.put("status", -1);
-            mapCard.put("orderUserId",orderUserId);
-            mapCard.put("type",orderType);
+            mapCard.put("userId",orderUserId);
+//            mapCard.put("type",orderType);
             List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
             for(NxCustomerUserCardEntity userCardEntity: cardEntities){
                 nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
@@ -1475,8 +1501,8 @@ public class NxCommunityOrdersSubController {
 
         Map<String, Object> mapCard = new HashMap<>();
         mapCard.put("status", -1);
-        mapCard.put("orderUserId",orderUserId);
-        mapCard.put("type",orderType);
+        mapCard.put("userId",orderUserId);
+//        mapCard.put("type",orderType);
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
 
         Map<String, Object> mapData = new HashMap<>();

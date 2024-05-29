@@ -118,27 +118,6 @@ public class NxCommunitySplicingOrdersController {
 
 		splicingOrdersEntity.setNxCsoStatus(2);
 		nxCommSplicingOrdersService.update(splicingOrdersEntity);
-
-		if(splicingOrdersEntity.getNxCsoBuyMemberCardTime() > 0){
-			List<NxCustomerUserCardEntity> nxCustomerUserCardEntities = splicingOrdersEntity.getNxCustomerUserCardEntities();
-			if(nxCustomerUserCardEntities.size() > 0){
-				for(NxCustomerUserCardEntity userCardEntity: nxCustomerUserCardEntities){
-					userCardEntity.setNxCucaComSplicingOrderId(splicingOrdersEntity.getNxCommunitySplicingOrdersId());
-					nxCustomerUserCardService.update(userCardEntity);
-				}
-			}
-		}
-
-
-
-//		List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = splicingOrdersEntity.getNxCommunityOrdersSubEntities();
-//		if(nxCommunityOrdersSubEntities.size() > 0){
-//			for(NxCommunityOrdersSubEntity subEntity: nxCommunityOrdersSubEntities){
-//				subEntity.setNxCosStatus(1);
-//				nxCommunityOrdersSubService.update(subEntity);
-//			}
-//		}
-
 		return R.ok();
 	}
 

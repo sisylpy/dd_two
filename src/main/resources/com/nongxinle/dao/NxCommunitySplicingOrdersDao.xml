@@ -24,7 +24,7 @@
 		    and  spSub.nx_COS_order_user_id = #{orderUserId} and spSub.nx_cos_type = #{orderType}
 		left join nx_customer_user as ncu on ncu.nx_CU_user_id = spSub.nx_COS_order_user_id
 		left join nx_customer_user_card as nccc on nccc.nx_cuca_customer_user_id = #{orderUserId} and
-		                                           nccc.nx_cuca_status = -1 and nccc.nx_cuca_type = 1
+		                                           nccc.nx_cuca_status = -1
 		left join nx_community_card as ncc  on ncc.nx_community_card_id = nccc.nx_cuca_card_id
 		left join nx_community_goods as ncg on ncg.nx_community_goods_id = spSub.nx_COS_community_goods_id
 
