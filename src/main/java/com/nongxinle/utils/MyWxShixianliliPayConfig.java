@@ -35,8 +35,6 @@ public class MyWxShixianliliPayConfig implements WXPayConfig {
 
 
 
-
-
     @Override
     public InputStream getCertStream() {
         return null;

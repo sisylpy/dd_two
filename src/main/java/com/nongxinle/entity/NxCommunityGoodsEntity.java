@@ -41,6 +41,7 @@ public class NxCommunityGoodsEntity implements Serializable, Comparable {
 	 *  商品状态
 	 */
 	private Integer nxCgGoodsStatus;
+	private Integer nxCgIsOpenAdsense;
 
 	/**
 	 *  是否称重
@@ -77,6 +78,7 @@ public class NxCommunityGoodsEntity implements Serializable, Comparable {
 	 * image
 	 */
 	private String nxCgNxFatherImg;
+	private String nxCgNxGoodsTopFilePath;
 	private Integer nxCgNxGrandId;
 	private String nxCgNxGrandName;
 	private Integer nxCgNxGreatGrandId;
@@ -163,6 +165,12 @@ public class NxCommunityGoodsEntity implements Serializable, Comparable {
 	private String nxCgStartTimeZone;
 	private String nxCgStopTimeZone;
 	private String nxCgStopTime;
+	private String nxCgAdsenseStartTime;
+	private String nxCgAdsenseStopTime;
+	private String nxCgAdsenseStartTimeZone;
+	private String nxCgAdsenseStopTimeZone;
+	private Integer nxCgAdsenseStockQuantity;
+	private Integer nxCgAdsenseRestQuantity;
 
 	private NxCommunityCardEntity nxCommunityCardEntity;
 

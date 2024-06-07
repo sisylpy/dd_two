@@ -40,6 +40,14 @@ public class NxCommunityTypeUtils {
     public final static Integer NX_COMMUNITY_ORDER_PAYMENT_STATUS_TO_PAY = 0;  ///提交微信支付
     public final static Integer NX_COMMUNITY_ORDER_PAYMENT_STATUS_PAYED = 1;  ///微信支付成功
 
+    public final static Integer NX_COMMUNITY_GOODS_SELL_TYPE_ALL = 0;  //全时段
+    public final static Integer NX_COMMUNITY_GOODS_SELL_TYPE_PART = 1;  //分时段
+
+
+    public final static Integer NX_COMMUNITY_GOODS_PULL_OFF_ON = 0;  //商家
+    public final static Integer NX_COMMUNITY_GOODS_PULL_OFF_YES = 1;  //分时段
+
+
 
 
 }

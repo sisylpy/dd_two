@@ -57,7 +57,7 @@ public class NxCustomerUserEntity implements Serializable {
 	/**
 	 *
 	 */
-	private Float nxCuOrderAmount;
+	private String nxCuOrderAmount;
 
 	/**
 	 *

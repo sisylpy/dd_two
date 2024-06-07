@@ -34,7 +34,8 @@
 		 	`nx_community_polygon`,
 		 	`nx_community_region`,
 		 	`nx_community_delivery_address`,
-		 	`nx_community_type`
+		 	`nx_community_type`,
+		 	`nx_community_wx_file`
 		)
 		values
 		(
@@ -47,7 +48,8 @@
 		 	#{nxCommunityPolygon},
 		 	#{nxCommunityRegion},
 		 	#{nxCommunityDeliveryAddress},
-		 	#{nxCommunityType}
+		 	#{nxCommunityType},
+		 	#{nxCommunityWxFile}
 		)
 	</insert>
 	 
@@ -62,6 +64,7 @@
 			<if test="nxCommunityRegion != null">`nx_community_region` = #{nxCommunityRegion}, </if>
 			<if test="nxCommunityDeliveryAddress != null">`nx_community_delivery_address` = #{nxCommunityDeliveryAddress}, </if>
 			<if test="nxCommunityType != null">`nx_community_type` = #{nxCommunityType}, </if>
+			<if test="nxCommunityWxFile != null">`nx_community_wx_file` = #{nxCommunityWxFile}, </if>
 			<if test="nxCommunityLng != null">`nx_community_lng` = #{nxCommunityLng}</if>
 		</set>
 		where nx_community_id = #{nxCommunityId}

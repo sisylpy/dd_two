@@ -106,11 +106,11 @@ public class NxCommunityFatherGoodsServiceImpl implements NxCommunityFatherGoods
 		return nxCommunityFatherGoodsDao.queryGrandGoodsWithOrders(map);
     }
 
-    @Override
-    public List<NxCommunityFatherGoodsEntity> queryGrandGoodsWithOrdersPindan(Map<String, Object> map) {
-
-		return nxCommunityFatherGoodsDao.queryGrandGoodsWithOrdersPindan(map);
-    }
+//    @Override
+//    public List<NxCommunityFatherGoodsEntity> queryGrandGoodsWithOrdersPindan(Map<String, Object> map) {
+//
+//		return nxCommunityFatherGoodsDao.queryGrandGoodsWithOrdersPindan(map);
+//    }
 
     @Override
     public List<NxCommunityFatherGoodsEntity> queryGrandGoodsAdmin(Map<String, Object> map) {

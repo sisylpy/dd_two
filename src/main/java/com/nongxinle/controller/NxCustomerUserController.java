@@ -57,6 +57,19 @@ public class NxCustomerUserController {
 
 
 
+	@RequestMapping(value = "/commSearchCustomer", method = RequestMethod.POST)
+	@ResponseBody
+	public R commSearchCustomer (Integer commId, String phone) {
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("commId", commId);
+		map.put("phone", phone);
+		System.out.println("searcusut" + map);
+		List<NxCustomerUserEntity> userEntities =  nxCustomerUserService.queryCustomerByParams(map);
+	    return R.ok().put("data", userEntities);
+	}
+
+
 
 	@RequestMapping(value = "/updateCustomerUser", method = RequestMethod.POST)
 	@ResponseBody
@@ -106,47 +119,6 @@ public class NxCustomerUserController {
 
 
 
-
-
-	@RequestMapping(value = "/getUserPhone", method = RequestMethod.POST)
-	@ResponseBody
-	public R getUserPhone(String code,String openId) {
-		MyAPPIDConfig myAPPIDConfig = new MyAPPIDConfig();
-		String appId = myAPPIDConfig.getShixianLiliAppId();
-		String secret  = myAPPIDConfig.getShixianLiliScreat();
-//
-//
-		System.out.println("codeee" + code);
-		String url = String.format("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", appId, secret);
-		String str = WeChatUtil.httpRequest(url, "GET", null);
-		System.out.println("str=====>>>>" + str);
-		// 转成Json对象 获取openid
-		JSONObject jsonObject = JSONObject.parseObject(str);
-		System.out.println("jsonObject" + jsonObject);
-		String accessToken = jsonObject.getString("access_token");
-		//通过token和code来获取用户手机号
-		String urlP = "https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=" + accessToken + "&code=" + code;
-//		JSONObject jsonObjectP = new JSONObject();
-		Map<String, Object> map = new HashMap<>();
-		map.put("code", code);
-		String body = HttpRequest.post(urlP).body(JSONUtil.toJsonStr(map), ContentType.JSON.getValue()).execute().body();
-
-		JSONObject jsonObjectP = JSONObject.parseObject(body);
-
-		String phoneI = jsonObjectP.getString("phone_info");
-		JSONObject jsonObjectPInfo = JSONObject.parseObject(phoneI);
-		String phone = jsonObjectPInfo.getString("phoneNumber");
-
-		System.out.println("bodydyyddyyd" + phone);
-
-		NxCustomerUserEntity userEntity = nxCustomerUserService.queryUserByOpenId(openId);
-		userEntity.setNxCuWxPhoneNumber(phone);
-		nxCustomerUserService.update(userEntity);
-
-
-
-	    return R.ok();
-	}
 
 
 	@RequestMapping(value = "/customerUserLogin/{code}")

@@ -80,4 +80,10 @@ public class NxCustomerUserServiceImpl implements NxCustomerUserService {
 		return map;
     }
 
+    @Override
+    public List<NxCustomerUserEntity> queryCustomerByParams(Map<String, Object> map) {
+
+		return nxCustomerUserDao.queryCustomerByParams(map);
+    }
+
 }

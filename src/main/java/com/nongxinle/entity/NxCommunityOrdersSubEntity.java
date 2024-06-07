@@ -125,6 +125,7 @@ public class NxCommunityOrdersSubEntity implements Serializable, Comparable {
 
 	private NxCommunityEntity nxCommunityEntity;
 	private NxCustomerUserGoodsEntity nxCustomerUserGoodsEntity;
+	private NxCustomerUserCardEntity nxCustomerUserCardEntity;
 
 
 

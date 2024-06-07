@@ -31,25 +31,8 @@ public class WxPay {
     public static void main(String[] args)  throws Exception{
 
 
-//            long averageTimeStamp =  timeStampTotal / stockCount ;
-//            long nowTimeStamp = System.currentTimeMillis() / 1000;
-//            long l = nowTimeStamp - averageTimeStamp;
-//            long l1 = l / 1000 / 60 / 60 / 24;
-//
 
-
-//        }
-//        String pinyin = hanziToPinyin("塑料袋（大）");
-//        System.out.println(pinyin);
-        String headPinyin = getHeadStringByString("塑料袋(大)", false, null);
-
-//        System.out.println(headPinyin);
-
-//        String s = afterWhatDay("2023-6-12", 1);
-//        System.out.println(s);
-//        System.out.println("ssstestPrintTime" + getWhatDayTimeStone("2024-05-01"));
-//
-        System.out.println("sss" +generatePickNumber(3));
+        System.out.println(" ttitiitiit"+  formatWhatDayMinute(10));
 
 
     }

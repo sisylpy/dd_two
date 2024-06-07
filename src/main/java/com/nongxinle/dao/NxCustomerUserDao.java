@@ -9,6 +9,7 @@ package com.nongxinle.dao;
 
 import com.nongxinle.entity.NxCustomerUserEntity;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -19,4 +20,6 @@ public interface NxCustomerUserDao extends BaseDao<NxCustomerUserEntity> {
     NxCustomerUserEntity queryUserByOpenId(String openid);
 
     Map<String, Object> queryCustomerUserInfo(Integer gbDepartmentUserId);
+
+    List<NxCustomerUserEntity> queryCustomerByParams(Map<String, Object> map);
 }

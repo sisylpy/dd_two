@@ -70,6 +70,10 @@ public class MyAPPIDConfig  {
         return "1f9543a012cab8874f88d0779d05251b";
     }
 
+    public String getShipinUserName(){ return "sphqFvEt6ugobZU"; }
+    public String getShipinId(){
+        return "export/UzFfAgtgekIEAQAAAAAAW-0PSW7LbwAAAAstQy6ubaLX4KHWvLEZgBPE3aM8Yj5zBpSEzNPgMJqlIFjEi5Ux6MJnJNZtneTU";
+    }
 
     /**
      * 用户名： liziyishangthree@163.com

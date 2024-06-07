@@ -113,7 +113,7 @@ public class NxCustomerUserGoodsController {
     @ResponseBody
     public R customerSearchGoods(Integer commId, String searchStr, Integer userId) {
         Map<String, Object> map = new HashMap<>();
-        map.put("comId", commId);
+        map.put("commId", commId);
         map.put("searchStr", searchStr);
         map.put("userId", userId);
         map.put("nowMinute", getNowMinute());

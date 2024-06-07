@@ -243,5 +243,17 @@ public class NxCommunityCommunityOrdersServiceImpl implements NxCommunityOrdersS
 		return nxCommunityOrdersDao.queryOrdersItemDetail(map);
     }
 
+    @Override
+    public Integer queryCommOrderCount(Map<String, Object> map) {
+
+		return nxCommunityOrdersDao.queryCommOrderCount(map);
+    }
+
+    @Override
+    public double queryCommOrderSubtotal(Map<String, Object> map) {
+
+		return nxCommunityOrdersDao.queryCommOrderSubtotal(map);
+    }
+
 
 }

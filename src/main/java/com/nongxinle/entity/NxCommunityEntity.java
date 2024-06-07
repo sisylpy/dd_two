@@ -47,6 +47,7 @@ public class NxCommunityEntity implements Serializable {
 
 	private String nxCommunityRegion;
 	private String nxCommunityDeliveryAddress;
+	private String nxCommunityWxFile;
 
 	private NxCommunityUserEntity nxCommunityUserEntity;
 

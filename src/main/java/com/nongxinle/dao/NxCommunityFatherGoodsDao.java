@@ -33,7 +33,7 @@ public interface NxCommunityFatherGoodsDao extends BaseDao<NxCommunityFatherGood
 
     List<NxCommunityFatherGoodsEntity> queryGrandGoodsWithOrders(Map<String, Object> map);
 
-    List<NxCommunityFatherGoodsEntity> queryGrandGoodsWithOrdersPindan(Map<String, Object> map);
+//    List<NxCommunityFatherGoodsEntity> queryGrandGoodsWithOrdersPindan(Map<String, Object> map);
 
     List<NxCommunityFatherGoodsEntity> queryGrandGoodsAdmin(Map<String, Object> map);
 }

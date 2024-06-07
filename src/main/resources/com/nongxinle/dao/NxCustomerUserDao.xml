@@ -76,6 +76,18 @@
 			</if>
 		</where>
 	</select>
+	<select id="queryCustomerByParams" resultType="com.nongxinle.entity.NxCustomerUserEntity">
+
+		select * from nx_customer_user as ncu
+		<where>
+			<if test="commId != null">
+				and ncu.nx_CU_community_id = #{commId}
+			</if>
+			<if test="phone != null">
+				and ncu.nx_CU_wx_phone_number like  concat('%', #{phone}, '%')
+			</if>
+		</where>
+	</select>
 
 
 	<insert id="save" parameterType="com.nongxinle.entity.NxCustomerUserEntity" useGeneratedKeys="true" keyProperty="nxCuUserId">

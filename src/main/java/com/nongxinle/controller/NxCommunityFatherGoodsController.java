@@ -161,52 +161,6 @@ public class NxCommunityFatherGoodsController {
     }
 
 
-    //
-    @RequestMapping(value = "/getFatherWithGoodsPindan", method = RequestMethod.POST)
-    @ResponseBody
-    public R getFatherWithGoodsPindan(Integer commId, Integer orderUserId, Integer splicingOrderId) {
-
-        System.out.println("idcommdmmdmdmdmdm" + commId);
-        Map<String, Object> map = new HashMap<>();
-        map.put("commId", commId);
-        map.put("level", 2);
-        map.put("nowMinute", getNowMinute());
-        if(orderUserId != -1){
-            map.put("orderUserId", orderUserId);
-            map.put("xiaoyuStatus", 2);
-            map.put("dayuType", 3);
-            if(splicingOrderId != -1){
-                map.put("splicingOrderId", splicingOrderId);
-            }
-
-
-        }
-
-        System.out.println("typtptprmapappapa" + map);
-        List<NxCommunityFatherGoodsEntity> fatherGoodsEntities =  cfgService.queryGrandGoodsWithOrdersPindan(map);
-
-//
-        Map<String, Object> mapA = new HashMap<>();
-        mapA.put("orderUserId", orderUserId);
-        mapA.put("status", 0);
-        mapA.put("dayuType", 3);
-        if(splicingOrderId != -1){
-            mapA.put("splicingOrderId", splicingOrderId);
-        }
-
-        System.out.println("fafaslfasfasaaaaaa" + mapA);
-        List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
-
-        List<NxCommunityAdsenseEntity> adsenseEntities = nxCommunityAdsenseService.queryAdsenseByNxCommunityId(commId);
-
-        Map<String, Object> mapR = new HashMap<>();
-
-        mapR.put("adsense", adsenseEntities);
-        mapR.put("arr", fatherGoodsEntities);
-        mapR.put("subOrders", nxCommunityOrdersSubEntities);
-
-        return R.ok().put("data", mapR);
-    }
 
 
     //
@@ -236,6 +190,7 @@ public class NxCommunityFatherGoodsController {
         map.put("commId", commId);
         map.put("level", 2);
         map.put("nowMinute", getNowMinute());
+        map.put("off", 0);
         map.put("splicingOrderId", spId);
         if(orderUserId != -1){
             map.put("orderUserId", orderUserId);
@@ -384,7 +339,7 @@ public class NxCommunityFatherGoodsController {
     @ResponseBody
     public R comGetComGoodsCata(@PathVariable Integer comId) {
         Map<String, Object> map = new HashMap<>();
-        map.put("comId", comId);
+        map.put("commId", comId);
         System.out.println("whwhwhhw" + map);
         List<NxCommunityFatherGoodsEntity> comGoodsCata = cfgService.queryComGoodsCata(map);
         if (comGoodsCata.size() > 0) {

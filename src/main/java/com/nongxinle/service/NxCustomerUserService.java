@@ -31,4 +31,6 @@ public interface NxCustomerUserService {
 	NxCustomerUserEntity queryUserByOpenId(String openid);
 
 	Map<String, Object> queryCustomerUserInfo(Integer gbDepartmentUserId);
+
+    List<NxCustomerUserEntity> queryCustomerByParams(Map<String, Object> map);
 }

@@ -7,24 +7,27 @@ package com.nongxinle.controller;
  * @date 2020-03-04 17:57:31
  */
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nongxinle.entity.NxCommunityCardEntity;
 import com.nongxinle.entity.NxCommunityFatherGoodsEntity;
 import com.nongxinle.entity.NxCommunityUserEntity;
 import com.nongxinle.service.NxCommunityFatherGoodsService;
 import com.nongxinle.service.NxCommunityUserService;
-import com.nongxinle.utils.MyAPPIDConfig;
-import com.nongxinle.utils.WeChatUtil;
+import com.nongxinle.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.nongxinle.entity.NxCommunityEntity;
 import com.nongxinle.service.NxCommunityService;
-import com.nongxinle.utils.PageUtils;
-import com.nongxinle.utils.R;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
 
 
 @RestController
@@ -87,6 +90,7 @@ public class NxCommunityController {
 			nxCommunityUserEntity.setNxCouCommunityId(communityId);
 			nxCommunityUserEntity.setNxCouWxOpenId(openid);
 			nxCommunityUserEntity.setNxCouDeviceId("-1");
+			nxCommunityUserEntity.setNxCouUrlIsChange(0);
 			nxCommunityUserService.save(nxCommunityUserEntity);
 
 
@@ -151,36 +155,43 @@ public class NxCommunityController {
 	@ResponseBody
 	public String newCustomerRegist( ) { return "bb7a0c73e61112c45ebd6ad3743bb05e"; }
 
-	/**
-	 * 社区用户注册时候查询地图坐标
-	 * @param communityId 社区id
-	 * @return 社区列表
-	 */
-//	@RequestMapping(value = "/newCustomerRegist/{communityId}")
-//	@ResponseBody
-//	public R newCustomerRegist(@PathVariable Integer communityId) {
-//		return R.ok().put("data", nxCommunityService.queryObject(communityId));
-//	}
 
-
-
-	/**
-	 * 修改
-	 */
+	@RequestMapping(value = "/updateCommWxWithFile", method = RequestMethod.POST)
 	@ResponseBody
-	@RequestMapping("/update")
-//	@RequiresPermissions("nxcommunity:update")
-	public R update(@RequestBody NxCommunityEntity nxCommunity){
-		nxCommunityService.update(nxCommunity);
-		
+	public R updateCommWxWithFile(@RequestParam("file") MultipartFile file,
+								@RequestParam("id") Integer id,
+								HttpSession session) {
+		//1,上传图片
+		String newUploadName = "userImage";
+		String realPath = UploadFile.upload(session, newUploadName, file);
+		String filename = file.getOriginalFilename();
+		String filePath = newUploadName + "/" + filename;
+
+		NxCommunityEntity communityCardEntity = nxCommunityService.queryObject(id);
+		if (communityCardEntity.getNxCommunityWxFile() != null) {
+			ServletContext servletContext = session.getServletContext();
+			String realPath1 = servletContext.getRealPath(communityCardEntity.getNxCommunityWxFile());
+			File file1 = new File(realPath1);
+			if (file1.exists()) {
+				file1.delete();
+			}
+		}
+
+		communityCardEntity.setNxCommunityWxFile(filePath);
+
+		nxCommunityService.update(communityCardEntity);
+
 		return R.ok();
 	}
-	@RequestMapping(value = "/info/{id}")
+
+	@RequestMapping(value = "/updateCommunity", method = RequestMethod.POST)
 	@ResponseBody
-	public R info(@PathVariable Integer id) {
-		NxCommunityEntity communityEntity = nxCommunityService.queryObject(id);
-		return R.ok().put("data", communityEntity);
+	public R updateCommunity (@RequestBody NxCommunityEntity comm) {
+	    nxCommunityService.update(comm);
+	    return R.ok();
 	}
+
+
 
 	
 }

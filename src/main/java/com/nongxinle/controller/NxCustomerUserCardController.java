@@ -33,7 +33,7 @@ public class NxCustomerUserCardController {
 	public R userGetCards (@PathVariable Integer id) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("userId", id);
-		map.put("status", 0);
+		map.put("status", 1);
 		System.out.println("getupodddi");
 		List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(map);
 		return R.ok().put("data", cardEntities);

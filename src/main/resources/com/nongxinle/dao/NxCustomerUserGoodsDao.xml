@@ -25,6 +25,19 @@
 
 	<resultMap id="disGoods" type="NxCommunityGoodsEntity">
 		<id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
+		<result property="nxCgAdsenseStartTimeZone" column="nx_cg_adsense_start_time_zone"/>
+		<result property="nxCgAdsenseStopTimeZone" column="nx_cg_adsense_stop_time_zone"/>
+		<result property="nxCgAdsenseStartTimeZone" column="nx_cg_adsense_start_time_zone"/>
+		<result property="nxCgAdsenseStopTimeZone" column="nx_cg_adsense_stop_time_zone"/>
+		<result property="nxCgAdsenseStartTime" column="nx_cg_adsense_start_time"/>
+		<result property="nxCgAdsenseStopTime" column="nx_cg_adsense_stop_time"/>
+		<result property="nxCgAdsenseStockQuantity" column="nx_cg_adsense_stock_quantity"/>
+		<result property="nxCgAdsenseRestQuantity" column="nx_cg_adsense_rest_quantity"/>
+		<result property="nxCgAdsenseStartTime" column="nx_cg_adsense_start_time"/>
+		<result property="nxCgAdsenseStopTime" column="nx_cg_adsense_stop_time"/>
+		<result property="nxCgAdsenseStockQuantity" column="nx_cg_adsense_stock_quantity"/>
+		<result property="nxCgAdsenseRestQuantity" column="nx_cg_adsense_rest_quantity"/>
+        <result property="nxCgIsOpenAdsense" column="nx_cg_is_open_adsense"/>
 		<result property="nxCgSellType" column="nx_cg_sell_type"/>
 		<result property="nxCgCardId" column="nx_cg_card_id"/>
 		<result property="nxCgStartTime" column="nx_cg_start_time"/>
@@ -38,6 +51,7 @@
 		<result property="nxCgCommunityId" column="nx_cg_community_id"/>
 		<result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
 		<result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
+		<result property="nxCgNxGoodsTopFilePath" column="nx_cg_nx_goods_top_file_path"/>
 		<result property="nxCgGoodsName" column="nx_cg_goods_name"/>
 		<result property="nxCgGoodsStandardname" column="nx_cg_goods_standardname"/>
 		<result property="nxCgGoodsBrand" column="nx_cg_goods_brand"/>
@@ -178,6 +192,13 @@
 
 	<resultMap id="comGoodsWithAllOrders" type="NxCommunityGoodsEntity">
 		<id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
+		<result property="nxCgAdsenseStartTimeZone" column="nx_cg_adsense_start_time_zone"/>
+		<result property="nxCgAdsenseStopTimeZone" column="nx_cg_adsense_stop_time_zone"/>
+		<result property="nxCgAdsenseStartTime" column="nx_cg_adsense_start_time"/>
+		<result property="nxCgAdsenseStopTime" column="nx_cg_adsense_stop_time"/>
+		<result property="nxCgAdsenseStockQuantity" column="nx_cg_adsense_stock_quantity"/>
+		<result property="nxCgAdsenseRestQuantity" column="nx_cg_adsense_rest_quantity"/>
+        <result property="nxCgIsOpenAdsense" column="nx_cg_is_open_adsense"/>
 		<result property="nxCgSellType" column="nx_cg_sell_type"/>
 		<result property="nxCgCardId" column="nx_cg_card_id"/>
 		<result property="nxCgStartTime" column="nx_cg_start_time"/>
@@ -191,6 +212,7 @@
 		<result property="nxCgCommunityId" column="nx_cg_community_id"/>
 		<result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
 		<result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
+		<result property="nxCgNxGoodsTopFilePath" column="nx_cg_nx_goods_top_file_path"/>
 		<result property="nxCgGoodsName" column="nx_cg_goods_name"/>
 		<result property="nxCgGoodsStandardname" column="nx_cg_goods_standardname"/>
 		<result property="nxCgGoodsBrand" column="nx_cg_goods_brand"/>
@@ -224,6 +246,7 @@
 		<result property="nxCgGoodsType" column="nx_cg_goods_type"/>
 		<result property="nxCgBuyingPrice" column="nx_cg_buying_price"/>
 		<result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
+		<result property="nxCgNxGoodsTopFilePath" column="nx_cg_nx_goods_top_file_path"/>
 		<association property="nxCommunityCardEntity" resultMap="goodsCard"/>
 		<association property="ordersSubEntity" resultMap="subOrder"/>
 		<association property="memberOrdersSubEntity" resultMap="memberSubOrder"/>

@@ -42,6 +42,13 @@
     </resultMap>
     <resultMap id="commGoods" type="NxCommunityGoodsEntity">
         <id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
+		<result property="nxCgAdsenseStartTimeZone" column="nx_cg_adsense_start_time_zone"/>
+		<result property="nxCgAdsenseStopTimeZone" column="nx_cg_adsense_stop_time_zone"/>
+		<result property="nxCgAdsenseStartTime" column="nx_cg_adsense_start_time"/>
+		<result property="nxCgAdsenseStopTime" column="nx_cg_adsense_stop_time"/>
+		<result property="nxCgAdsenseStockQuantity" column="nx_cg_adsense_stock_quantity"/>
+		<result property="nxCgAdsenseRestQuantity" column="nx_cg_adsense_rest_quantity"/>
+        <result property="nxCgIsOpenAdsense" column="nx_cg_is_open_adsense"/>
 		<result property="nxCgSellType" column="nx_cg_sell_type"/>
         <result property="nxCgCardId" column="nx_cg_card_id"/>
         <result property="nxCgStartTime" column="nx_cg_start_time"/>
@@ -55,6 +62,7 @@
         <result property="nxCgCommunityId" column="nx_cg_community_id"/>
         <result property="nxCgSetSubNumber" column="nx_cg_set_sub_number"/>
         <result property="nxCgNxGoodsFilePath" column="nx_cg_nx_goods_file_path"/>
+		<result property="nxCgNxGoodsTopFilePath" column="nx_cg_nx_goods_top_file_path"/>
         <result property="nxCgGoodsName" column="nx_cg_goods_name"/>
         <result property="nxCgGoodsStandardname" column="nx_cg_goods_standardname"/>
         <result property="nxCgGoodsBrand" column="nx_cg_goods_brand"/>
@@ -93,11 +101,23 @@
     </resultMap>
 
     <resultMap id="community" type="NxCommunityEntity">
-        <id property="nxCommunityId" column="nx_community_id"/>
+        		<id property="nxCommunityId" column="nx_community_id"/>
+		<result property="nxCommunityWxFile" column="nx_community_wx_file"/>
 		<result property="nxCommunityType" column="nx_community_type"/>
         <result property="nxCommunityName" column="nx_community_name"/>
     </resultMap>
 
+    <resultMap id="userCard" type="NxCustomerUserCardEntity">
+        <id property="nxCustomerUserCardId" column="nx_customer_user_card_id"/>
+        <result property="nxCucaIsSelected" column="nx_cuca_is_selected"/>
+        <result property="nxCucaCardId" column="nx_cuca_card_id"/>
+        <result property="nxCucaCustomerUserId" column="nx_cuca_customer_user_id"/>
+        <result property="nxCucaStartDate" column="nx_cuca_start_date"/>
+        <result property="nxCucaStopDate" column="nx_cuca_stop_date"/>
+        <result property="nxCucaStatus" column="nx_cuca_status"/>
+        <result property="nxCucaType" column="nx_cuca_type"/>
+        <result property="nxCucaCommunityId" column="nx_cuca_community_id"/>
+    </resultMap>
     <resultMap id="subOrders" type="NxCommunityOrdersSubEntity">
          <id property="nxCommunityOrdersSubId" column="nx_community_orders_sub_id"/>
         <result property="nxCosSplicingOrdersId" column="nx_COS_splicing_orders_id"/>
@@ -128,6 +148,7 @@
         <result property="nxCosPurchaseUserId" column="nx_COS_purchase_usr_id"/>
         <association property="nxCommunityGoodsEntity"  resultMap="commGoods"/>
         <association property="nxCommunityEntity" resultMap="community"/>
+        <association property="nxCustomerUserCardEntity" resultMap="userCard"/>
     </resultMap>
     <resultMap id="printSubOrders" type="NxCommunityPrintOrdersSubEntity">
         <id property="nxCommunityOrdersPrintSubId" column="nx_community_orders_sub_id"/>
@@ -228,6 +249,7 @@
            left join nx_community_card as ncc on ncc.nx_community_card_id = cg.nx_cg_card_id
         left join nx_community_goods_set_item as ncgsiGoods on ncgsiGoods.nx_cgsi_item_cg_goods_id =
         cg.nx_community_goods_id
+        left join nx_customer_user_card as ncuc on ncuc.nx_cuca_customer_user_id = s.nx_COS_order_user_id and ncuc.nx_cuca_status = 1
         <where>
             <if test="fatherId != null">
               and  nx_COS_community_goods_father_id = #{fatherId}
@@ -310,7 +332,7 @@
                 and  s.nx_COS_service =  #{service}
             </if>
             <if test="time != null">
-                and  s.nx_COS_service_time &gt;  #{time}
+                and  s.nx_COS_service_time &lt;  #{time}
             </if>
         </where>
          limit 1
@@ -375,10 +397,6 @@
     <select id="querySubOrderTotalHuaxianQuantity" resultType="java.lang.Integer">
         select SUM(nx_COS_quantity)
         from nx_community_orders_sub  as s
-        left join nx_community_goods as cg on s.nx_COS_community_goods_id = cg.nx_community_goods_id
-        left join nx_community_card as ncc on ncc.nx_community_card_id = cg.nx_cg_card_id
-        left join nx_community_goods_set_item as ncgsiGoods on ncgsiGoods.nx_cgsi_item_cg_goods_id =
-        cg.nx_community_goods_id
         <where>
             <if test="fatherId != null">
                 and  nx_COS_community_goods_father_id = #{fatherId}

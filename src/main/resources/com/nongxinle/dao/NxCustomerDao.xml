@@ -51,7 +51,8 @@
 		select count(*) from nx_customer where nx_customer_community_id = #{nxCommunityId}
 	</select>
 	<resultMap id="community" type="NxCommunityEntity">
-		<id property="nxCommunityId" column="nx_community_id"/>
+				<id property="nxCommunityId" column="nx_community_id"/>
+		<result property="nxCommunityWxFile" column="nx_community_wx_file"/>
 		<result property="nxCommunityType" column="nx_community_type"/>
 		<result property="nxCommunityName" column="nx_community_name"/>
 		<result property="nxCommunityDeliveryAddress" column="nx_community_delivery_address"/>

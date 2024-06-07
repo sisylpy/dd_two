@@ -20,6 +20,13 @@
 
 	<resultMap id="goods" type="NxCommunityGoodsEntity">
 		<id property="nxCommunityGoodsId" column="nx_community_goods_id"/>
+		<result property="nxCgAdsenseStartTimeZone" column="nx_cg_adsense_start_time_zone"/>
+		<result property="nxCgAdsenseStopTimeZone" column="nx_cg_adsense_stop_time_zone"/>
+		<result property="nxCgAdsenseStartTime" column="nx_cg_adsense_start_time"/>
+		<result property="nxCgAdsenseStopTime" column="nx_cg_adsense_stop_time"/>
+		<result property="nxCgAdsenseStockQuantity" column="nx_cg_adsense_stock_quantity"/>
+		<result property="nxCgAdsenseRestQuantity" column="nx_cg_adsense_rest_quantity"/>
+        <result property="nxCgIsOpenAdsense" column="nx_cg_is_open_adsense"/>
 		<result property="nxCgSellType" column="nx_cg_sell_type"/>
 		<result property="nxCgCardId" column="nx_cg_card_id"/>
 		<result property="nxCgStartTime" column="nx_cg_start_time"/>
@@ -67,6 +74,9 @@
 				<if test="type != null">
 					and nx_cuca_type = #{type}
 				</if>
+				<if test="isSelected != null">
+					and nx_cuca_is_selected = #{isSelected}
+				</if>
 				<if test="stopTime != null">
 					and nx_cuca_stop_date &gt;= #{stopTime}
 				</if>
@@ -97,7 +107,7 @@
 				and nx_cuca_type = #{type}
 			</if>
 			<if test="stopTime != null">
-				and nx_cuca_start_date &lt;= #{stopTime}
+				and nx_cuca_stop_date &gt;= #{stopTime}
 			</if>
 		</where>
 	</select>
@@ -143,7 +153,7 @@
 			<if test="nxCucaType != null">`nx_cuca_type` = #{nxCucaType}, </if>
 			<if test="nxCucaStartDate != null">`nx_cuca_start_date` = #{nxCucaStartDate}, </if>
 			<if test="nxCucaComOrderId != null">`nx_cuca_com_order_id` = #{nxCucaComOrderId}, </if>
-			<if test="nxCucaIsSelected != null">`nx_cuca_is_selected` = #{nxCucaIsSelected}, </if>
+			<if test="nxCucaIsSelected != -99">`nx_cuca_is_selected` = #{nxCucaIsSelected}, </if>
 			<if test="nxCucaComSplicingOrderId != null">`nx_cuca_com_splicing_order_id` = #{nxCucaComSplicingOrderId}, </if>
 			<if test="nxCucaStopDate != null">`nx_cuca_stop_date` = #{nxCucaStopDate}</if>
 		</set>

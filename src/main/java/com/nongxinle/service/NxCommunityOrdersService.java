@@ -45,4 +45,8 @@ public interface NxCommunityOrdersService {
 	void justSaveWithUserGoods(NxCommunityOrdersEntity nxOrders);
 
 	NxCommunityOrdersEntity queryOrdersItemDetail(Map<String, Object> map);
+
+    Integer queryCommOrderCount(Map<String, Object> map);
+
+	double queryCommOrderSubtotal(Map<String, Object> map);
 }

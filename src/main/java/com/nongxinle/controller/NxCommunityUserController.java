@@ -8,6 +8,7 @@ package com.nongxinle.controller;
  */
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -16,15 +17,16 @@ import java.util.*;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nongxinle.entity.*;
-import com.nongxinle.utils.MyAPPIDConfig;
-import com.nongxinle.utils.ParseObject;
-import com.nongxinle.utils.WeChatUtil;
+import com.nongxinle.utils.*;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.nongxinle.service.NxCommunityUserService;
-import com.nongxinle.utils.R;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
 
 import static com.nongxinle.utils.DateUtils.formatWhatDay;
 
@@ -37,11 +39,50 @@ public class NxCommunityUserController {
 
 
 
-	@RequestMapping(value = "/updateCustomerUser", method = RequestMethod.POST)
+
+	@RequestMapping(value = "/updateCommUserWithFile", method = RequestMethod.POST)
 	@ResponseBody
-	public R updateCustomerUser (@RequestBody NxCommunityUserEntity customerUser) {
-		nxCommunityUserService.update(customerUser);
+	public R updateCommUserWithFile(@RequestParam("file") MultipartFile file,
+								  @RequestParam("id") Integer id,
+								  HttpSession session) {
+		//1,上传图片
+		String newUploadName = "userImage";
+		String realPath = UploadFile.upload(session, newUploadName, file);
+		String filename = file.getOriginalFilename();
+		String filePath = newUploadName + "/" + filename;
+
+		NxCommunityUserEntity communityCardEntity = nxCommunityUserService.queryObject(id);
+		if (communityCardEntity.getNxCouWxAvartraUrl() != null) {
+			ServletContext servletContext = session.getServletContext();
+			String realPath1 = servletContext.getRealPath(communityCardEntity.getNxCouWxAvartraUrl());
+			File file1 = new File(realPath1);
+			if (file1.exists()) {
+				file1.delete();
+			}
+		}
+
+		communityCardEntity.setNxCouWxAvartraUrl(filePath);
+		communityCardEntity.setNxCouUrlIsChange(1);
+		nxCommunityUserService.update(communityCardEntity);
+
 		return R.ok();
+	}
+
+
+
+	@RequestMapping(value = "/updateCommunityUser", method = RequestMethod.POST)
+	@ResponseBody
+	public R updateCommunityUser (@RequestBody NxCommunityUserEntity customerUser) {
+		nxCommunityUserService.update(customerUser);
+		return R.ok().put("data", customerUser);
+	}
+
+
+	@RequestMapping(value = "/deleteCommunityUser/{id}")
+	@ResponseBody
+	public R deleteCommunityUser(@PathVariable Integer id) {
+	    nxCommunityUserService.delete(id);
+	    return R.ok();
 	}
 
 
@@ -54,8 +95,8 @@ public class NxCommunityUserController {
 		MyAPPIDConfig myAPPIDConfig = new MyAPPIDConfig();
 
 		// 1, 先检查微信号是否以前注册过
-		String url = "https://api.weixin.qq.com/sns/jscode2session?appid=" + myAPPIDConfig.getShixianLiliAppId() + "&secret=" +
-				myAPPIDConfig.getShixianLiliScreat() + "&js_code=" + user.getNxCouCode() +
+		String url = "https://api.weixin.qq.com/sns/jscode2session?appid=" + myAPPIDConfig.getCommunityAppID() + "&secret=" +
+				myAPPIDConfig.getCommunityScreat() + "&js_code=" + user.getNxCouCode() +
 				"&grant_type=authorization_code";
 		// 发送请求，返回Json字符串
 		String str = WeChatUtil.httpRequest(url, "GET", null);
@@ -75,6 +116,8 @@ public class NxCommunityUserController {
 
 			user.setNxCouWxOpenId(openid);
 			user.setNxCouDeviceId("-1");
+			user.setNxCouUrlIsChange(0);
+
 			nxCommunityUserService.save(user);
 
 			//3..3 返回用户id
@@ -89,6 +132,8 @@ public class NxCommunityUserController {
 		}
 
 	}
+
+
 
 	@RequestMapping(value = "/getComUsers/{comId}")
 	@ResponseBody
@@ -138,6 +183,7 @@ public class NxCommunityUserController {
 			//添加新用户
 			user.setNxCouWxOpenId(openId);
 			user.setNxCouDeviceId("-1");
+			user.setNxCouUrlIsChange(0);
 			nxCommunityUserService.save(user);
 			Integer communityUserId = user.getNxCommunityUserId();
 			Map<String, Object> map2 = new HashMap<>();

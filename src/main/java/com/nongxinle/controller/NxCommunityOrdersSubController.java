@@ -28,8 +28,6 @@ public class NxCommunityOrdersSubController {
     @Autowired
     private NxCommunityGoodsService nxCommunityGoodsService;
     @Autowired
-    private NxCommunitySplicingOrdersService nxCommSplicingOrdersService;
-    @Autowired
     private NxCommunityOrdersService nxCommunityOrdersService;
     @Autowired
     private NxCustomerUserCouponService nxCustomerUserCouponService;
@@ -38,6 +36,28 @@ public class NxCommunityOrdersSubController {
     @Autowired
     private NxCustomerUserCardService nxCustomerUserCardService;
 
+
+    @RequestMapping(value = "/checkAdsenseGoodsSubOrders", method = RequestMethod.POST)
+    @ResponseBody
+    public R checkAdsenseGoodsSubOrders(@RequestBody List<NxCommunityOrdersSubEntity> subList) {
+        System.out.println("checkckckkckckkcc");
+        for (NxCommunityOrdersSubEntity subEntity : subList) {
+            Integer nxCosCommunityGoodsId = subEntity.getNxCosCommunityGoodsId();
+            NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(nxCosCommunityGoodsId);
+            BigDecimal orderOrderQuantity = new BigDecimal(subEntity.getNxCosQuantity());
+            int wxCountAuto = new BigDecimal(goodsEntity.getNxCgAdsenseRestQuantity()).compareTo(orderOrderQuantity);
+
+            System.out.println("duibdididiididi==wxCountAuto" + wxCountAuto + "goensresq=" + goodsEntity.getNxCgAdsenseRestQuantity() + "oroeqnn" + orderOrderQuantity) ;
+            int nowMinute = getNowMinute();
+            int nxCgAdsenseStartTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStartTimeZone());
+            int nxCgAdsenseStopTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStopTimeZone());
+
+            if (goodsEntity.getNxCgIsOpenAdsense() == 1 && wxCountAuto  < 0  && nowMinute > nxCgAdsenseStartTimeZone && nowMinute < nxCgAdsenseStopTimeZone) {
+                return R.error(-1, goodsEntity.getNxCgGoodsName() + "剩余库存不足");
+            }
+        }
+        return R.ok();
+    }
 
 
     @RequestMapping(value = "/printSubOrders", method = RequestMethod.POST)
@@ -62,11 +82,7 @@ public class NxCommunityOrdersSubController {
             NxCommunityOrdersEntity nxCommunityOrdersEntity = nxCommunityOrdersService.queryObject(nxCosOrdersId);
             nxCommunityOrdersEntity.setNxCoStatus(3);
             nxCommunityOrdersService.update(nxCommunityOrdersEntity);
-            System.out.println("orderid=" + subEntity.getNxCommunityOrdersSubId() + "timemeemmelog222" + testPrintTime());
         }
-
-        System.out.println("orderid=" + subEntity.getNxCommunityOrdersSubId() + "timemeemmelog333" + testPrintTime());
-
         return R.ok();
     }
 
@@ -79,13 +95,11 @@ public class NxCommunityOrdersSubController {
         map.put("commId", commId);
         map.put("status", status);
         map.put("service", 0);
-        System.out.println("priririir" + map);
         List<NxCommunityPrintOrdersSubEntity> subEntities = nxCommunityOrdersSubService.queryPrintSubOrders(map);
 
         map.put("service", 1);
         map.put("date", formatWhatDate(0));
-        map.put("time", formatWhatDayMinute(30));
-        System.out.println("kadnkafdanfdkameiieirpiriririrmap" + map);
+        map.put("time", formatWhatDayMinute(10));
         List<NxCommunityPrintOrdersSubEntity> subEntities1 = nxCommunityOrdersSubService.queryPrintSubOrders(map);
         subEntities.addAll(subEntities1);
 
@@ -102,14 +116,11 @@ public class NxCommunityOrdersSubController {
     }
 
 
-
-
-
     @RequestMapping(value = "/changeMemberCard", method = RequestMethod.POST)
     @ResponseBody
-    public R changeMemberCard ( Integer orderUserId, Integer status, Integer orderType, Integer userCardId, Integer cardId) {
+    public R changeMemberCard(Integer orderUserId, Integer status, Integer orderType, Integer userCardId, Integer cardId) {
 
-        if(status == 1){
+        if (status == 1) {
             Map<String, Object> map = new HashMap<>();
             map.put("orderUserId", orderUserId);
             map.put("orderType", orderType);
@@ -119,8 +130,8 @@ public class NxCommunityOrdersSubController {
             //查询
             List<NxCommunityOrdersSubEntity> subEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
             //status = 1 ,则取消会员卡功能
-            if(subEntities.size() > 0){
-                for(NxCommunityOrdersSubEntity subEntity: subEntities){
+            if (subEntities.size() > 0) {
+                for (NxCommunityOrdersSubEntity subEntity : subEntities) {
                     //先查是否有一样的没有优惠价格的订单
 
                     Integer nxCosCommunityGoodsId = subEntity.getNxCosCommunityGoodsId();
@@ -130,11 +141,11 @@ public class NxCommunityOrdersSubController {
                     mapSame.put("status", -1);
                     mapSame.put("diffPrice", 0);
                     mapSame.put("goodsId", nxCosCommunityGoodsId);
-                    if(subEntity.getNxCosRemark() != null){
+                    if (subEntity.getNxCosRemark() != null) {
                         mapSame.put("remark", subEntity.getNxCosRemark());
                     }
                     NxCommunityOrdersSubEntity sameGoodsOrder = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapSame);
-                    if(sameGoodsOrder != null){
+                    if (sameGoodsOrder != null) {
                         //jiashulaing
                         BigDecimal changeQuantity = new BigDecimal(subEntity.getNxCosQuantity());
                         BigDecimal add = new BigDecimal(sameGoodsOrder.getNxCosQuantity()).add(changeQuantity);
@@ -145,7 +156,7 @@ public class NxCommunityOrdersSubController {
 
                         nxCommunityOrdersSubService.delete(subEntity.getNxCommunityOrdersSubId());
 
-                    }else{
+                    } else {
                         NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(nxCosCommunityGoodsId);
                         subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
                         BigDecimal orderQuantity = new BigDecimal(subEntity.getNxCosQuantity());
@@ -168,7 +179,7 @@ public class NxCommunityOrdersSubController {
 
 
         //
-        if(status == 0){
+        if (status == 0) {
             Map<String, Object> map = new HashMap<>();
             map.put("orderUserId", orderUserId);
             map.put("orderType", orderType);
@@ -179,20 +190,20 @@ public class NxCommunityOrdersSubController {
             //查询
             List<NxCommunityOrdersSubEntity> subEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
             //status = 1 ,则取消会员卡功能
-            if(subEntities.size() > 0){
-                for(NxCommunityOrdersSubEntity subEntity: subEntities){
+            if (subEntities.size() > 0) {
+                for (NxCommunityOrdersSubEntity subEntity : subEntities) {
                     //先查是否有一样的没有优惠价格的订单
                     Integer nxCosCommunityGoodsId = subEntity.getNxCosCommunityGoodsId();
                     NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(nxCosCommunityGoodsId);
                     //只有划线商品的订单才改动
-                    if(goodsEntity.getNxCgGoodsHuaxianPrice() != null){
+                    if (goodsEntity.getNxCgGoodsHuaxianPrice() != null) {
                         BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
                         BigDecimal orderQuantity = new BigDecimal(subEntity.getNxCosQuantity());
                         BigDecimal moreQuantity = huaxianQuantity.subtract(orderQuantity);
                         //划线优惠数量没有用完，直接修改订单
                         System.out.println("huaxianqqqqqq" + huaxianQuantity);
                         System.out.println("moreQuantitymoreQuantitymoreQuantity" + moreQuantity);
-                        if(moreQuantity.compareTo(new BigDecimal(0))  == 1){
+                        if (moreQuantity.compareTo(new BigDecimal(0)) == 1) {
 
                             BigDecimal decimal = new BigDecimal(goodsEntity.getNxCgGoodsPrice()).multiply(orderQuantity).setScale(1, BigDecimal.ROUND_HALF_UP);
                             subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
@@ -200,7 +211,7 @@ public class NxCommunityOrdersSubController {
                             subEntity.setNxCosSubtotal(decimal.toString());
                             nxCommunityOrdersSubService.update(subEntity);
 
-                        }else{
+                        } else {
                             //划线优惠数量用完了
                             //查询是否有同样商品的没有优惠的订单
                             Map<String, Object> mapSame = new HashMap<>();
@@ -209,21 +220,21 @@ public class NxCommunityOrdersSubController {
                             mapSame.put("status", -1);
                             mapSame.put("diffPrice", 0);
                             mapSame.put("goodsId", nxCosCommunityGoodsId);
-                            if(subEntity.getNxCosRemark() != null){
+                            if (subEntity.getNxCosRemark() != null) {
                                 mapSame.put("remark", subEntity.getNxCosRemark());
                             }
                             System.out.println("mapososososos" + mapSame);
                             NxCommunityOrdersSubEntity sameGoodsOrder = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapSame);
 
-                            if(sameGoodsOrder != null){
+                            if (sameGoodsOrder != null) {
 
-                                if(moreQuantity.compareTo(new BigDecimal(0)) == 0){
+                                if (moreQuantity.compareTo(new BigDecimal(0)) == 0) {
                                     BigDecimal decimal = new BigDecimal(goodsEntity.getNxCgGoodsPrice()).multiply(orderQuantity).setScale(1, BigDecimal.ROUND_HALF_UP);
                                     subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
                                     subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
                                     subEntity.setNxCosSubtotal(decimal.toString());
                                     nxCommunityOrdersSubService.update(subEntity);
-                                }else {
+                                } else {
                                     System.out.println("hasamdmmdmdmdmd" + sameGoodsOrder.getNxCosQuantity());
 
                                     //有相同的没有优惠的订单,把一个订房分成 2 部分
@@ -248,7 +259,6 @@ public class NxCommunityOrdersSubController {
                                     nxCommunityOrdersSubService.save(limitOrder);
 
 
-
                                     BigDecimal restQuantity = new BigDecimal(sameGoodsOrder.getNxCosQuantity()).subtract(new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity()));
                                     BigDecimal decimal1 = restQuantity.multiply(new BigDecimal(goodsEntity.getNxCgGoodsHuaxianPrice())).setScale(1, BigDecimal.ROUND_HALF_UP);
                                     sameGoodsOrder.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
@@ -260,7 +270,7 @@ public class NxCommunityOrdersSubController {
                                 }
 
 
-                            }else{
+                            } else {
 
                                 BigDecimal decimal = new BigDecimal(goodsEntity.getNxCgGoodsPrice()).multiply(orderQuantity).setScale(1, BigDecimal.ROUND_HALF_UP);
                                 subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
@@ -271,12 +281,10 @@ public class NxCommunityOrdersSubController {
                         }
 
 
-
                     }
 
                 }
             }
-
 
 
             NxCustomerUserCardEntity userCardEntity = nxCustomerUserCardService.queryObject(userCardId);
@@ -287,12 +295,6 @@ public class NxCommunityOrdersSubController {
         }
 
 
-
-
-
-
-        //------
-
         Map<String, Object> mapA = new HashMap<>();
         mapA.put("orderUserId", orderUserId);
         mapA.put("status", -1);
@@ -302,7 +304,6 @@ public class NxCommunityOrdersSubController {
         Map<String, Object> mapC = new HashMap<>();
         mapC.put("userId", orderUserId);
         mapC.put("status", -1);
-//        mapC.put("type", orderType);
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
 
         Map<String, Object> mapR = new HashMap<>();
@@ -312,88 +313,241 @@ public class NxCommunityOrdersSubController {
     }
 
 
-
-
-
+    @RequestMapping(value = "/orderUserGetApply/{orderUserId}")
     @ResponseBody
-    @RequestMapping(value = "/saveSubOrder", method = RequestMethod.POST)
-    public R saveSubOrder(Integer goodsId, Integer orderUserId, Integer spId, Integer orderType, Integer pindanId) {
+    public R orderUserGetApply(@PathVariable Integer orderUserId) {
 
+        Map<String, Object> mapA = new HashMap<>();
+        mapA.put("orderUserId", orderUserId);
+        mapA.put("status", -1);
+        mapA.put("orderType", 0);
+        List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
+
+        Map<String, Object> mapC = new HashMap<>();
+        mapC.put("userId", orderUserId);
+        mapC.put("status", -1);
+        mapC.put("isSelected", 1);
+        List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
+
+        Map<String, Object> mapR = new HashMap<>();
+        mapR.put("subOrders", nxCommunityOrdersSubEntities);
+        mapR.put("cardList", cardEntities);
+        return R.ok().put("data", mapR);
+    }
+
+
+    @RequestMapping(value = "/reduceSubOrderRemark", method = RequestMethod.POST)
+    @ResponseBody
+    public R reduceSubOrderRemark(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
         NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
-        NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-        subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-        subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-        subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-        subEntity.setNxCosOrderUserId(orderUserId);
-        subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-        subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-        subEntity.setNxCosQuantity("1");
-        subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-        subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
-        subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
-
-        if (goodsEntity.getNxCgGoodsHuaxianPrice() != null) {
-            subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-            subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
-            subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+        if (goodsEntity.getNxCgGoodsHuaxianQuantity() == null) {
+            this.reduceSubOrderRemarkNoQuantity(goodsId, orderUserId, remark, orderType, spId);
         } else {
-            subEntity.setNxCosHuaxianDifferentPrice("0");
+            this.reduceSubOrderRemarkQuantity(goodsId, orderUserId, remark, orderType, spId);
         }
 
-        subEntity.setNxCosStatus(-1);
-        subEntity.setNxCosType(orderType);
-        subEntity.setNxCosSplicingOrdersId(spId);
-        subEntity.setNxCosOrdersId(pindanId);
-        nxCommunityOrdersSubService.save(subEntity);
 
-        //判断是否是会员卡商品
-        if (goodsEntity.getNxCgCardId() != null) {
+        Map<String, Object> mapA = new HashMap<>();
+        mapA.put("orderUserId", orderUserId);
+        mapA.put("status", -1);
+        mapA.put("orderType", orderType);
+        List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("cardId", goodsEntity.getNxCgCardId());
-            map.put("userId", orderUserId);
-//            map.put("type", orderType);
-            map.put("status", -1);
-            System.out.println("checkckckckdkusrcarr-1-1--1-1-1-1-1" + map);
-            List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(map);
-            if (cardEntities.size() == 0) {
-                Map<String, Object> mapU = new HashMap<>();
-                mapU.put("cardId", goodsEntity.getNxCgCardId());
-                mapU.put("stopTime", formatWhatDay(0));
-                mapU.put("userId", orderUserId);
-//                mapU.put("type", orderType);
-                System.out.println("checkckckckdkusrcarr222222" + mapU);
-                List<NxCustomerUserCardEntity> cardEntitiesU = nxCustomerUserCardService.queryUserCardByParams(mapU);
-                if(cardEntitiesU.size() == 0){
-                    NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(goodsEntity.getNxCgCardId());
-                    NxCustomerUserCardEntity userCardEntity = new NxCustomerUserCardEntity();
-                    userCardEntity.setNxCucaStatus(-1);
-                    userCardEntity.setNxCucaCustomerUserId(orderUserId);
-                    userCardEntity.setNxCucaStartDate(formatWhatDay(0));
-                    userCardEntity.setNxCucaStopDate(formatWhatDay(Integer.valueOf(cardEntity.getNxCcEffectiveDays())));
-                    userCardEntity.setNxCucaCardId(cardEntity.getNxCommunityCardId());
-                    userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
-                    userCardEntity.setNxCucaIsSelected(1);
-                    userCardEntity.setNxCucaType(orderType);
-                    userCardEntity.setNxCucaComSplicingOrderId(spId);
-                    userCardEntity.setNxCucaComOrderId(pindanId);
-                    nxCustomerUserCardService.save(userCardEntity);
+        Map<String, Object> mapCard = new HashMap<>();
+        mapCard.put("status", -1);
+        mapCard.put("userId", orderUserId);
+        List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
 
+        Map<String, Object> mapData = new HashMap<>();
+        mapData.put("arr", nxCommunityOrdersSubEntities);
+        mapData.put("cardList", cardEntities);
+
+
+        return R.ok().put("data", mapData);
+
+    }
+
+    private void reduceSubOrderRemarkNoQuantity(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId) {
+        //common -
+        Map<String, Object> map = new HashMap<>();
+        map.put("orderUserId", orderUserId);
+        map.put("goodsId", goodsId);
+        map.put("status", -1);
+        map.put("orderType", orderType);
+        map.put("splicingOrderId", spId);
+        map.put("remark", remark);
+        NxCommunityOrdersSubEntity commSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
+        if (commSubOrderEntity != null) {
+            BigDecimal orderQuantity = new BigDecimal(commSubOrderEntity.getNxCosQuantity());
+            if (orderQuantity.compareTo(new BigDecimal(1)) == 0) {
+                //1，删除订单
+                nxCommunityOrdersSubService.delete(commSubOrderEntity.getNxCommunityOrdersSubId());
+            } else {
+                BigDecimal quantity = new BigDecimal(commSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
+                BigDecimal decimal = new BigDecimal(commSubOrderEntity.getNxCosPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                commSubOrderEntity.setNxCosQuantity(quantity.toString());
+                commSubOrderEntity.setNxCosSubtotal(decimal.toString());
+                if (commSubOrderEntity.getNxCosHuaxianPrice() != null) {
+                    BigDecimal decimal1 = new BigDecimal(commSubOrderEntity.getNxCosHuaxianPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                    commSubOrderEntity.setNxCosHuaxianSubtotal(decimal1.toString());
                 }
-
+                nxCommunityOrdersSubService.update(commSubOrderEntity);
             }
+        }
+    }
+
+
+    private void reduceSubOrderRemarkQuantity(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("orderUserId", orderUserId);
+        map.put("goodsId", goodsId);
+        map.put("status", -1);
+        map.put("diffPrice", 0);
+        map.put("orderType", orderType);
+        map.put("remark", remark);
+        map.put("splicingOrderId", spId);
+        NxCommunityOrdersSubEntity diffZeroSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
+        if (diffZeroSubOrderEntity != null) {
+            BigDecimal orderQuantity = new BigDecimal(diffZeroSubOrderEntity.getNxCosQuantity());
+            if (orderQuantity.compareTo(new BigDecimal(1)) == 0) {
+                //1，删除订单
+                nxCommunityOrdersSubService.delete(diffZeroSubOrderEntity.getNxCommunityOrdersSubId());
+            } else {
+                BigDecimal quantity = new BigDecimal(diffZeroSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
+                BigDecimal decimal = new BigDecimal(diffZeroSubOrderEntity.getNxCosPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                diffZeroSubOrderEntity.setNxCosQuantity(quantity.toString());
+                diffZeroSubOrderEntity.setNxCosSubtotal(decimal.toString());
+                if (diffZeroSubOrderEntity.getNxCosHuaxianPrice() != null) {
+                    BigDecimal decimal1 = new BigDecimal(diffZeroSubOrderEntity.getNxCosHuaxianPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                    diffZeroSubOrderEntity.setNxCosHuaxianSubtotal(decimal1.toString());
+                }
+                nxCommunityOrdersSubService.update(diffZeroSubOrderEntity);
+            }
+        } else {
+            Map<String, Object> mapD = new HashMap<>();
+            mapD.put("orderUserId", orderUserId);
+            mapD.put("goodsId", goodsId);
+            mapD.put("status", -1);
+            mapD.put("dayuDiffPrice", 0);
+            mapD.put("orderType", orderType);
+            mapD.put("splicingOrderId", spId);
+            mapD.put("remark", remark);
+            System.out.println("dayoouuiiuiououoaa" + mapD);
+            //有优惠的订单
+            NxCommunityOrdersSubEntity diffSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapD);
+            if (diffSubOrderEntity != null) {
+                BigDecimal orderQuantity = new BigDecimal(diffSubOrderEntity.getNxCosQuantity());
+                if (orderQuantity.compareTo(new BigDecimal(1)) == 0) {
+                    //1，删除订单
+                    nxCommunityOrdersSubService.delete(diffSubOrderEntity.getNxCommunityOrdersSubId());
+                } else {
+                    BigDecimal quantity = new BigDecimal(diffSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
+                    BigDecimal decimal = new BigDecimal(diffSubOrderEntity.getNxCosPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                    diffSubOrderEntity.setNxCosQuantity(quantity.toString());
+                    diffSubOrderEntity.setNxCosSubtotal(decimal.toString());
+                    if (diffSubOrderEntity.getNxCosHuaxianPrice() != null) {
+                        BigDecimal decimal1 = new BigDecimal(diffSubOrderEntity.getNxCosHuaxianPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                        diffSubOrderEntity.setNxCosHuaxianSubtotal(decimal1.toString());
+                    }
+                    nxCommunityOrdersSubService.update(diffSubOrderEntity);
+                }
+            }
+        }
+    }
+
+    @RequestMapping(value = "/saveSubOrderRemark", method = RequestMethod.POST)
+    @ResponseBody
+    public R saveSubOrderRemark(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
+        NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
+        int wxCountAuto = -1;
+        Map<String, Object> mapQ = new HashMap<>();
+        mapQ.put("goodsId", goodsId);
+        mapQ.put("status", -1);
+        mapQ.put("orderUserId", orderUserId);
+        int countOrder = nxCommunityOrdersSubService.querySubOrderCount(mapQ);
+        if (countOrder > 0) {
+            int userOrderQuantity = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapQ);
+            BigDecimal orderOrderQuantity = new BigDecimal(userOrderQuantity);
+            wxCountAuto = new BigDecimal(goodsEntity.getNxCgAdsenseRestQuantity()).compareTo(orderOrderQuantity);
+        }
+        int nowMinute = getNowMinute();
+        int nxCgAdsenseStartTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStartTimeZone());
+        int nxCgAdsenseStopTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStopTimeZone());
+        if (goodsEntity.getNxCgIsOpenAdsense() == 1 && wxCountAuto == 0 && nowMinute > nxCgAdsenseStartTimeZone && nowMinute < nxCgAdsenseStopTimeZone) {
+            return R.error(-1, "剩余份数不足");
+        } else {
+            if (goodsEntity.getNxCgGoodsHuaxianQuantity() == null) {
+                this.saveSubOrderRemarkNoQuantity(goodsId, orderUserId, remark, orderType, spId, pindanId);
+            } else {
+                this.saveSubOrderRemarkQuantity(goodsId, orderUserId, remark, orderType, spId, pindanId);
+            }
+            //giveapply
+            Map<String, Object> mapA = new HashMap<>();
+            mapA.put("orderUserId", orderUserId);
+            mapA.put("status", -1);
+            mapA.put("orderType", orderType);
+            mapA.put("splicingOrderId", spId);
+            System.out.println("apappapap" + mapA);
+            List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
+
+
+            return R.ok().put("data", nxCommunityOrdersSubEntities);
 
         }
-
-
-        return R.ok().put("data", subEntity);
 
     }
 
 
-    @RequestMapping(value = "/memberSaveMemberOrderRemark", method = RequestMethod.POST)
-    @ResponseBody
-    public R memberSaveMemberOrderRemark (Integer goodsId, Integer orderUserId, String remark, Integer orderType,Integer spId, Integer pindanId) {
+    private void saveSubOrderRemarkNoQuantity(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
+
+        NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
+        Map<String, Object> mapC = new HashMap<>();
+        mapC.put("orderUserId", orderUserId);
+        mapC.put("goodsId", goodsId);
+        mapC.put("status", -1);
+        mapC.put("remark", remark);
+        mapC.put("orderType", orderType);
+        mapC.put("splicingOrderId", spId);
+        //1.1.1 先查询优惠订单是否超过数量
+        System.out.println("ccccccccccaaaammmmmmmmmmNOqunaitytyyty" + mapC);
+        NxCommunityOrdersSubEntity communityOrdersSubEntityC = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
+        if (communityOrdersSubEntityC != null) {
+            BigDecimal add = new BigDecimal(communityOrdersSubEntityC.getNxCosQuantity()).add(new BigDecimal(1));
+            BigDecimal subtotal = new BigDecimal(communityOrdersSubEntityC.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+            communityOrdersSubEntityC.setNxCosQuantity(add.toString());
+            communityOrdersSubEntityC.setNxCosSubtotal(subtotal.toString());
+            nxCommunityOrdersSubService.update(communityOrdersSubEntityC);
+        } else {
+
+
+            //添加信息普通订单
+            NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+            subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+            subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+            subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+            subEntity.setNxCosOrderUserId(orderUserId);
+            subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+            subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+            subEntity.setNxCosQuantity("1");
+            subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+            subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+            subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+            subEntity.setNxCosHuaxianDifferentPrice("0");
+            subEntity.setNxCosStatus(-1);
+            subEntity.setNxCosRemark(remark);
+            subEntity.setNxCosType(orderType);
+            subEntity.setNxCosSplicingOrdersId(spId);
+            subEntity.setNxCosOrdersId(pindanId);
+            System.out.println("dkfadfjalfahuaxx" + goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
+            nxCommunityOrdersSubService.save(subEntity);
+
+        }
+
+    }
+
+
+    private void saveSubOrderRemarkQuantity(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
+
         NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
         Map<String, Object> mapC = new HashMap<>();
         mapC.put("orderUserId", orderUserId);
@@ -404,7 +558,7 @@ public class NxCommunityOrdersSubController {
         mapC.put("orderType", orderType);
         mapC.put("splicingOrderId", spId);
         //1.1.1 先查询优惠订单是否超过数量
-        System.out.println("ccccccccccaaaammmmmmmmmm" + mapC);
+        System.out.println("ccccccccccaaaammmmmmmmmmsaveSubOrderRemarkQuantity" + mapC);
         NxCommunityOrdersSubEntity communityOrdersSubEntityC = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
         if (communityOrdersSubEntityC != null) {
             BigDecimal add = new BigDecimal(communityOrdersSubEntityC.getNxCosQuantity()).add(new BigDecimal(1));
@@ -412,7 +566,9 @@ public class NxCommunityOrdersSubController {
             communityOrdersSubEntityC.setNxCosQuantity(add.toString());
             communityOrdersSubEntityC.setNxCosSubtotal(subtotal.toString());
             nxCommunityOrdersSubService.update(communityOrdersSubEntityC);
-        }else{
+        } else {
+            //huaxianQuantity
+
             Map<String, Object> map = new HashMap<>();
             map.put("orderUserId", orderUserId);
             map.put("goodsId", goodsId);
@@ -421,7 +577,7 @@ public class NxCommunityOrdersSubController {
             map.put("remark", remark);
             map.put("orderType", orderType);
             map.put("splicingOrderId", spId);
-            System.out.println("ccccccccccaaaa" + map);
+            System.out.println("ccccccccccaaaasaveSubOrderRemarkQuantity" + map);
             NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
             if (communityOrdersSubEntity != null) {
                 BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
@@ -436,7 +592,7 @@ public class NxCommunityOrdersSubController {
                 int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
                 BigDecimal restQuantity = huaxianQuantity.subtract(new BigDecimal(total)); //剩余可用划线后优惠价格的数量
                 //1.1.1.1剩余数量大于 1，则加1
-                System.out.println("restttoototot" + restQuantity);
+                System.out.println("restttootototsaveSubOrderRemarkQuantity" + restQuantity);
                 if (restQuantity.compareTo(new BigDecimal(0)) == 1) {
                     BigDecimal add = orderQuantity.add(new BigDecimal(1));
                     BigDecimal subtotal = new BigDecimal(communityOrdersSubEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
@@ -455,11 +611,11 @@ public class NxCommunityOrdersSubController {
                     mapZ.put("remark", remark);
                     mapZ.put("orderType", orderType);
                     mapZ.put("splicingOrderId", spId);
-                    System.out.println("mappppzzzzzzRRRRRRRRRR" + mapZ);
+                    System.out.println("ccccccccccaaaasaveSubOrderRemarkQuantity" + mapZ);
                     NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
                     //已经有了普通订单，则修改数量
                     if (communityOrdersSubZero != null) {
-                        System.out.println("meiyouzuozuozzlididiididm" + communityOrdersSubZero.getNxCosQuantity());
+                        System.out.println("meiyouzuozuozzlididiididmsaveSubOrderRemarkQuantity" + communityOrdersSubZero.getNxCosQuantity());
                         BigDecimal nxCosQuantity = new BigDecimal(communityOrdersSubZero.getNxCosQuantity());
                         BigDecimal add = nxCosQuantity.add(new BigDecimal(1));
                         BigDecimal subtotal = new BigDecimal(communityOrdersSubZero.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
@@ -490,66 +646,144 @@ public class NxCommunityOrdersSubController {
                         nxCommunityOrdersSubService.save(subEntity);
                     }
                 }
-            }else{
-                //diyige
-                System.out.println("idigyigeeiie111111111");
-                System.out.println("whgoodsnewCommmonssssssaa" + goodsEntity.getNxCgGoodsName());
-                NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-                subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-                subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-                subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-                subEntity.setNxCosOrderUserId(orderUserId);
-                subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-                subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-                subEntity.setNxCosQuantity("1");
-                subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-                subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
-                subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
-                subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
-                subEntity.setNxCosStatus(-1);
-                subEntity.setNxCosRemark(remark);
-                subEntity.setNxCosType(orderType);
-                subEntity.setNxCosSplicingOrdersId(spId);
-                subEntity.setNxCosOrdersId(pindanId);
-                System.out.println("fakdfalfjaslfjsafahfahef");
-                nxCommunityOrdersSubService.save(subEntity);
+
+
+            } else {
+
+                BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
+                Map<String, Object> mapT = new HashMap<>();
+                mapT.put("orderUserId", orderUserId);
+                mapT.put("goodsId", goodsId);
+                mapT.put("status", -1);
+                mapT.put("orderType", orderType);
+                mapT.put("splicingOrderId", spId);
+                int count = nxCommunityOrdersSubService.querySubOrderCount(mapT);
+                if (count > 0) {
+                    //diyige
+                    int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
+                    //如果商品的订购数量大于划线数量，则按划线订单
+                    NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                    subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                    subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                    subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                    subEntity.setNxCosOrderUserId(orderUserId);
+                    subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                    subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                    subEntity.setNxCosQuantity("1");
+                    subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                    if (new BigDecimal(total).compareTo(huaxianQuantity) > -1) {
+                        subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                        subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                        subEntity.setNxCosHuaxianDifferentPrice("0");
+                    } else {
+                        subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+                        subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+                        subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
+                    }
+
+                    subEntity.setNxCosStatus(-1);
+                    subEntity.setNxCosRemark(remark);
+                    subEntity.setNxCosType(orderType);
+                    subEntity.setNxCosSplicingOrdersId(spId);
+                    subEntity.setNxCosOrdersId(pindanId);
+                    System.out.println("fakdfalfjaslfjsafahfahef");
+                    nxCommunityOrdersSubService.save(subEntity);
+                } else {
+
+                    //tianajia
+
+                    //添加信息普通订单
+                    NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                    subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                    subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                    subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                    subEntity.setNxCosOrderUserId(orderUserId);
+                    subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                    subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                    subEntity.setNxCosQuantity("1");
+                    subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                    subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+                    subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                    subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                    subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+                    subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
+                    subEntity.setNxCosStatus(-1);
+                    subEntity.setNxCosRemark(remark);
+                    subEntity.setNxCosType(orderType);
+                    subEntity.setNxCosSplicingOrdersId(spId);
+                    subEntity.setNxCosOrdersId(pindanId);
+                    nxCommunityOrdersSubService.save(subEntity);
+
+                }
             }
 
+
         }
-        return R.ok();
+
     }
 
 
-    @ResponseBody
-    @RequestMapping(value = "/saveSubOrderRemark", method = RequestMethod.POST)
-    public R saveSubOrderRemark(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
+//
+//    @RequestMapping(value = "/saveSubOrderRemarkQuantity", method = RequestMethod.POST)
+//    @ResponseBody
+//    public R saveSubOrderRemarkQuantity() {
+//
+//        return R.ok();
+//    }
 
+
+    @RequestMapping(value = "/memberSaveMemberOrderRemark", method = RequestMethod.POST)
+    @ResponseBody
+    public R memberSaveMemberOrderRemark(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
         NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
-        Map<String, Object> map = new HashMap<>();
-        map.put("cardId", goodsEntity.getNxCgCardId());
-        map.put("stopTime", formatWhatDay(0));
-        map.put("userId", orderUserId);
-        map.put("goodsId", goodsId);
-        map.put("status", -1);
-        map.put("type", orderType);
-        map.put("splicingOrderId", spId);
-        System.out.println("wkwkjekejrelqelwqrekr" + map);
-        NxCustomerUserCardEntity userCardEntitys = nxCustomerUserCardService.queryUserGoodsCard(map);
-        // 一，如果已经有会员卡
-        if (userCardEntitys != null) {
-            //1.1 如果会员卡被选择，则继续查询是否可以按照优惠价格保存订单
-            if (userCardEntitys.getNxCucaIsSelected() == 1) {
-                Map<String, Object> mapC = new HashMap<>();
-                mapC.put("orderUserId", orderUserId);
-                mapC.put("goodsId", goodsId);
-                mapC.put("status", -1);
-                mapC.put("dayuDiffPrice", 0);
-                mapC.put("remark", remark);
-                mapC.put("orderType", orderType);
-                mapC.put("splicingOrderId", spId);
-                //1.1.1 先查询优惠订单是否超过数量
-                System.out.println("ccccccccccaaaa" + mapC);
-                NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
+        int wxCountAuto = -1;
+        Map<String, Object> mapQ = new HashMap<>();
+        mapQ.put("goodsId", goodsId);
+        mapQ.put("status", -1);
+        mapQ.put("orderUserId", orderUserId);
+        int countOrder = nxCommunityOrdersSubService.querySubOrderCount(mapQ);
+        if (countOrder > 0) {
+            int userOrderQuantity = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapQ);
+            BigDecimal orderOrderQuantity = new BigDecimal(userOrderQuantity);
+            wxCountAuto = new BigDecimal(goodsEntity.getNxCgAdsenseRestQuantity()).compareTo(orderOrderQuantity);
+        }
+        int nowMinute = getNowMinute();
+        int nxCgAdsenseStartTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStartTimeZone());
+        int nxCgAdsenseStopTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStopTimeZone());
+
+        if (goodsEntity.getNxCgIsOpenAdsense() == 1 && wxCountAuto == 0 && nowMinute > nxCgAdsenseStartTimeZone && nowMinute < nxCgAdsenseStopTimeZone) {
+            return R.error(-1, "剩余份数不足");
+        } else {
+            Map<String, Object> mapC = new HashMap<>();
+            mapC.put("orderUserId", orderUserId);
+            mapC.put("goodsId", goodsId);
+            mapC.put("status", -1);
+            mapC.put("diffPrice", 0);
+            mapC.put("remark", remark);
+            mapC.put("orderType", orderType);
+            mapC.put("splicingOrderId", spId);
+            //1.1.1 先查询优惠订单是否超过数量
+            System.out.println("ccccccccccaaaammmmmmmmmmmemberSaveMemberOr" + mapC);
+            NxCommunityOrdersSubEntity communityOrdersSubEntityC = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
+            if (communityOrdersSubEntityC != null) {
+                BigDecimal add = new BigDecimal(communityOrdersSubEntityC.getNxCosQuantity()).add(new BigDecimal(1));
+                BigDecimal subtotal = new BigDecimal(communityOrdersSubEntityC.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                communityOrdersSubEntityC.setNxCosQuantity(add.toString());
+                communityOrdersSubEntityC.setNxCosSubtotal(subtotal.toString());
+                nxCommunityOrdersSubService.update(communityOrdersSubEntityC);
+            } else {
+                //huaxianQuantity
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("orderUserId", orderUserId);
+                map.put("goodsId", goodsId);
+                map.put("status", -1);
+                map.put("dayuDiffPrice", 0);
+                map.put("remark", remark);
+                map.put("orderType", orderType);
+                map.put("splicingOrderId", spId);
+                System.out.println("ccccccccccaaaamemberSaveMemberOrderR" + map);
+                NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
                 if (communityOrdersSubEntity != null) {
                     BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
                     BigDecimal orderQuantity = new BigDecimal(communityOrdersSubEntity.getNxCosQuantity());
@@ -561,8 +795,546 @@ public class NxCommunityOrdersSubController {
                     mapT.put("orderType", orderType);
                     mapT.put("splicingOrderId", spId);
 
+                    int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
+                    BigDecimal restQuantity = huaxianQuantity.subtract(new BigDecimal(total)); //剩余可用划线后优惠价格的数量
+                    //1.1.1.1剩余数量大于 1，则加1
+                    System.out.println("restttootototmemberSaveMemberOrderRek" + restQuantity);
+                    if (restQuantity.compareTo(new BigDecimal(0)) == 1) {
+                        BigDecimal add = orderQuantity.add(new BigDecimal(1));
+                        BigDecimal subtotal = new BigDecimal(communityOrdersSubEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                        BigDecimal huaxianSubtotal = new BigDecimal(communityOrdersSubEntity.getNxCosHuaxianPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                        communityOrdersSubEntity.setNxCosQuantity(add.toString());
+                        communityOrdersSubEntity.setNxCosSubtotal(subtotal.toString());
+                        communityOrdersSubEntity.setNxCosHuaxianSubtotal(huaxianSubtotal.toString());
+                        nxCommunityOrdersSubService.update(communityOrdersSubEntity);
+                    } else {
+                        //1.1.1.2保存普通订单之前先查是否有同样的订单
+                        Map<String, Object> mapZ = new HashMap<>();
+                        mapZ.put("orderUserId", orderUserId);
+                        mapZ.put("goodsId", goodsId);
+                        mapZ.put("status", -1);
+                        mapZ.put("diffPrice", 0);
+                        mapZ.put("remark", remark);
+                        mapZ.put("orderType", orderType);
+                        mapZ.put("splicingOrderId", spId);
+                        System.out.println("mappppzzzzzzRRRRRRRRRR" + mapZ);
+                        NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
+                        //已经有了普通订单，则修改数量
+                        if (communityOrdersSubZero != null) {
+                            System.out.println("meiyouzuozuozzlididiididm" + communityOrdersSubZero.getNxCosQuantity());
+                            BigDecimal nxCosQuantity = new BigDecimal(communityOrdersSubZero.getNxCosQuantity());
+                            BigDecimal add = nxCosQuantity.add(new BigDecimal(1));
+                            BigDecimal subtotal = new BigDecimal(communityOrdersSubZero.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                            communityOrdersSubZero.setNxCosQuantity(add.toString());
+                            communityOrdersSubZero.setNxCosSubtotal(subtotal.toString());
+                            System.out.println("updddateeeee" + communityOrdersSubZero.getNxCosQuantity());
+                            nxCommunityOrdersSubService.update(communityOrdersSubZero);
+
+                        } else {
+                            //添加信息普通订单
+                            NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                            subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                            subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                            subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                            subEntity.setNxCosOrderUserId(orderUserId);
+                            subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                            subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                            subEntity.setNxCosQuantity("1");
+                            subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                            subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                            subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                            subEntity.setNxCosHuaxianDifferentPrice("0");
+                            subEntity.setNxCosStatus(-1);
+                            subEntity.setNxCosRemark(remark);
+                            subEntity.setNxCosType(orderType);
+                            subEntity.setNxCosSplicingOrdersId(spId);
+                            subEntity.setNxCosOrdersId(pindanId);
+                            nxCommunityOrdersSubService.save(subEntity);
+                        }
+                    }
+                } else {
+                    Map<String, Object> mapT = new HashMap<>();
+                    mapT.put("orderUserId", orderUserId);
+                    mapT.put("goodsId", goodsId);
+                    mapT.put("status", -1);
+                    mapT.put("orderType", orderType);
+                    mapT.put("splicingOrderId", spId);
                     int count = nxCommunityOrdersSubService.querySubOrderCount(mapT);
+
                     if (count > 0) {
+                        //diyige
+                        BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
+
+                        int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
+                        //如果商品的订购数量大于划线数量，则按划线订单
+                        NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                        subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                        subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                        subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                        subEntity.setNxCosOrderUserId(orderUserId);
+                        subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                        subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                        subEntity.setNxCosQuantity("1");
+                        subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                        if (new BigDecimal(total).compareTo(huaxianQuantity) > -1) {
+                            subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                            subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                            subEntity.setNxCosHuaxianDifferentPrice("0");
+                        } else {
+                            subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+                            subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+                            subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
+                        }
+
+                        subEntity.setNxCosStatus(-1);
+                        subEntity.setNxCosRemark(remark);
+                        subEntity.setNxCosType(orderType);
+                        subEntity.setNxCosSplicingOrdersId(spId);
+                        subEntity.setNxCosOrdersId(pindanId);
+                        System.out.println("fakdfalfjaslfjsafahfahef");
+                        nxCommunityOrdersSubService.save(subEntity);
+                    } else {
+                        NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                        subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                        subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                        subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                        subEntity.setNxCosOrderUserId(orderUserId);
+                        subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                        subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                        subEntity.setNxCosQuantity("1");
+                        subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                        subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+                        subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+                        subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
+                        subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                        subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                        subEntity.setNxCosStatus(-1);
+                        subEntity.setNxCosRemark(remark);
+                        subEntity.setNxCosType(orderType);
+                        subEntity.setNxCosSplicingOrdersId(spId);
+                        subEntity.setNxCosOrdersId(pindanId);
+                        nxCommunityOrdersSubService.save(subEntity);
+                    }
+
+                }
+
+            }
+            //giveapply
+            Map<String, Object> mapA = new HashMap<>();
+            mapA.put("orderUserId", orderUserId);
+            mapA.put("status", -1);
+            mapA.put("orderType", orderType);
+            mapA.put("splicingOrderId", spId);
+            System.out.println("apappapap" + mapA);
+            List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
+
+
+            return R.ok().put("data", nxCommunityOrdersSubEntities);
+
+        }
+
+
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/saveSubOrderRemarkCard", method = RequestMethod.POST)
+    public R saveSubOrderRemarkCard(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
+
+        NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
+        int wxCountAuto = -1;
+        Map<String, Object> mapQ = new HashMap<>();
+        mapQ.put("goodsId", goodsId);
+        mapQ.put("status", -1);
+        mapQ.put("orderUserId", orderUserId);
+        int countOrder = nxCommunityOrdersSubService.querySubOrderCount(mapQ);
+        if (countOrder > 0) {
+            int userOrderQuantity = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapQ);
+            BigDecimal orderOrderQuantity = new BigDecimal(userOrderQuantity);
+            wxCountAuto = new BigDecimal(goodsEntity.getNxCgAdsenseRestQuantity()).compareTo(orderOrderQuantity);
+        }
+        int nowMinute = getNowMinute();
+        int nxCgAdsenseStartTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStartTimeZone());
+        int nxCgAdsenseStopTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStopTimeZone());
+
+        if (goodsEntity.getNxCgIsOpenAdsense() == 1 && wxCountAuto == 0 && nowMinute > nxCgAdsenseStartTimeZone && nowMinute < nxCgAdsenseStopTimeZone) {
+            return R.error(-1, "剩余份数不足");
+        } else {
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("cardId", goodsEntity.getNxCgCardId());
+            map.put("stopTime", formatWhatDay(0));
+            map.put("userId", orderUserId);
+            map.put("goodsId", goodsId);
+            map.put("status", -1);
+            map.put("type", orderType);
+//            map.put("splicingOrderId", spId);
+            System.out.println("wkwkjekejrelqelwqrekrremakrekkk???" + map);
+            NxCustomerUserCardEntity userCardEntitys = nxCustomerUserCardService.queryUserGoodsCard(map);
+            System.out.println("zahuisshsisisiiisi????" + userCardEntitys);
+            // 一，如果已经有会员卡
+            if (userCardEntitys != null) {
+                //1.1 如果会员卡被选择，则继续查询是否可以按照优惠价格保存订单
+                if (userCardEntitys.getNxCucaIsSelected() == 1) {
+                    Map<String, Object> mapC = new HashMap<>();
+                    mapC.put("orderUserId", orderUserId);
+                    mapC.put("goodsId", goodsId);
+                    mapC.put("status", -1);
+                    mapC.put("dayuDiffPrice", 0);
+                    mapC.put("remark", remark);
+                    mapC.put("orderType", orderType);
+                    mapC.put("splicingOrderId", spId);
+                    //1.1.1 先查询优惠订单是否超过数量
+                    System.out.println("ccccccccccaaaaRemarkkekeek" + mapC);
+                    NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
+                    if (communityOrdersSubEntity != null) {
+                        BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
+                        BigDecimal orderQuantity = new BigDecimal(communityOrdersSubEntity.getNxCosQuantity());
+                        Map<String, Object> mapT = new HashMap<>();
+                        mapT.put("orderUserId", orderUserId);
+                        mapT.put("goodsId", goodsId);
+                        mapT.put("status", -1);
+                        mapT.put("dayuDiffPrice", 0);
+                        mapT.put("orderType", orderType);
+                        mapT.put("splicingOrderId", spId);
+
+                        int count = nxCommunityOrdersSubService.querySubOrderCount(mapT);
+                        System.out.println("akankankandocut" + count);
+                        if (count > 0) {
+                            int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
+                            BigDecimal restQuantity = huaxianQuantity.subtract(new BigDecimal(total)); //剩余可用划线后优惠价格的数量
+                            //1.1.1.1剩余数量大于 1，则加1
+                            if (restQuantity.compareTo(new BigDecimal(0)) == 1) {
+                                BigDecimal add = orderQuantity.add(new BigDecimal(1));
+                                BigDecimal subtotal = new BigDecimal(communityOrdersSubEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                                BigDecimal huaxianSubtotal = new BigDecimal(communityOrdersSubEntity.getNxCosHuaxianPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                                communityOrdersSubEntity.setNxCosQuantity(add.toString());
+                                communityOrdersSubEntity.setNxCosSubtotal(subtotal.toString());
+                                communityOrdersSubEntity.setNxCosHuaxianSubtotal(huaxianSubtotal.toString());
+                                nxCommunityOrdersSubService.update(communityOrdersSubEntity);
+                            } else {
+                                //1.1.1.2保存普通订单之前先查是否有同样的订单
+                                Map<String, Object> mapZ = new HashMap<>();
+                                mapZ.put("orderUserId", orderUserId);
+                                mapZ.put("goodsId", goodsId);
+                                mapZ.put("status", -1);
+                                mapZ.put("diffPrice", 0);
+                                mapZ.put("remark", remark);
+                                mapZ.put("orderType", orderType);
+                                mapZ.put("splicingOrderId", spId);
+                                System.out.println("mappppzzzzzzRRRRRRRRRRRemarkkeke" + mapZ);
+                                NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
+                                //已经有了普通订单，则修改数量
+                                if (communityOrdersSubZero != null) {
+                                    System.out.println("meiyouzuozuozzlididiididm" + communityOrdersSubZero.getNxCosQuantity());
+                                    BigDecimal nxCosQuantity = new BigDecimal(communityOrdersSubZero.getNxCosQuantity());
+                                    BigDecimal add = nxCosQuantity.add(new BigDecimal(1));
+                                    BigDecimal subtotal = new BigDecimal(communityOrdersSubZero.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                                    communityOrdersSubZero.setNxCosQuantity(add.toString());
+                                    communityOrdersSubZero.setNxCosSubtotal(subtotal.toString());
+                                    System.out.println("updddateeeee" + communityOrdersSubZero.getNxCosQuantity());
+                                    nxCommunityOrdersSubService.update(communityOrdersSubZero);
+
+                                } else {
+                                    //添加信息普通订单
+                                    System.out.println("whgoodsnewCommmonssssss111Remakkke" + goodsEntity.getNxCgGoodsName());
+                                    NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                                    subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                                    subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                                    subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                                    subEntity.setNxCosOrderUserId(orderUserId);
+                                    subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                                    subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                                    subEntity.setNxCosQuantity("1");
+                                    subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                                    subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                    subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                    subEntity.setNxCosHuaxianDifferentPrice("0");
+                                    subEntity.setNxCosStatus(-1);
+                                    subEntity.setNxCosRemark(remark);
+                                    subEntity.setNxCosType(orderType);
+                                    subEntity.setNxCosSplicingOrdersId(spId);
+                                    subEntity.setNxCosOrdersId(pindanId);
+                                    nxCommunityOrdersSubService.save(subEntity);
+                                }
+                            }
+                        }
+
+
+                    } else {
+                        //2，如果
+
+                        Map<String, Object> mapZ = new HashMap<>();
+                        mapZ.put("orderUserId", orderUserId);
+                        mapZ.put("goodsId", goodsId);
+                        mapZ.put("status", -1);
+                        mapZ.put("diffPrice", 0);
+                        mapZ.put("remark", remark);
+                        mapZ.put("orderType", orderType);
+                        mapZ.put("splicingOrderId", spId);
+                        System.out.println("mappppzzzzzz" + mapZ);
+                        NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
+                        if (communityOrdersSubZero != null) {
+                            System.out.println("meiyouzuozuozzlididiididm" + communityOrdersSubZero.getNxCosQuantity());
+                            BigDecimal nxCosQuantity = new BigDecimal(communityOrdersSubZero.getNxCosQuantity());
+                            BigDecimal add = nxCosQuantity.add(new BigDecimal(1));
+                            BigDecimal subtotal = new BigDecimal(communityOrdersSubZero.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                            communityOrdersSubZero.setNxCosQuantity(add.toString());
+                            communityOrdersSubZero.setNxCosSubtotal(subtotal.toString());
+                            System.out.println("updddateeeee" + communityOrdersSubZero.getNxCosQuantity());
+                            nxCommunityOrdersSubService.update(communityOrdersSubZero);
+
+                        } else {
+                            Map<String, Object> mapT = new HashMap<>();
+                            mapT.put("orderUserId", orderUserId);
+                            mapT.put("goodsId", goodsId);
+                            mapT.put("status", -1);
+                            mapT.put("dayuDiffPrice", 0);
+                            mapT.put("orderType", orderType);
+                            mapT.put("splicingOrderId", spId);
+                            int count = nxCommunityOrdersSubService.querySubOrderCount(mapT);
+                            if (count > 0) {
+                                int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
+                                BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
+                                BigDecimal restQuantity = huaxianQuantity.subtract(new BigDecimal(total)); //剩余可用划线后优惠价格的数量
+                                //1.1.1.1剩余数量大于 1，则加1
+                                if (restQuantity.compareTo(new BigDecimal(0)) == 1) {
+                                    NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                                    subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                                    subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                                    subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                                    subEntity.setNxCosOrderUserId(orderUserId);
+                                    subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                                    subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                                    subEntity.setNxCosQuantity("1");
+                                    subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                                    subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+                                    subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+                                    subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                    subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
+                                    subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                    subEntity.setNxCosStatus(-1);
+                                    subEntity.setNxCosType(orderType);
+                                    subEntity.setNxCosSplicingOrdersId(spId);
+                                    subEntity.setNxCosRemark(remark);
+                                    subEntity.setNxCosOrdersId(pindanId);
+                                    nxCommunityOrdersSubService.save(subEntity);
+                                } else {
+                                    NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                                    subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                                    subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                                    subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                                    subEntity.setNxCosOrderUserId(orderUserId);
+                                    subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                                    subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                                    subEntity.setNxCosQuantity("1");
+                                    subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                                    subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                    subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                    subEntity.setNxCosHuaxianDifferentPrice("0");
+                                    subEntity.setNxCosStatus(-1);
+                                    subEntity.setNxCosRemark(remark);
+                                    subEntity.setNxCosType(orderType);
+                                    subEntity.setNxCosSplicingOrdersId(spId);
+                                    subEntity.setNxCosOrdersId(pindanId);
+                                    nxCommunityOrdersSubService.save(subEntity);
+                                }
+
+                            } else {
+                                //diyige
+                                NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                                subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                                subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                                subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                                subEntity.setNxCosOrderUserId(orderUserId);
+                                subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                                subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                                subEntity.setNxCosQuantity("1");
+                                subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                                subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+                                subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+                                subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
+                                subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                subEntity.setNxCosStatus(-1);
+                                subEntity.setNxCosType(orderType);
+                                subEntity.setNxCosSplicingOrdersId(spId);
+                                subEntity.setNxCosRemark(remark);
+                                subEntity.setNxCosOrdersId(pindanId);
+                                nxCommunityOrdersSubService.save(subEntity);
+                            }
+                        }
+                    }
+
+                } else {
+                    //如果会员卡没有被选择，则按照划线价格添加订单
+                    Map<String, Object> mapS = new HashMap<>();
+                    mapS.put("orderUserId", orderUserId);
+                    mapS.put("goodsId", goodsId);
+                    mapS.put("status", -1);
+                    mapS.put("remark", remark);
+                    mapS.put("diffPrice", 0);
+                    mapS.put("orderType", orderType);
+                    mapS.put("splicingOrderId", spId);
+                    NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapS);
+                    if (subOrderEntity != null) {
+                        BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
+                        BigDecimal add = orderQuantity.add(new BigDecimal(1));
+                        BigDecimal subtotal = new BigDecimal(subOrderEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                        subOrderEntity.setNxCosQuantity(add.toString());
+                        subOrderEntity.setNxCosSubtotal(subtotal.toString());
+                        nxCommunityOrdersSubService.update(subOrderEntity);
+
+                    } else {
+
+                        System.out.println("whgoodsnewCommmon222222" + goodsEntity.getNxCgGoodsName());
+                        NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                        subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                        subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                        subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                        subEntity.setNxCosOrderUserId(orderUserId);
+                        subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                        subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                        subEntity.setNxCosQuantity("1");
+                        subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                        subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                        subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                        subEntity.setNxCosHuaxianDifferentPrice("0");
+                        subEntity.setNxCosStatus(-1);
+                        subEntity.setNxCosRemark(remark);
+                        subEntity.setNxCosType(orderType);
+                        subEntity.setNxCosSplicingOrdersId(spId);
+                        subEntity.setNxCosOrdersId(pindanId);
+                        nxCommunityOrdersSubService.save(subEntity);
+                    }
+                }
+            } else {
+                //第一次保存订单
+                System.out.println("dyiicbaocincindnd");
+
+                NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                subEntity.setNxCosOrderUserId(orderUserId);
+                subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                subEntity.setNxCosQuantity("1");
+                subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+                subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+
+                subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
+                subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                subEntity.setNxCosStatus(-1);
+                subEntity.setNxCosRemark(remark);
+                subEntity.setNxCosType(orderType);
+                subEntity.setNxCosSplicingOrdersId(spId);
+                subEntity.setNxCosOrdersId(pindanId);
+                nxCommunityOrdersSubService.save(subEntity);
+
+
+                System.out.println("isshhdhdhhddhd" + goodsEntity.getNxCgCardId());
+                if (goodsEntity.getNxCgCardId() != null) {
+                    NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(goodsEntity.getNxCgCardId());
+                    NxCustomerUserCardEntity userCardEntity = new NxCustomerUserCardEntity();
+                    userCardEntity.setNxCucaStatus(-1);
+                    userCardEntity.setNxCucaCustomerUserId(orderUserId);
+                    userCardEntity.setNxCucaStartDate(formatWhatDay(0));
+                    userCardEntity.setNxCucaStopDate(formatWhatDay(Integer.valueOf(cardEntity.getNxCcEffectiveDays())));
+                    userCardEntity.setNxCucaCardId(cardEntity.getNxCommunityCardId());
+                    userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
+                    userCardEntity.setNxCucaIsSelected(1);
+                    userCardEntity.setNxCucaType(orderType);
+                    userCardEntity.setNxCucaComSplicingOrderId(spId);
+                    userCardEntity.setNxCucaComOrderId(pindanId);
+                    System.out.println("nimeiieyeoeueoueoeu" + userCardEntity.getNxCucaIsSelected());
+                    nxCustomerUserCardService.save(userCardEntity);
+                }
+
+            }
+
+
+            //giveapply
+            Map<String, Object> mapA = new HashMap<>();
+            mapA.put("orderUserId", orderUserId);
+            mapA.put("status", -1);
+            mapA.put("orderType", orderType);
+            mapA.put("splicingOrderId", spId);
+            System.out.println("apappapap" + mapA);
+            List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
+
+
+            return R.ok().put("data", nxCommunityOrdersSubEntities);
+        }
+
+
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/saveSubOrderRemarkHuaxianCard", method = RequestMethod.POST)
+    public R saveSubOrderRemarkHuaxianCard(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
+        NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
+        int wxCountAuto = -1;
+        Map<String, Object> mapQ = new HashMap<>();
+        mapQ.put("goodsId", goodsId);
+        mapQ.put("status", -1);
+        mapQ.put("orderUserId", orderUserId);
+        int countOrder = nxCommunityOrdersSubService.querySubOrderCount(mapQ);
+        if (countOrder > 0) {
+            int userOrderQuantity = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapQ);
+            BigDecimal orderOrderQuantity = new BigDecimal(userOrderQuantity);
+            wxCountAuto = new BigDecimal(goodsEntity.getNxCgAdsenseRestQuantity()).compareTo(orderOrderQuantity);
+        }
+        int nowMinute = getNowMinute();
+        int nxCgAdsenseStartTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStartTimeZone());
+        int nxCgAdsenseStopTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStopTimeZone());
+
+        if (goodsEntity.getNxCgIsOpenAdsense() == 1 && wxCountAuto == 0 && nowMinute > nxCgAdsenseStartTimeZone && nowMinute < nxCgAdsenseStopTimeZone) {
+            return R.error(-1, "剩余份数不足");
+        } else {
+            //一，如果已经有会员卡，则按照优惠订单保存
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("cardId", goodsEntity.getNxCgCardId());
+            map.put("stopTime", formatWhatDay(0));
+            map.put("userId", orderUserId);
+            map.put("goodsId", goodsId);
+            map.put("status", -1);
+            map.put("type", orderType);
+            map.put("splicingOrderId", spId);
+            System.out.println("zehlieyoeucarddddddd" + map);
+            NxCustomerUserCardEntity userCardEntitys = nxCustomerUserCardService.queryUserGoodsCard(map);
+            // 一，如果已经有会员卡
+            if (userCardEntitys != null) {
+
+                //1.1 如果会员卡被选择，则继续查询是否可以按照优惠价格保存订单
+                if (userCardEntitys.getNxCucaIsSelected() == 1) {
+
+                    Map<String, Object> mapC = new HashMap<>();
+                    mapC.put("orderUserId", orderUserId);
+                    mapC.put("goodsId", goodsId);
+                    mapC.put("status", -1);
+                    mapC.put("dayuDiffPrice", 0);
+                    mapC.put("remark", remark);
+                    mapC.put("orderType", orderType);
+                    mapC.put("splicingOrderId", spId);
+                    //1.1.1 先查询优惠订单是否超过数量
+                    NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
+                    System.out.println("wwwhwiiwiwiwiwwiiwiiwiiw" + communityOrdersSubEntity);
+
+                    if (communityOrdersSubEntity != null) {
+
+                        BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
+                        BigDecimal orderQuantity = new BigDecimal(communityOrdersSubEntity.getNxCosQuantity());
+                        Map<String, Object> mapT = new HashMap<>();
+                        mapT.put("orderUserId", orderUserId);
+                        mapT.put("goodsId", goodsId);
+                        mapT.put("status", -1);
+                        mapT.put("dayuDiffPrice", 0);
+                        mapT.put("orderType", orderType);
+                        mapT.put("splicingOrderId", spId);
                         int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
                         BigDecimal restQuantity = huaxianQuantity.subtract(new BigDecimal(total)); //剩余可用划线后优惠价格的数量
                         //1.1.1.1剩余数量大于 1，则加1
@@ -584,7 +1356,7 @@ public class NxCommunityOrdersSubController {
                             mapZ.put("remark", remark);
                             mapZ.put("orderType", orderType);
                             mapZ.put("splicingOrderId", spId);
-                            System.out.println("mappppzzzzzzRRRRRRRRRR" + mapZ);
+                            System.out.println("mappppzzzzzz" + mapZ);
                             NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
                             //已经有了普通订单，则修改数量
                             if (communityOrdersSubZero != null) {
@@ -599,7 +1371,8 @@ public class NxCommunityOrdersSubController {
 
                             } else {
                                 //添加信息普通订单
-                                System.out.println("whgoodsnewCommmonssssss111" + goodsEntity.getNxCgGoodsName());
+                                //----
+                                System.out.println("whgoodsnewCommmonssssss" + goodsEntity.getNxCgGoodsName());
                                 NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
                                 subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
                                 subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
@@ -620,31 +1393,6 @@ public class NxCommunityOrdersSubController {
                                 nxCommunityOrdersSubService.save(subEntity);
                             }
                         }
-                    }
-
-
-                } else {
-                    //2，如果
-
-                    Map<String, Object> mapZ = new HashMap<>();
-                    mapZ.put("orderUserId", orderUserId);
-                    mapZ.put("goodsId", goodsId);
-                    mapZ.put("status", -1);
-                    mapZ.put("diffPrice", 0);
-                    mapZ.put("remark", remark);
-                    mapZ.put("orderType", orderType);
-                    mapZ.put("splicingOrderId", spId);
-                    System.out.println("mappppzzzzzz" + mapZ);
-                    NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
-                    if (communityOrdersSubZero != null) {
-                        System.out.println("meiyouzuozuozzlididiididm" + communityOrdersSubZero.getNxCosQuantity());
-                        BigDecimal nxCosQuantity = new BigDecimal(communityOrdersSubZero.getNxCosQuantity());
-                        BigDecimal add = nxCosQuantity.add(new BigDecimal(1));
-                        BigDecimal subtotal = new BigDecimal(communityOrdersSubZero.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                        communityOrdersSubZero.setNxCosQuantity(add.toString());
-                        communityOrdersSubZero.setNxCosSubtotal(subtotal.toString());
-                        System.out.println("updddateeeee" + communityOrdersSubZero.getNxCosQuantity());
-                        nxCommunityOrdersSubService.update(communityOrdersSubZero);
 
                     } else {
                         Map<String, Object> mapT = new HashMap<>();
@@ -661,6 +1409,7 @@ public class NxCommunityOrdersSubController {
                             BigDecimal restQuantity = huaxianQuantity.subtract(new BigDecimal(total)); //剩余可用划线后优惠价格的数量
                             //1.1.1.1剩余数量大于 1，则加1
                             if (restQuantity.compareTo(new BigDecimal(0)) == 1) {
+                                System.out.println("nanndndndnddnzleiie");
                                 NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
                                 subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
                                 subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
@@ -672,38 +1421,63 @@ public class NxCommunityOrdersSubController {
                                 subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
                                 subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
                                 subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+
                                 subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
                                 subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
                                 subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
                                 subEntity.setNxCosStatus(-1);
+                                subEntity.setNxCosRemark(remark);
                                 subEntity.setNxCosType(orderType);
                                 subEntity.setNxCosSplicingOrdersId(spId);
-                                subEntity.setNxCosRemark(remark);
                                 subEntity.setNxCosOrdersId(pindanId);
                                 nxCommunityOrdersSubService.save(subEntity);
                             } else {
-                                NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-                                subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-                                subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-                                subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-                                subEntity.setNxCosOrderUserId(orderUserId);
-                                subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-                                subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-                                subEntity.setNxCosQuantity("1");
-                                subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-                                subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-                                subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
-                                subEntity.setNxCosHuaxianDifferentPrice("0");
-                                subEntity.setNxCosStatus(-1);
-                                subEntity.setNxCosRemark(remark);
-                                subEntity.setNxCosType(orderType);
-                                subEntity.setNxCosSplicingOrdersId(spId);
-                                subEntity.setNxCosOrdersId(pindanId);
-                                nxCommunityOrdersSubService.save(subEntity);
-                            }
 
-                        }else{
-                            //diyige
+                                System.out.println("jianchaputoggnfndndndndn");
+                                Map<String, Object> mapS = new HashMap<>();
+                                mapS.put("orderUserId", orderUserId);
+                                mapS.put("goodsId", goodsId);
+                                mapS.put("status", -1);
+                                mapS.put("remark", remark);
+                                mapS.put("diffPrice", 0);
+                                mapS.put("orderType", orderType);
+                                mapS.put("splicingOrderId", spId);
+                                NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapS);
+                                if (subOrderEntity != null) {
+                                    BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
+                                    BigDecimal add = orderQuantity.add(new BigDecimal(1));
+                                    BigDecimal subtotal = new BigDecimal(subOrderEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                                    subOrderEntity.setNxCosQuantity(add.toString());
+                                    subOrderEntity.setNxCosSubtotal(subtotal.toString());
+                                    nxCommunityOrdersSubService.update(subOrderEntity);
+
+                                } else {
+
+                                    System.out.println("whgoodsnewCommmon222222" + goodsEntity.getNxCgGoodsName());
+                                    NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                                    subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                                    subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                                    subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                                    subEntity.setNxCosOrderUserId(orderUserId);
+                                    subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                                    subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                                    subEntity.setNxCosQuantity("1");
+                                    subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                                    subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                    subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                    subEntity.setNxCosHuaxianDifferentPrice("0");
+                                    subEntity.setNxCosStatus(-1);
+                                    subEntity.setNxCosRemark(remark);
+                                    subEntity.setNxCosType(orderType);
+                                    subEntity.setNxCosSplicingOrdersId(spId);
+                                    subEntity.setNxCosOrdersId(pindanId);
+                                    nxCommunityOrdersSubService.save(subEntity);
+                                }
+                            }
+                        } else {
+
+                            //todo kk
+                            System.out.println("whgoodsnewCommmon222222" + goodsEntity.getNxCgGoodsName());
                             NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
                             subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
                             subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
@@ -719,495 +1493,38 @@ public class NxCommunityOrdersSubController {
                             subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
                             subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
                             subEntity.setNxCosStatus(-1);
+                            subEntity.setNxCosRemark(remark);
                             subEntity.setNxCosType(orderType);
                             subEntity.setNxCosSplicingOrdersId(spId);
-                            subEntity.setNxCosRemark(remark);
                             subEntity.setNxCosOrdersId(pindanId);
                             nxCommunityOrdersSubService.save(subEntity);
                         }
                     }
-                }
 
-            } else {
-                //如果会员卡没有被选择，则按照划线价格添加订单
-                Map<String, Object> mapS = new HashMap<>();
-                mapS.put("orderUserId", orderUserId);
-                mapS.put("goodsId", goodsId);
-                mapS.put("status", -1);
-                mapS.put("remark", remark);
-                mapS.put("diffPrice", 0);
-                mapS.put("orderType", orderType);
-                mapS.put("splicingOrderId", spId);
-                NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapS);
-                if (subOrderEntity != null) {
-                    BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
-                    BigDecimal add = orderQuantity.add(new BigDecimal(1));
-                    BigDecimal subtotal = new BigDecimal(subOrderEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                    subOrderEntity.setNxCosQuantity(add.toString());
-                    subOrderEntity.setNxCosSubtotal(subtotal.toString());
-                    nxCommunityOrdersSubService.update(subOrderEntity);
 
                 } else {
-
-                    System.out.println("whgoodsnewCommmon222222" + goodsEntity.getNxCgGoodsName());
-                    NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-                    subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-                    subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-                    subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-                    subEntity.setNxCosOrderUserId(orderUserId);
-                    subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-                    subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-                    subEntity.setNxCosQuantity("1");
-                    subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-                    subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-                    subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
-                    subEntity.setNxCosHuaxianDifferentPrice("0");
-                    subEntity.setNxCosStatus(-1);
-                    subEntity.setNxCosRemark(remark);
-                    subEntity.setNxCosType(orderType);
-                    subEntity.setNxCosSplicingOrdersId(spId);
-                    subEntity.setNxCosOrdersId(pindanId);
-                    nxCommunityOrdersSubService.save(subEntity);
-                }
-            }
-        } else {
-            //第一次保存订单
-            System.out.println("dyiicbaocincindnd");
-
-            NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(goodsEntity.getNxCgCardId());
-            NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-            subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-            subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-            subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-            subEntity.setNxCosOrderUserId(orderUserId);
-            subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-            subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-            subEntity.setNxCosQuantity("1");
-            subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-            subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
-            subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
-
-            subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-            subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
-            subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
-            subEntity.setNxCosStatus(-1);
-            subEntity.setNxCosRemark(remark);
-            subEntity.setNxCosType(orderType);
-            subEntity.setNxCosSplicingOrdersId(spId);
-            subEntity.setNxCosOrdersId(pindanId);
-            nxCommunityOrdersSubService.save(subEntity);
-
-            NxCustomerUserCardEntity userCardEntity = new NxCustomerUserCardEntity();
-            userCardEntity.setNxCucaStatus(-1);
-            userCardEntity.setNxCucaCustomerUserId(orderUserId);
-            userCardEntity.setNxCucaStartDate(formatWhatDay(0));
-            userCardEntity.setNxCucaStopDate(formatWhatDay(Integer.valueOf(cardEntity.getNxCcEffectiveDays())));
-            userCardEntity.setNxCucaCardId(cardEntity.getNxCommunityCardId());
-            userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
-            userCardEntity.setNxCucaIsSelected(1);
-            userCardEntity.setNxCucaType(orderType);
-            userCardEntity.setNxCucaComSplicingOrderId(spId);
-            userCardEntity.setNxCucaComOrderId(pindanId);
-            System.out.println("nimeiieyeoeueoueoeu" + userCardEntity.getNxCucaIsSelected());
-            nxCustomerUserCardService.save(userCardEntity);
-
-        }
-
-
-        //giveapply
-        Map<String, Object> mapA = new HashMap<>();
-        mapA.put("orderUserId", orderUserId);
-        mapA.put("status", -1);
-        mapA.put("orderType", orderType);
-        mapA.put("splicingOrderId", spId);
-        System.out.println("apappapap" + mapA);
-        List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
-
-        return R.ok().put("data", nxCommunityOrdersSubEntities);
-
-    }
-
-
-    @ResponseBody
-    @RequestMapping(value = "/saveSubOrderRemarkHuaxian", method = RequestMethod.POST)
-    public R saveSubOrderRemarkHuaxian(Integer goodsId, Integer orderUserId, String remark, Integer orderType, Integer spId, Integer pindanId) {
-        NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
-        //一，如果已经有会员卡，则按照优惠订单保存
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("cardId", goodsEntity.getNxCgCardId());
-        map.put("stopTime", formatWhatDay(0));
-        map.put("userId", orderUserId);
-        map.put("goodsId", goodsId);
-        map.put("status", -1);
-        map.put("type", orderType);
-        map.put("splicingOrderId", spId);
-        System.out.println("zehlieyoeucarddddddd" + map);
-        NxCustomerUserCardEntity userCardEntitys = nxCustomerUserCardService.queryUserGoodsCard(map);
-        // 一，如果已经有会员卡
-        if (userCardEntitys != null) {
-
-            //1.1 如果会员卡被选择，则继续查询是否可以按照优惠价格保存订单
-            if (userCardEntitys.getNxCucaIsSelected() == 1) {
-
-                Map<String, Object> mapC = new HashMap<>();
-                mapC.put("orderUserId", orderUserId);
-                mapC.put("goodsId", goodsId);
-                mapC.put("status", -1);
-                mapC.put("dayuDiffPrice", 0);
-                mapC.put("remark", remark);
-                mapC.put("orderType", orderType);
-                mapC.put("splicingOrderId", spId);
-                //1.1.1 先查询优惠订单是否超过数量
-                NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
-                System.out.println("wwwhwiiwiwiwiwwiiwiiwiiw" + communityOrdersSubEntity);
-
-                if (communityOrdersSubEntity != null) {
-
-                    BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
-                    BigDecimal orderQuantity = new BigDecimal(communityOrdersSubEntity.getNxCosQuantity());
-                    Map<String, Object> mapT = new HashMap<>();
-                    mapT.put("orderUserId", orderUserId);
-                    mapT.put("goodsId", goodsId);
-                    mapT.put("status", -1);
-                    mapT.put("dayuDiffPrice", 0);
-                    mapT.put("orderType", orderType);
-                    mapT.put("splicingOrderId", spId);
-                    int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
-                    BigDecimal restQuantity = huaxianQuantity.subtract(new BigDecimal(total)); //剩余可用划线后优惠价格的数量
-                    //1.1.1.1剩余数量大于 1，则加1
-                    if (restQuantity.compareTo(new BigDecimal(0)) == 1) {
+                    //如果会员卡没有被选择，则按照划线价格添加订单
+                    Map<String, Object> mapS = new HashMap<>();
+                    mapS.put("orderUserId", orderUserId);
+                    mapS.put("goodsId", goodsId);
+                    mapS.put("status", -1);
+                    mapS.put("remark", remark);
+                    mapS.put("diffPrice", 0);
+                    mapS.put("orderType", orderType);
+                    mapS.put("splicingOrderId", spId);
+                    NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapS);
+                    if (subOrderEntity != null) {
+                        System.out.println("neexxxx222");
+                        BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
                         BigDecimal add = orderQuantity.add(new BigDecimal(1));
-                        BigDecimal subtotal = new BigDecimal(communityOrdersSubEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                        BigDecimal huaxianSubtotal = new BigDecimal(communityOrdersSubEntity.getNxCosHuaxianPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                        communityOrdersSubEntity.setNxCosQuantity(add.toString());
-                        communityOrdersSubEntity.setNxCosSubtotal(subtotal.toString());
-                        communityOrdersSubEntity.setNxCosHuaxianSubtotal(huaxianSubtotal.toString());
-                        nxCommunityOrdersSubService.update(communityOrdersSubEntity);
-                    } else {
-                        //1.1.1.2保存普通订单之前先查是否有同样的订单
-                        Map<String, Object> mapZ = new HashMap<>();
-                        mapZ.put("orderUserId", orderUserId);
-                        mapZ.put("goodsId", goodsId);
-                        mapZ.put("status", -1);
-                        mapZ.put("diffPrice", 0);
-                        mapZ.put("remark", remark);
-                        mapZ.put("orderType", orderType);
-                        mapZ.put("splicingOrderId", spId);
-                        System.out.println("mappppzzzzzz" + mapZ);
-                        NxCommunityOrdersSubEntity communityOrdersSubZero = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapZ);
-                        //已经有了普通订单，则修改数量
-                        if (communityOrdersSubZero != null) {
-                            System.out.println("meiyouzuozuozzlididiididm" + communityOrdersSubZero.getNxCosQuantity());
-                            BigDecimal nxCosQuantity = new BigDecimal(communityOrdersSubZero.getNxCosQuantity());
-                            BigDecimal add = nxCosQuantity.add(new BigDecimal(1));
-                            BigDecimal subtotal = new BigDecimal(communityOrdersSubZero.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                            communityOrdersSubZero.setNxCosQuantity(add.toString());
-                            communityOrdersSubZero.setNxCosSubtotal(subtotal.toString());
-                            System.out.println("updddateeeee" + communityOrdersSubZero.getNxCosQuantity());
-                            nxCommunityOrdersSubService.update(communityOrdersSubZero);
+                        BigDecimal subtotal = new BigDecimal(subOrderEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                        subOrderEntity.setNxCosQuantity(add.toString());
+                        subOrderEntity.setNxCosSubtotal(subtotal.toString());
+                        nxCommunityOrdersSubService.update(subOrderEntity);
 
-                        } else {
-                            //添加信息普通订单
-                            //----
-                            System.out.println("whgoodsnewCommmonssssss" + goodsEntity.getNxCgGoodsName());
-                            NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-                            subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-                            subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-                            subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-                            subEntity.setNxCosOrderUserId(orderUserId);
-                            subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-                            subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-                            subEntity.setNxCosQuantity("1");
-                            subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-                            subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-                            subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
-                            subEntity.setNxCosHuaxianDifferentPrice("0");
-                            subEntity.setNxCosStatus(-1);
-                            subEntity.setNxCosRemark(remark);
-                            subEntity.setNxCosType(orderType);
-                            subEntity.setNxCosSplicingOrdersId(spId);
-                            subEntity.setNxCosOrdersId(pindanId);
-                            nxCommunityOrdersSubService.save(subEntity);
-                        }
-                    }
-
-                } else {
-                    Map<String, Object> mapT = new HashMap<>();
-                    mapT.put("orderUserId", orderUserId);
-                    mapT.put("goodsId", goodsId);
-                    mapT.put("status", -1);
-                    mapT.put("dayuDiffPrice", 0);
-                    mapT.put("orderType", orderType);
-                    mapT.put("splicingOrderId", spId);
-                    int count = nxCommunityOrdersSubService.querySubOrderCount(mapT);
-                    if (count > 0) {
-                        int total = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapT);
-                        BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
-                        BigDecimal restQuantity = huaxianQuantity.subtract(new BigDecimal(total)); //剩余可用划线后优惠价格的数量
-                        //1.1.1.1剩余数量大于 1，则加1
-                        if (restQuantity.compareTo(new BigDecimal(0)) == 1) {
-                            System.out.println("nanndndndnddnzleiie");
-                            NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-                            subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-                            subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-                            subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-                            subEntity.setNxCosOrderUserId(orderUserId);
-                            subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-                            subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-                            subEntity.setNxCosQuantity("1");
-                            subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-                            subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
-                            subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
-
-                            subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-                            subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
-                            subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
-                            subEntity.setNxCosStatus(-1);
-                            subEntity.setNxCosRemark(remark);
-                            subEntity.setNxCosType(orderType);
-                            subEntity.setNxCosSplicingOrdersId(spId);
-                            subEntity.setNxCosOrdersId(pindanId);
-                            nxCommunityOrdersSubService.save(subEntity);
-                        } else {
-
-                            System.out.println("jianchaputoggnfndndndndn");
-                            Map<String, Object> mapS = new HashMap<>();
-                            mapS.put("orderUserId", orderUserId);
-                            mapS.put("goodsId", goodsId);
-                            mapS.put("status", -1);
-                            mapS.put("remark", remark);
-                            mapS.put("diffPrice", 0);
-                            mapS.put("orderType", orderType);
-                            mapS.put("splicingOrderId", spId);
-                            NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapS);
-                            if (subOrderEntity != null) {
-                                BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
-                                BigDecimal add = orderQuantity.add(new BigDecimal(1));
-                                BigDecimal subtotal = new BigDecimal(subOrderEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                                subOrderEntity.setNxCosQuantity(add.toString());
-                                subOrderEntity.setNxCosSubtotal(subtotal.toString());
-                                nxCommunityOrdersSubService.update(subOrderEntity);
-
-                            } else {
-
-                                System.out.println("whgoodsnewCommmon222222" + goodsEntity.getNxCgGoodsName());
-                                NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-                                subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-                                subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-                                subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-                                subEntity.setNxCosOrderUserId(orderUserId);
-                                subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-                                subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-                                subEntity.setNxCosQuantity("1");
-                                subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-                                subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-                                subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
-                                subEntity.setNxCosHuaxianDifferentPrice("0");
-                                subEntity.setNxCosStatus(-1);
-                                subEntity.setNxCosRemark(remark);
-                                subEntity.setNxCosType(orderType);
-                                subEntity.setNxCosSplicingOrdersId(spId);
-                                subEntity.setNxCosOrdersId(pindanId);
-                                nxCommunityOrdersSubService.save(subEntity);
-                            }
-                        }
                     } else {
 
-                        //todo kk
                         System.out.println("whgoodsnewCommmon222222" + goodsEntity.getNxCgGoodsName());
-                        NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-                    subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-                    subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-                    subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-                    subEntity.setNxCosOrderUserId(orderUserId);
-                    subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-                    subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-                    subEntity.setNxCosQuantity("1");
-                    subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-                    subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
-                    subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
-                    subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-                    subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
-                    subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
-                    subEntity.setNxCosStatus(-1);
-                    subEntity.setNxCosRemark(remark);
-                    subEntity.setNxCosType(orderType);
-                    subEntity.setNxCosSplicingOrdersId(spId);
-                    subEntity.setNxCosOrdersId(pindanId);
-                        nxCommunityOrdersSubService.save(subEntity);
-                    }
-                }
-
-
-            } else {
-                //如果会员卡没有被选择，则按照划线价格添加订单
-                Map<String, Object> mapS = new HashMap<>();
-                mapS.put("orderUserId", orderUserId);
-                mapS.put("goodsId", goodsId);
-                mapS.put("status", -1);
-                mapS.put("remark", remark);
-                mapS.put("diffPrice", 0);
-                mapS.put("orderType", orderType);
-                mapS.put("splicingOrderId", spId);
-                NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapS);
-                if (subOrderEntity != null) {
-                    System.out.println("neexxxx222");
-                    BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
-                    BigDecimal add = orderQuantity.add(new BigDecimal(1));
-                    BigDecimal subtotal = new BigDecimal(subOrderEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                    subOrderEntity.setNxCosQuantity(add.toString());
-                    subOrderEntity.setNxCosSubtotal(subtotal.toString());
-                    nxCommunityOrdersSubService.update(subOrderEntity);
-
-                } else {
-
-                    System.out.println("whgoodsnewCommmon222222" + goodsEntity.getNxCgGoodsName());
-                    NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-                    subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-                    subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-                    subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-                    subEntity.setNxCosOrderUserId(orderUserId);
-                    subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-                    subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-                    subEntity.setNxCosQuantity("1");
-                    subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-                    subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-                    subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
-                    subEntity.setNxCosHuaxianDifferentPrice("0");
-                    subEntity.setNxCosStatus(-1);
-                    subEntity.setNxCosRemark(remark);
-                    subEntity.setNxCosType(orderType);
-                    subEntity.setNxCosSplicingOrdersId(spId);
-                    subEntity.setNxCosOrdersId(pindanId);
-                    nxCommunityOrdersSubService.save(subEntity);
-                }
-            }
-
-
-
-        } else {
-
-
-            //二，如果没有会员卡，则按照普通订单保存，并添加未选择会员卡
-            System.out.println("whgoodsnewCommmon222222333" + goodsEntity.getNxCgGoodsName());
-            NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
-            subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
-            subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
-            subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
-            subEntity.setNxCosOrderUserId(orderUserId);
-            subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
-            subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
-            subEntity.setNxCosQuantity("1");
-            subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
-            subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
-            subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
-            subEntity.setNxCosHuaxianDifferentPrice("0");
-            subEntity.setNxCosStatus(-1);
-            subEntity.setNxCosRemark(remark);
-            subEntity.setNxCosType(orderType);
-            subEntity.setNxCosSplicingOrdersId(spId);
-            subEntity.setNxCosOrdersId(pindanId);
-            nxCommunityOrdersSubService.save(subEntity);
-
-            NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(goodsEntity.getNxCgCardId());
-            NxCustomerUserCardEntity userCardEntity = new NxCustomerUserCardEntity();
-            userCardEntity.setNxCucaStatus(-1);
-            userCardEntity.setNxCucaCustomerUserId(orderUserId);
-            userCardEntity.setNxCucaStartDate(formatWhatDay(0));
-            userCardEntity.setNxCucaStopDate(formatWhatDay(Integer.valueOf(cardEntity.getNxCcEffectiveDays())));
-            userCardEntity.setNxCucaCardId(cardEntity.getNxCommunityCardId());
-            userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
-            userCardEntity.setNxCucaIsSelected(0);
-            userCardEntity.setNxCucaType(orderType);
-            userCardEntity.setNxCucaComSplicingOrderId(spId);
-            userCardEntity.setNxCucaComOrderId(pindanId);
-            System.out.println("nimeiieyeoeueoueoeu" + userCardEntity.getNxCucaIsSelected());
-            nxCustomerUserCardService.save(userCardEntity);
-
-
-        }
-
-
-        return R.ok();
-    }
-
-
-    @ResponseBody
-    @RequestMapping(value = "/addGoodsOrder", method = RequestMethod.POST)
-    public R addGoodsOrder(Integer goodsId, Integer orderUserId, Integer orderType, Integer spId, Integer pindanId) {
-
-        NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
-        if (goodsEntity.getNxCgGoodsHuaxianPrice() == null) {
-            //commAdd
-            Map<String, Object> map = new HashMap<>();
-            map.put("orderUserId", orderUserId);
-            map.put("goodsId", goodsId);
-            map.put("orderType", orderType);
-            map.put("status", -1);
-            map.put("splicingOrderId", spId);
-            NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
-            if (subOrderEntity != null) {
-                BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
-                BigDecimal add = orderQuantity.add(new BigDecimal(1));
-                BigDecimal subtotal = new BigDecimal(subOrderEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                subOrderEntity.setNxCosQuantity(add.toString());
-                subOrderEntity.setNxCosSubtotal(subtotal.toString());
-                nxCommunityOrdersSubService.update(subOrderEntity);
-            }
-
-        } else {
-            //pandan
-            Map<String, Object> map = new HashMap<>();
-            map.put("orderUserId", orderUserId);
-            map.put("goodsId", goodsId);
-            map.put("orderType", orderType);
-            map.put("status", -1);
-            map.put("diffPrice", 0);
-            map.put("splicingOrderId", spId);
-            //先查是否有普通订单
-            System.out.println("addddddd" + map);
-            NxCommunityOrdersSubEntity putongSubOrder = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
-            if (putongSubOrder != null) {
-                //普通订单加 1
-                BigDecimal orderQuantity = new BigDecimal(putongSubOrder.getNxCosQuantity());
-                BigDecimal add = orderQuantity.add(new BigDecimal(1));
-
-                BigDecimal subtotal = new BigDecimal(putongSubOrder.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                putongSubOrder.setNxCosQuantity(add.toString());
-                putongSubOrder.setNxCosSubtotal(subtotal.toString());
-                nxCommunityOrdersSubService.update(putongSubOrder);
-
-            } else {
-                //查询优惠订单
-                Map<String, Object> mapC = new HashMap<>();
-                mapC.put("orderUserId", orderUserId);
-                mapC.put("goodsId", goodsId);
-                mapC.put("status", -1);
-                mapC.put("orderType", orderType);
-                mapC.put("dayuDiffPrice", 0);
-                mapC.put("splicingOrderId", spId);
-                //先查询优惠订单是否超过数量
-                System.out.println("youhuidiadddddd" + mapC);
-                NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
-                if (communityOrdersSubEntity != null) {
-
-                    BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
-                    BigDecimal orderQuantity = new BigDecimal(communityOrdersSubEntity.getNxCosQuantity());
-                    //剩余可用划线后优惠价格的数量
-                    BigDecimal restQuantity = huaxianQuantity.subtract(orderQuantity);
-                    System.out.println("resssddfsadsfdafafaaa" + restQuantity);
-                    //剩余数量大于 1，则加1
-                    if (restQuantity.compareTo(new BigDecimal(0)) == 1) {
-                        BigDecimal add = orderQuantity.add(new BigDecimal(1));
-                        BigDecimal subtotal = new BigDecimal(communityOrdersSubEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                        BigDecimal huaxianSubtotal = new BigDecimal(communityOrdersSubEntity.getNxCosHuaxianPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
-                        communityOrdersSubEntity.setNxCosQuantity(add.toString());
-                        communityOrdersSubEntity.setNxCosSubtotal(subtotal.toString());
-                        communityOrdersSubEntity.setNxCosHuaxianSubtotal(huaxianSubtotal.toString());
-                        nxCommunityOrdersSubService.update(communityOrdersSubEntity);
-                    } else {
-                        System.out.println("whgoodsnewCommmon" + goodsEntity.getNxCgGoodsName());
                         NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
                         subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
                         subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
@@ -1221,185 +1538,67 @@ public class NxCommunityOrdersSubController {
                         subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
                         subEntity.setNxCosHuaxianDifferentPrice("0");
                         subEntity.setNxCosStatus(-1);
+                        subEntity.setNxCosRemark(remark);
                         subEntity.setNxCosType(orderType);
                         subEntity.setNxCosSplicingOrdersId(spId);
                         subEntity.setNxCosOrdersId(pindanId);
                         nxCommunityOrdersSubService.save(subEntity);
                     }
                 }
-            }
-        }
-
-        //giveapply
-        Map<String, Object> mapA = new HashMap<>();
-        mapA.put("orderUserId", orderUserId);
-        mapA.put("status", -1);
-        mapA.put("oderType", orderType);
-        mapA.put("splicingOrderId", spId);
-        List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
-        return R.ok().put("data", nxCommunityOrdersSubEntities);
 
 
-    }
-
-
-    @ResponseBody
-    @RequestMapping(value = "/reduceGoodsOrder", method = RequestMethod.POST)
-    public R reduceGoodsOrder(Integer goodsId, Integer orderUserId, Integer orderType, Integer spId) {
-
-        NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
-        if (goodsEntity.getNxCgGoodsHuaxianPrice() != null) {
-
-            Map<String, Object> map = new HashMap<>();
-            map.put("orderUserId", orderUserId);
-            map.put("goodsId", goodsId);
-            map.put("status", -1);
-            map.put("diffPrice", 0);
-            map.put("orderType", orderType);
-            map.put("splicingOrderId", spId);
-            NxCommunityOrdersSubEntity diffZeroSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
-            if (diffZeroSubOrderEntity != null) {
-                BigDecimal orderQuantity = new BigDecimal(diffZeroSubOrderEntity.getNxCosQuantity());
-                if (orderQuantity.compareTo(new BigDecimal(1)) == 0) {
-                    //1，删除订单
-                    nxCommunityOrdersSubService.delete(diffZeroSubOrderEntity.getNxCommunityOrdersSubId());
-                } else {
-                    BigDecimal subtract = new BigDecimal(diffZeroSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
-                    BigDecimal decimal = new BigDecimal(diffZeroSubOrderEntity.getNxCosPrice()).multiply(subtract).setScale(1, BigDecimal.ROUND_HALF_UP);
-                    diffZeroSubOrderEntity.setNxCosQuantity(subtract.toString());
-                    diffZeroSubOrderEntity.setNxCosSubtotal(decimal.toString());
-                    nxCommunityOrdersSubService.update(diffZeroSubOrderEntity);
-                }
             } else {
-                Map<String, Object> mapD = new HashMap<>();
-                mapD.put("orderUserId", orderUserId);
-                mapD.put("goodsId", goodsId);
-                mapD.put("status", -1);
-                mapD.put("dayuDiffPrice", 0);
-                mapD.put("orderType", orderType);
-                mapD.put("splicingOrderId", spId);
-                System.out.println("dayoouuiiuiououo" + mapD);
-                //有优惠的订单
-                NxCommunityOrdersSubEntity diffSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapD);
-                if (diffSubOrderEntity != null) {
-                    BigDecimal orderQuantity = new BigDecimal(diffSubOrderEntity.getNxCosQuantity());
-                    if (orderQuantity.compareTo(new BigDecimal(1)) == 0) {
-                        //1，删除订单
-                        nxCommunityOrdersSubService.delete(diffSubOrderEntity.getNxCommunityOrdersSubId());
-                    } else {
-                        BigDecimal subtract = new BigDecimal(diffSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
-                        BigDecimal decimal = new BigDecimal(diffSubOrderEntity.getNxCosPrice()).multiply(subtract).setScale(1, BigDecimal.ROUND_HALF_UP);
-                        diffSubOrderEntity.setNxCosQuantity(subtract.toString());
-                        diffSubOrderEntity.setNxCosSubtotal(decimal.toString());
-                        nxCommunityOrdersSubService.update(diffSubOrderEntity);
-                    }
 
-                }
+
+                //二，如果没有会员卡，则按照普通订单保存，并添加未选择会员卡
+                System.out.println("whgoodsnewCommmon222222333" + goodsEntity.getNxCgGoodsName());
+                NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                subEntity.setNxCosOrderUserId(orderUserId);
+                subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                subEntity.setNxCosQuantity("1");
+                subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                subEntity.setNxCosHuaxianDifferentPrice("0");
+                subEntity.setNxCosStatus(-1);
+                subEntity.setNxCosRemark(remark);
+                subEntity.setNxCosType(orderType);
+                subEntity.setNxCosSplicingOrdersId(spId);
+                subEntity.setNxCosOrdersId(pindanId);
+                nxCommunityOrdersSubService.save(subEntity);
+
+                NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(goodsEntity.getNxCgCardId());
+                NxCustomerUserCardEntity userCardEntity = new NxCustomerUserCardEntity();
+                userCardEntity.setNxCucaStatus(-1);
+                userCardEntity.setNxCucaCustomerUserId(orderUserId);
+                userCardEntity.setNxCucaStartDate(formatWhatDay(0));
+                userCardEntity.setNxCucaStopDate(formatWhatDay(Integer.valueOf(cardEntity.getNxCcEffectiveDays())));
+                userCardEntity.setNxCucaCardId(cardEntity.getNxCommunityCardId());
+                userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
+                userCardEntity.setNxCucaIsSelected(0);
+                userCardEntity.setNxCucaType(orderType);
+                userCardEntity.setNxCucaComSplicingOrderId(spId);
+                userCardEntity.setNxCucaComOrderId(pindanId);
+                System.out.println("nimeiieyeoeueoueoeu" + userCardEntity.getNxCucaIsSelected());
+                nxCustomerUserCardService.save(userCardEntity);
+
+
             }
 
-        } else {
 
-            //common -
-            Map<String, Object> map = new HashMap<>();
-            map.put("orderUserId", orderUserId);
-            map.put("goodsId", goodsId);
-            map.put("status", -1);
-            map.put("orderType", orderType);
-            map.put("splicingOrderId", spId);
-            NxCommunityOrdersSubEntity commSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
-            if (commSubOrderEntity != null) {
-                BigDecimal orderQuantity = new BigDecimal(commSubOrderEntity.getNxCosQuantity());
-                if (orderQuantity.compareTo(new BigDecimal(1)) == 0) {
-                    //1，删除订单
-                    nxCommunityOrdersSubService.delete(commSubOrderEntity.getNxCommunityOrdersSubId());
-                } else {
-                    BigDecimal subtract = new BigDecimal(commSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
-                    BigDecimal decimal = new BigDecimal(commSubOrderEntity.getNxCosPrice()).multiply(subtract).setScale(1, BigDecimal.ROUND_HALF_UP);
-                    commSubOrderEntity.setNxCosQuantity(subtract.toString());
-                    commSubOrderEntity.setNxCosSubtotal(decimal.toString());
-                    nxCommunityOrdersSubService.update(commSubOrderEntity);
-                }
-            }
-
+            return R.ok();
         }
-
-
-        //giveapply
-        Map<String, Object> mapA = new HashMap<>();
-        mapA.put("orderUserId", orderUserId);
-        mapA.put("status", -1);
-        mapA.put("orderType", orderType);
-        mapA.put("splicingOrderId", spId);
-        System.out.println("aaaaaaaaa" + mapA);
-        List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
-
-        if(nxCommunityOrdersSubEntities.size() > 0){
-
-            Map<String, Object> mapCard = new HashMap<>();
-            mapCard.put("status", -1);
-            mapCard.put("userId",orderUserId);
-//            mapCard.put("type",orderType);
-            System.out.println("bbbbbbbbbbbbb" + mapCard);
-            List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
-
-            for(NxCustomerUserCardEntity userCardEntity: cardEntities){
-                int hasApply = 0;
-                NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(userCardEntity.getNxCucaCardId());
-                Integer nxCommunityCardId = cardEntity.getNxCommunityCardId();
-                System.out.println("commdmdcairriidid" + nxCommunityCardId);
-                System.out.println("commdmdcairriidid" + cardEntity.getNxCommunityCardName());
-                for(NxCommunityOrdersSubEntity subEntity: nxCommunityOrdersSubEntities){
-
-                    Integer nxCosCommunityGoodsId = subEntity.getNxCosCommunityGoodsId();
-
-                    NxCommunityGoodsEntity goodsEntityS = nxCommunityGoodsService.queryObject(nxCosCommunityGoodsId);
-                    if(goodsEntityS.getNxCgCardId() != null){
-
-                        if(goodsEntityS.getNxCgCardId().equals(nxCommunityCardId)){
-                            hasApply = 1;
-                        }
-                    }
-                }
-                System.out.println("carddddndnhasapapaply" + hasApply);
-                if(hasApply == 0){
-                    nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
-                }
-            }
-
-        }
-        else{
-            Map<String, Object> mapCard = new HashMap<>();
-            mapCard.put("status", -1);
-            mapCard.put("userId",orderUserId);
-//            mapCard.put("type",orderType);
-            List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
-            for(NxCustomerUserCardEntity userCardEntity: cardEntities){
-                nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
-            }
-
-        }
-
-
-
-        Map<String, Object> mapCard = new HashMap<>();
-        mapCard.put("status", -1);
-        mapCard.put("userId",orderUserId);
-//        mapCard.put("type",orderType);
-        List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
-
-        Map<String, Object> mapData = new HashMap<>();
-        mapData.put("arr", nxCommunityOrdersSubEntities);
-        mapData.put("cardList",  cardEntities);
-        return R.ok().put("data",mapData);
-
 
     }
 
 
     @ResponseBody
-    @RequestMapping(value = "/reduceSubOrderRemark", method = RequestMethod.POST)
-    public R reduceSubOrderRemark(Integer goodsId, Integer orderUserId, String remark, Integer orderType) {
-
+    @RequestMapping(value = "/reduceSubOrderRemarkCard", method = RequestMethod.POST)
+    public R reduceSubOrderRemarkCard(Integer goodsId, Integer orderUserId, String remark, Integer orderType) {
 
         Map<String, Object> map = new HashMap<>();
         map.put("orderUserId", orderUserId);
@@ -1416,10 +1615,14 @@ public class NxCommunityOrdersSubController {
                 //1，删除订单
                 nxCommunityOrdersSubService.delete(diffZeroSubOrderEntity.getNxCommunityOrdersSubId());
             } else {
-                BigDecimal subtract = new BigDecimal(diffZeroSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
-                BigDecimal decimal = new BigDecimal(diffZeroSubOrderEntity.getNxCosPrice()).multiply(subtract).setScale(1, BigDecimal.ROUND_HALF_UP);
-                diffZeroSubOrderEntity.setNxCosQuantity(subtract.toString());
+                BigDecimal quantity = new BigDecimal(diffZeroSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
+                BigDecimal decimal = new BigDecimal(diffZeroSubOrderEntity.getNxCosPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                diffZeroSubOrderEntity.setNxCosQuantity(quantity.toString());
                 diffZeroSubOrderEntity.setNxCosSubtotal(decimal.toString());
+                if (diffZeroSubOrderEntity.getNxCosHuaxianPrice() != null) {
+                    BigDecimal decimal1 = new BigDecimal(diffZeroSubOrderEntity.getNxCosHuaxianPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                    diffZeroSubOrderEntity.setNxCosHuaxianSubtotal(decimal1.toString());
+                }
                 nxCommunityOrdersSubService.update(diffZeroSubOrderEntity);
             }
         } else {
@@ -1439,10 +1642,14 @@ public class NxCommunityOrdersSubController {
                     //1，删除订单
                     nxCommunityOrdersSubService.delete(diffSubOrderEntity.getNxCommunityOrdersSubId());
                 } else {
-                    BigDecimal subtract = new BigDecimal(diffSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
-                    BigDecimal decimal = new BigDecimal(diffSubOrderEntity.getNxCosPrice()).multiply(subtract).setScale(1, BigDecimal.ROUND_HALF_UP);
-                    diffSubOrderEntity.setNxCosQuantity(subtract.toString());
+                    BigDecimal quantity = new BigDecimal(diffSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
+                    BigDecimal decimal = new BigDecimal(diffSubOrderEntity.getNxCosPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                    diffSubOrderEntity.setNxCosQuantity(quantity.toString());
                     diffSubOrderEntity.setNxCosSubtotal(decimal.toString());
+                    if (diffSubOrderEntity.getNxCosHuaxianPrice() != null) {
+                        BigDecimal decimal1 = new BigDecimal(diffSubOrderEntity.getNxCosHuaxianPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                        diffSubOrderEntity.setNxCosHuaxianSubtotal(decimal1.toString());
+                    }
                     nxCommunityOrdersSubService.update(diffSubOrderEntity);
                 }
 
@@ -1458,81 +1665,452 @@ public class NxCommunityOrdersSubController {
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
 
-        if(nxCommunityOrdersSubEntities.size() > 0){
+        if (nxCommunityOrdersSubEntities.size() > 0) {
 
             Map<String, Object> mapCard = new HashMap<>();
             mapCard.put("status", -1);
-            mapCard.put("userId",orderUserId);
-//            mapCard.put("type",orderType);
+            mapCard.put("userId", orderUserId);
             List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
             int hasApply = 0;
-            for(NxCustomerUserCardEntity userCardEntity: cardEntities){
+            for (NxCustomerUserCardEntity userCardEntity : cardEntities) {
 
                 NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(userCardEntity.getNxCucaCardId());
                 Integer nxCommunityCardId = cardEntity.getNxCommunityCardId();
-                for(NxCommunityOrdersSubEntity subEntity: nxCommunityOrdersSubEntities){
+                for (NxCommunityOrdersSubEntity subEntity : nxCommunityOrdersSubEntities) {
                     Integer nxCosCommunityGoodsId = subEntity.getNxCosCommunityGoodsId();
                     NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(nxCosCommunityGoodsId);
-                    if(goodsEntity.getNxCgCardId() != null){
-                        if(goodsEntity.getNxCgCardId().equals(nxCommunityCardId)){
+                    if (goodsEntity.getNxCgCardId() != null) {
+                        if (goodsEntity.getNxCgCardId().equals(nxCommunityCardId)) {
                             hasApply = 1;
                         }
                     }
                 }
-                if(hasApply == 0){
+                if (hasApply == 0) {
                     nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
                 }
             }
 
-        }
-        else{
+        } else {
             Map<String, Object> mapCard = new HashMap<>();
             mapCard.put("status", -1);
-            mapCard.put("userId",orderUserId);
+            mapCard.put("userId", orderUserId);
 //            mapCard.put("type",orderType);
             List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
-            for(NxCustomerUserCardEntity userCardEntity: cardEntities){
+            for (NxCustomerUserCardEntity userCardEntity : cardEntities) {
                 nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
             }
 
         }
 
 
-
         Map<String, Object> mapCard = new HashMap<>();
         mapCard.put("status", -1);
-        mapCard.put("userId",orderUserId);
-//        mapCard.put("type",orderType);
+        mapCard.put("userId", orderUserId);
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
 
         Map<String, Object> mapData = new HashMap<>();
         mapData.put("arr", nxCommunityOrdersSubEntities);
-        mapData.put("cardList",  cardEntities);
-        return R.ok().put("data",mapData);
+        mapData.put("cardList", cardEntities);
+
+
+        return R.ok().put("data", mapData);
 
     }
 
 
     @ResponseBody
-    @RequestMapping("/saveSubOrderCoupon")
-    public R saveSubOrderCoupon(@RequestBody NxCommunityOrdersSubEntity nxOrdersSub) {
-        nxCommunityOrdersSubService.save(nxOrdersSub);
-        Integer nxCosCucId = nxOrdersSub.getNxCosCucId();
-        NxCustomerUserCouponEntity userCouponEntity = nxCustomerUserCouponService.equalObject(nxCosCucId);
-        userCouponEntity.setNxCucStatus(1);
-        userCouponEntity.setNxCucSubOrderId(nxOrdersSub.getNxCommunityOrdersSubId());
-        nxCustomerUserCouponService.update(userCouponEntity);
+    @RequestMapping(value = "/addSubOrder", method = RequestMethod.POST)
+    public R addSubOrder(Integer goodsId, Integer orderUserId, Integer orderType, Integer spId, Integer pindanId) {
 
-        return R.ok();
+        NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
+        Map<String, Object> mapQ = new HashMap<>();
+        mapQ.put("goodsId", goodsId);
+        mapQ.put("status", -1);
+        mapQ.put("orderUserId", orderUserId);
+        int wxCountAuto1 = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapQ);
+        BigDecimal orderOrderQuantity = new BigDecimal(wxCountAuto1);
+
+        int wxCountAuto = new BigDecimal(goodsEntity.getNxCgAdsenseRestQuantity()).compareTo(orderOrderQuantity);
+        int nowMinute = getNowMinute();
+        int nxCgAdsenseStartTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStartTimeZone());
+        int nxCgAdsenseStopTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStopTimeZone());
+        System.out.println("indidididid==" + wxCountAuto + "orderOrderQuantity==" + orderOrderQuantity);
+
+        if (goodsEntity.getNxCgIsOpenAdsense() == 1 && wxCountAuto == 0 && nowMinute > nxCgAdsenseStartTimeZone && nowMinute < nxCgAdsenseStopTimeZone) {
+            return R.error(-1, "剩余份数不足");
+        } else {
+            if (goodsEntity.getNxCgGoodsHuaxianPrice() == null) {
+                //commAdd
+                Map<String, Object> map = new HashMap<>();
+                map.put("orderUserId", orderUserId);
+                map.put("goodsId", goodsId);
+                map.put("orderType", orderType);
+                map.put("status", -1);
+                map.put("splicingOrderId", spId);
+                NxCommunityOrdersSubEntity subOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
+                if (subOrderEntity != null) {
+                    BigDecimal orderQuantity = new BigDecimal(subOrderEntity.getNxCosQuantity());
+                    BigDecimal add = orderQuantity.add(new BigDecimal(1));
+                    BigDecimal subtotal = new BigDecimal(subOrderEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                    subOrderEntity.setNxCosQuantity(add.toString());
+                    subOrderEntity.setNxCosSubtotal(subtotal.toString());
+                    nxCommunityOrdersSubService.update(subOrderEntity);
+                }
+
+            } else {
+                //pandan
+                Map<String, Object> map = new HashMap<>();
+                map.put("orderUserId", orderUserId);
+                map.put("goodsId", goodsId);
+                map.put("orderType", orderType);
+                map.put("status", -1);
+                map.put("diffPrice", 0);
+                map.put("splicingOrderId", spId);
+                //先查是否有普通订单
+                System.out.println("addddddd" + map);
+                NxCommunityOrdersSubEntity putongSubOrder = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
+                if (putongSubOrder != null) {
+                    //普通订单加 1
+                    BigDecimal orderQuantity = new BigDecimal(putongSubOrder.getNxCosQuantity());
+                    BigDecimal add = orderQuantity.add(new BigDecimal(1));
+
+                    BigDecimal subtotal = new BigDecimal(putongSubOrder.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                    putongSubOrder.setNxCosQuantity(add.toString());
+                    putongSubOrder.setNxCosSubtotal(subtotal.toString());
+                    nxCommunityOrdersSubService.update(putongSubOrder);
+
+                } else {
+                    //查询优惠订单
+                    Map<String, Object> mapC = new HashMap<>();
+                    mapC.put("orderUserId", orderUserId);
+                    mapC.put("goodsId", goodsId);
+                    mapC.put("status", -1);
+                    mapC.put("orderType", orderType);
+                    mapC.put("dayuDiffPrice", 0);
+                    mapC.put("splicingOrderId", spId);
+                    //先查询优惠订单是否超过数量
+                    System.out.println("youhuidiadddddd" + mapC);
+                    NxCommunityOrdersSubEntity communityOrdersSubEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapC);
+                    if (communityOrdersSubEntity != null) {
+
+                        BigDecimal orderQuantity = new BigDecimal(communityOrdersSubEntity.getNxCosQuantity());
+                        //huxianQuantity
+                        if (goodsEntity.getNxCgGoodsHuaxianQuantity() != null) {
+                            BigDecimal huaxianQuantity = new BigDecimal(goodsEntity.getNxCgGoodsHuaxianQuantity());
+                            //剩余可用划线后优惠价格的数量
+                            BigDecimal restQuantity = huaxianQuantity.subtract(orderQuantity);
+                            System.out.println("resssddfsadsfdafafaaa" + restQuantity);
+                            //剩余数量大于 1，则加1
+                            if (restQuantity.compareTo(new BigDecimal(0)) == 1) {
+                                BigDecimal add = orderQuantity.add(new BigDecimal(1));
+                                BigDecimal subtotal = new BigDecimal(communityOrdersSubEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                                BigDecimal huaxianSubtotal = new BigDecimal(communityOrdersSubEntity.getNxCosHuaxianPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                                communityOrdersSubEntity.setNxCosQuantity(add.toString());
+                                communityOrdersSubEntity.setNxCosSubtotal(subtotal.toString());
+                                communityOrdersSubEntity.setNxCosHuaxianSubtotal(huaxianSubtotal.toString());
+                                nxCommunityOrdersSubService.update(communityOrdersSubEntity);
+                            } else {
+                                System.out.println("whgoodsnewCommmon" + goodsEntity.getNxCgGoodsName());
+                                NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+                                subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+                                subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+                                subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+                                subEntity.setNxCosOrderUserId(orderUserId);
+                                subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+                                subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+                                subEntity.setNxCosQuantity("1");
+                                subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+                                subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+                                subEntity.setNxCosHuaxianDifferentPrice("0");
+                                subEntity.setNxCosStatus(-1);
+                                subEntity.setNxCosType(orderType);
+                                subEntity.setNxCosSplicingOrdersId(spId);
+                                subEntity.setNxCosOrdersId(pindanId);
+                                nxCommunityOrdersSubService.save(subEntity);
+                            }
+                        } else {
+                            //update
+                            BigDecimal add = orderQuantity.add(new BigDecimal(1));
+                            BigDecimal subtotal = new BigDecimal(communityOrdersSubEntity.getNxCosPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                            BigDecimal huaxianSubtotal = new BigDecimal(communityOrdersSubEntity.getNxCosHuaxianPrice()).multiply(add).setScale(1, BigDecimal.ROUND_HALF_UP);
+                            communityOrdersSubEntity.setNxCosQuantity(add.toString());
+                            communityOrdersSubEntity.setNxCosSubtotal(subtotal.toString());
+                            communityOrdersSubEntity.setNxCosHuaxianSubtotal(huaxianSubtotal.toString());
+                            nxCommunityOrdersSubService.update(communityOrdersSubEntity);
+
+                        }
+                    }
+                }
+            }
+
+            //giveapply
+            Map<String, Object> mapA = new HashMap<>();
+            mapA.put("orderUserId", orderUserId);
+            mapA.put("status", -1);
+            mapA.put("oderType", orderType);
+            mapA.put("splicingOrderId", spId);
+            List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
+
+
+            return R.ok().put("data", nxCommunityOrdersSubEntities);
+
+        }
+
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/reduceSubOrder", method = RequestMethod.POST)
+    public R reduceSubOrder(Integer goodsId, Integer orderUserId, Integer orderType, Integer spId) {
+
+        NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
+        if (goodsEntity.getNxCgGoodsHuaxianPrice() != null) {
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("orderUserId", orderUserId);
+            map.put("goodsId", goodsId);
+            map.put("status", -1);
+            map.put("diffPrice", 0);
+            map.put("orderType", orderType);
+            map.put("splicingOrderId", spId);
+            NxCommunityOrdersSubEntity diffZeroSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
+            if (diffZeroSubOrderEntity != null) {
+                BigDecimal orderQuantity = new BigDecimal(diffZeroSubOrderEntity.getNxCosQuantity());
+                if (orderQuantity.compareTo(new BigDecimal(1)) == 0) {
+                    //1，删除订单
+                    nxCommunityOrdersSubService.delete(diffZeroSubOrderEntity.getNxCommunityOrdersSubId());
+                } else {
+                    BigDecimal quantity = new BigDecimal(diffZeroSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
+                    BigDecimal decimal = new BigDecimal(diffZeroSubOrderEntity.getNxCosPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                    diffZeroSubOrderEntity.setNxCosQuantity(quantity.toString());
+                    diffZeroSubOrderEntity.setNxCosSubtotal(decimal.toString());
+                    if (diffZeroSubOrderEntity.getNxCosHuaxianPrice() != null) {
+                        BigDecimal decimal1 = new BigDecimal(diffZeroSubOrderEntity.getNxCosHuaxianPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                        diffZeroSubOrderEntity.setNxCosHuaxianSubtotal(decimal1.toString());
+                    }
+                    nxCommunityOrdersSubService.update(diffZeroSubOrderEntity);
+                }
+            } else {
+                Map<String, Object> mapD = new HashMap<>();
+                mapD.put("orderUserId", orderUserId);
+                mapD.put("goodsId", goodsId);
+                mapD.put("status", -1);
+                mapD.put("dayuDiffPrice", 0);
+                mapD.put("orderType", orderType);
+                mapD.put("splicingOrderId", spId);
+                System.out.println("dayoouuiiuiououoaa" + mapD);
+                //有优惠的订单
+                NxCommunityOrdersSubEntity diffSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(mapD);
+                if (diffSubOrderEntity != null) {
+                    BigDecimal orderQuantity = new BigDecimal(diffSubOrderEntity.getNxCosQuantity());
+                    if (orderQuantity.compareTo(new BigDecimal(1)) == 0) {
+                        //1，删除订单
+                        nxCommunityOrdersSubService.delete(diffSubOrderEntity.getNxCommunityOrdersSubId());
+                    } else {
+                        BigDecimal quantity = new BigDecimal(diffSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
+                        BigDecimal decimal = new BigDecimal(diffSubOrderEntity.getNxCosPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                        diffSubOrderEntity.setNxCosQuantity(quantity.toString());
+                        diffSubOrderEntity.setNxCosSubtotal(decimal.toString());
+                        if (diffSubOrderEntity.getNxCosHuaxianPrice() != null) {
+                            BigDecimal decimal1 = new BigDecimal(diffSubOrderEntity.getNxCosHuaxianPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                            diffSubOrderEntity.setNxCosHuaxianSubtotal(decimal1.toString());
+                        }
+                        nxCommunityOrdersSubService.update(diffSubOrderEntity);
+                    }
+                }
+            }
+
+        } else {
+
+            //common -
+            Map<String, Object> map = new HashMap<>();
+            map.put("orderUserId", orderUserId);
+            map.put("goodsId", goodsId);
+            map.put("status", -1);
+            map.put("orderType", orderType);
+            map.put("splicingOrderId", spId);
+            NxCommunityOrdersSubEntity commSubOrderEntity = nxCommunityOrdersSubService.queryChangeSubOrderByParams(map);
+            if (commSubOrderEntity != null) {
+                BigDecimal orderQuantity = new BigDecimal(commSubOrderEntity.getNxCosQuantity());
+                if (orderQuantity.compareTo(new BigDecimal(1)) == 0) {
+                    //1，删除订单
+                    nxCommunityOrdersSubService.delete(commSubOrderEntity.getNxCommunityOrdersSubId());
+                } else {
+                    BigDecimal quantity = new BigDecimal(commSubOrderEntity.getNxCosQuantity()).subtract(new BigDecimal(1));
+                    BigDecimal decimal = new BigDecimal(commSubOrderEntity.getNxCosPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                    commSubOrderEntity.setNxCosQuantity(quantity.toString());
+                    commSubOrderEntity.setNxCosSubtotal(decimal.toString());
+                    if (commSubOrderEntity.getNxCosHuaxianPrice() != null) {
+                        BigDecimal decimal1 = new BigDecimal(commSubOrderEntity.getNxCosHuaxianPrice()).multiply(quantity).setScale(1, BigDecimal.ROUND_HALF_UP);
+                        commSubOrderEntity.setNxCosHuaxianSubtotal(decimal1.toString());
+                    }
+                    nxCommunityOrdersSubService.update(commSubOrderEntity);
+                }
+            }
+
+        }
+
+        //giveapply
+        Map<String, Object> mapA = new HashMap<>();
+        mapA.put("orderUserId", orderUserId);
+        mapA.put("status", -1);
+        mapA.put("orderType", orderType);
+        mapA.put("splicingOrderId", spId);
+        List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
+        if (nxCommunityOrdersSubEntities.size() > 0) {
+
+            Map<String, Object> mapCard = new HashMap<>();
+            mapCard.put("status", -1);
+            mapCard.put("userId", orderUserId);
+            List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
+
+            for (NxCustomerUserCardEntity userCardEntity : cardEntities) {
+                int hasApply = 0;
+                NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(userCardEntity.getNxCucaCardId());
+                Integer nxCommunityCardId = cardEntity.getNxCommunityCardId();
+                for (NxCommunityOrdersSubEntity subEntity : nxCommunityOrdersSubEntities) {
+                    Integer nxCosCommunityGoodsId = subEntity.getNxCosCommunityGoodsId();
+                    NxCommunityGoodsEntity goodsEntityS = nxCommunityGoodsService.queryObject(nxCosCommunityGoodsId);
+                    if (goodsEntityS.getNxCgCardId() != null) {
+                        if (goodsEntityS.getNxCgCardId().equals(nxCommunityCardId)) {
+                            hasApply = 1;
+                        }
+                    }
+                }
+                if (hasApply == 0) {
+                    nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
+                }
+            }
+
+        } else {
+            Map<String, Object> mapCard = new HashMap<>();
+            mapCard.put("status", -1);
+            mapCard.put("userId", orderUserId);
+            List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
+            for (NxCustomerUserCardEntity userCardEntity : cardEntities) {
+                nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
+            }
+        }
+
+        Map<String, Object> mapCard = new HashMap<>();
+        mapCard.put("status", -1);
+        mapCard.put("userId", orderUserId);
+        List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapCard);
+
+        Map<String, Object> mapData = new HashMap<>();
+        mapData.put("arr", nxCommunityOrdersSubEntities);
+        mapData.put("cardList", cardEntities);
+
+
+        return R.ok().put("data", mapData);
+
+
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/saveFirstSubOrder", method = RequestMethod.POST)
+    public R saveFirstSubOrder(Integer goodsId, Integer orderUserId, Integer spId, Integer orderType, Integer pindanId) {
+
+        NxCommunityGoodsEntity goodsEntity = nxCommunityGoodsService.queryObject(goodsId);
+
+
+        int wxCountAuto = -1;
+        Map<String, Object> mapQ = new HashMap<>();
+        mapQ.put("goodsId", goodsId);
+        mapQ.put("status", -1);
+        mapQ.put("orderUserId", orderUserId);
+        int countOrder = nxCommunityOrdersSubService.querySubOrderCount(mapQ);
+        if (countOrder > 0) {
+            int userOrderQuantity = nxCommunityOrdersSubService.querySubOrderTotalHuaxianQuantity(mapQ);
+            BigDecimal orderOrderQuantity = new BigDecimal(userOrderQuantity);
+            wxCountAuto = new BigDecimal(goodsEntity.getNxCgAdsenseRestQuantity()).compareTo(orderOrderQuantity);
+        }
+        int nowMinute = getNowMinute();
+        int nxCgAdsenseStartTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStartTimeZone());
+        int nxCgAdsenseStopTimeZone = Integer.parseInt(goodsEntity.getNxCgAdsenseStopTimeZone());
+
+        if (goodsEntity.getNxCgIsOpenAdsense() == 1 && wxCountAuto == 0 && nowMinute > nxCgAdsenseStartTimeZone && nowMinute < nxCgAdsenseStopTimeZone) {
+            return R.error(-1, "剩余份数不足");
+        }
+
+        else {
+
+            NxCommunityOrdersSubEntity subEntity = new NxCommunityOrdersSubEntity();
+            subEntity.setNxCosCommunityId(goodsEntity.getNxCgCommunityId());
+            subEntity.setNxCosCommunityGoodsId(goodsEntity.getNxCommunityGoodsId());
+            subEntity.setNxCosCommunityGoodsFatherId(goodsEntity.getNxCgCfgGoodsFatherId());
+            subEntity.setNxCosOrderUserId(orderUserId);
+            subEntity.setNxCosGoodsType(goodsEntity.getNxCgGoodsType());
+            subEntity.setNxCosGoodsSellType(goodsEntity.getNxCgSellType());
+            subEntity.setNxCosQuantity("1");
+            subEntity.setNxCosStandard(goodsEntity.getNxCgGoodsStandardname());
+            subEntity.setNxCosPrice(goodsEntity.getNxCgGoodsPrice());
+            subEntity.setNxCosSubtotal(goodsEntity.getNxCgGoodsPrice());
+
+            if (goodsEntity.getNxCgGoodsHuaxianPrice() != null) {
+                subEntity.setNxCosHuaxianPrice(goodsEntity.getNxCgGoodsHuaxianPrice());
+                subEntity.setNxCosHuaxianDifferentPrice(goodsEntity.getNxCgGoodsHuaxianPriceDifferent());
+                subEntity.setNxCosHuaxianSubtotal(goodsEntity.getNxCgGoodsHuaxianPrice());
+            } else {
+                subEntity.setNxCosHuaxianDifferentPrice("0");
+            }
+
+            subEntity.setNxCosStatus(-1);
+            subEntity.setNxCosType(orderType);
+            subEntity.setNxCosSplicingOrdersId(spId);
+            subEntity.setNxCosOrdersId(pindanId);
+            nxCommunityOrdersSubService.save(subEntity);
+
+            //判断是否是会员卡商品
+            if (goodsEntity.getNxCgCardId() != null) {
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("cardId", goodsEntity.getNxCgCardId());
+                map.put("userId", orderUserId);
+                map.put("status", -1);
+                System.out.println("checkckckckdkusrcarr-1-1--1-1-1-1-1" + map);
+                List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(map);
+                if (cardEntities.size() == 0) {
+                    Map<String, Object> mapU = new HashMap<>();
+                    mapU.put("cardId", goodsEntity.getNxCgCardId());
+                    mapU.put("stopTime", formatWhatDay(0));
+                    mapU.put("userId", orderUserId);
+                    System.out.println("checkckckckdkusrcarr222222" + mapU);
+                    List<NxCustomerUserCardEntity> cardEntitiesU = nxCustomerUserCardService.queryUserCardByParams(mapU);
+                    if (cardEntitiesU.size() == 0) {
+                        NxCommunityCardEntity cardEntity = nxCommunityCardService.queryObject(goodsEntity.getNxCgCardId());
+                        NxCustomerUserCardEntity userCardEntity = new NxCustomerUserCardEntity();
+                        userCardEntity.setNxCucaStatus(-1);
+                        userCardEntity.setNxCucaCustomerUserId(orderUserId);
+                        userCardEntity.setNxCucaStartDate(formatWhatDay(0));
+                        userCardEntity.setNxCucaStopDate(formatWhatDay(Integer.valueOf(cardEntity.getNxCcEffectiveDays())));
+                        userCardEntity.setNxCucaCardId(cardEntity.getNxCommunityCardId());
+                        userCardEntity.setNxCucaCommunityId(cardEntity.getNxCcCommunityId());
+                        userCardEntity.setNxCucaIsSelected(1);
+                        userCardEntity.setNxCucaType(orderType);
+                        userCardEntity.setNxCucaComSplicingOrderId(spId);
+                        userCardEntity.setNxCucaComOrderId(pindanId);
+                        nxCustomerUserCardService.save(userCardEntity);
+
+                    }
+                }
+            }
+
+
+            return R.ok().put("data", subEntity);
+        }
+
+
     }
 
 
     @ResponseBody
     @RequestMapping("/deleteSubOrders")
     public R deleteSubOrders(@RequestBody Integer[] nxOrdersSubIds) {
-        for(Integer i : nxOrdersSubIds){
+        for (Integer i : nxOrdersSubIds) {
             NxCommunityOrdersSubEntity subEntity = nxCommunityOrdersSubService.queryObject(i);
-            if(subEntity.getNxCosCucId() != null){
+            if (subEntity.getNxCosCucId() != null) {
                 NxCustomerUserCouponEntity customerUserCouponEntity = nxCustomerUserCouponService.equalObject(subEntity.getNxCosCucId());
                 customerUserCouponEntity.setNxCucSubOrderId(null);
                 customerUserCouponEntity.setNxCucStatus(0);
@@ -1546,11 +2124,11 @@ public class NxCommunityOrdersSubController {
         mapC.put("status", -1);
         mapC.put("type", 0);
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
-          if(cardEntities.size() > 0){
-              for(NxCustomerUserCardEntity userCardEntity: cardEntities){
-                  nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
-              }
-          }
+        if (cardEntities.size() > 0) {
+            for (NxCustomerUserCardEntity userCardEntity : cardEntities) {
+                nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
+            }
+        }
         return R.ok();
     }
 
@@ -1558,9 +2136,9 @@ public class NxCommunityOrdersSubController {
     @ResponseBody
     @RequestMapping("/deleteSubOrdersPindan")
     public R deleteSubOrdersPindan(@RequestBody Integer[] nxOrdersSubIds) {
-        for(Integer i : nxOrdersSubIds){
+        for (Integer i : nxOrdersSubIds) {
             NxCommunityOrdersSubEntity subEntity = nxCommunityOrdersSubService.queryObject(i);
-            if(subEntity.getNxCosCucId() != null){
+            if (subEntity.getNxCosCucId() != null) {
                 NxCustomerUserCouponEntity customerUserCouponEntity = nxCustomerUserCouponService.equalObject(subEntity.getNxCosCucId());
                 customerUserCouponEntity.setNxCucSubOrderId(null);
                 customerUserCouponEntity.setNxCucStatus(0);
@@ -1574,11 +2152,24 @@ public class NxCommunityOrdersSubController {
         mapC.put("status", -1);
         mapC.put("type", 1);
         List<NxCustomerUserCardEntity> cardEntities = nxCustomerUserCardService.queryUserCardByParams(mapC);
-        if(cardEntities.size() > 0){
-            for(NxCustomerUserCardEntity userCardEntity: cardEntities){
+        if (cardEntities.size() > 0) {
+            for (NxCustomerUserCardEntity userCardEntity : cardEntities) {
                 nxCustomerUserCardService.delete(userCardEntity.getNxCustomerUserCardId());
             }
         }
+        return R.ok();
+    }
+
+    @ResponseBody
+    @RequestMapping("/saveSubOrderCoupon")
+    public R saveSubOrderCoupon(@RequestBody NxCommunityOrdersSubEntity nxOrdersSub) {
+        nxCommunityOrdersSubService.save(nxOrdersSub);
+        Integer nxCosCucId = nxOrdersSub.getNxCosCucId();
+        NxCustomerUserCouponEntity userCouponEntity = nxCustomerUserCouponService.equalObject(nxCosCucId);
+        userCouponEntity.setNxCucStatus(1);
+        userCouponEntity.setNxCucSubOrderId(nxOrdersSub.getNxCommunityOrdersSubId());
+        nxCustomerUserCouponService.update(userCouponEntity);
+
         return R.ok();
     }
 
