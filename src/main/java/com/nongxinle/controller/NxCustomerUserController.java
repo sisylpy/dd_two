@@ -8,6 +8,8 @@ package com.nongxinle.controller;
  */
 
 import java.io.File;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
+import static com.nongxinle.utils.DateUtils.afterWhatDay;
+import static com.nongxinle.utils.DateUtils.getHowManyDaysInPeriod;
+
 
 @RestController
 @RequestMapping("api/nxcustomeruser")
@@ -54,6 +59,78 @@ public class NxCustomerUserController {
 	private NxCommunityCouponService nxCommunityCouponService;
 	@Autowired
 	private NxCustomerUserCouponService nxCustomerUserCouponService;
+
+
+
+
+
+	@RequestMapping(value = "/getDayCustomer", method = RequestMethod.POST)
+	@ResponseBody
+	public R getDayCustomer(Integer commId, String date) {
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("commId", commId);
+		map.put("date", date);
+		System.out.println("dateeee" + map);
+		List<NxCustomerUserEntity> userEntities = nxCustomerUserService.queryCustomerByParams(map);
+
+		return R.ok().put("data", userEntities);
+	}
+
+
+
+
+	@RequestMapping(value = "/getCustomerEveryDay", method = RequestMethod.POST)
+	@ResponseBody
+	private Map<String, Object> getCustomerEveryDay(String startDate, String stopDate, Integer commId) {
+
+		System.out.println("getfrisheeieieidydyydydydyydydyydydydyy");
+		Map<String, Object> mapR = new HashMap<>();
+		List<Map<String, Object>> itemList = new ArrayList<>();
+		List<String> dateList = new ArrayList<>();
+		List<String> totalList = new ArrayList<>();
+		Integer howManyDaysInPeriod = 0;
+		if (!startDate.equals(stopDate)) {
+			howManyDaysInPeriod = getHowManyDaysInPeriod(stopDate, startDate);
+		}
+		if (howManyDaysInPeriod > 0) {
+
+			for (int i = 0; i < howManyDaysInPeriod + 1; i++) {
+				// dateList
+				String whichDay = "";
+				if (i == 0) {
+					whichDay = startDate;
+				} else {
+					whichDay = afterWhatDay(startDate, i);
+				}
+				Map<String, Object> map = new HashMap<>();
+				map.put("date", whichDay);
+				map.put("commId", commId);
+				String substring = whichDay.substring(8, 10);
+				dateList.add(substring);
+
+//				String dailyFresh = "0";
+				Integer integer = nxCustomerUserService.queryCustomerUserCount(map);
+//				if (integer > 0) {
+////					double subtotal = nxCustomerUserService.query(map);
+////					dailyFresh = new BigDecimal(subtotal).setScale(1, BigDecimal.ROUND_HALF_UP).toString();
+//
+//				}
+				totalList.add(integer.toString());
+				Map<String, Object> mapItem = new HashMap<>();
+				mapItem.put("day", whichDay);
+				mapItem.put("value", integer);
+				itemList.add(mapItem);
+				mapR.put("date", dateList);
+				mapR.put("list", totalList);
+				mapR.put("arr", itemList);
+
+			}
+
+		}
+		return R.ok().put("data", mapR);
+
+	}
 
 
 

@@ -121,7 +121,7 @@ public class NxCommunityCommunityOrdersServiceImpl implements NxCommunityOrdersS
 	}
 	
 	@Override
-	public void delete(Integer nxOrdersId){
+	public void deleteWithSubOrders(Integer nxOrdersId){
 		nxCommunityOrdersDao.delete(nxOrdersId);
 
 		Map<String, Object> map = new HashMap<>();
@@ -254,6 +254,11 @@ public class NxCommunityCommunityOrdersServiceImpl implements NxCommunityOrdersS
 
 		return nxCommunityOrdersDao.queryCommOrderSubtotal(map);
     }
+
+	@Override
+	public void delete(Integer nxOrdersId) {
+		nxCommunityOrdersDao.delete(nxOrdersId);
+	}
 
 
 }

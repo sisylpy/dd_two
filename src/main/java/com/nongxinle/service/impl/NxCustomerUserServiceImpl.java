@@ -86,4 +86,10 @@ public class NxCustomerUserServiceImpl implements NxCustomerUserService {
 		return nxCustomerUserDao.queryCustomerByParams(map);
     }
 
+    @Override
+    public Integer queryCustomerUserCount(Map<String, Object> map) {
+
+		return  nxCustomerUserDao.queryCustomerUserCount(map);
+    }
+
 }

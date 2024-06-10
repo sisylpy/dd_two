@@ -113,16 +113,71 @@ public class NxCommunityGoodsController {
     }
 
 
+
+    @RequestMapping(value = "/updateAdsendse", method = RequestMethod.POST)
+    @ResponseBody
+    public R updateAdsendse (@RequestBody NxCommunityGoodsEntity nxCommunityGoodsEntity  ) {
+
+        String cgStartTime = nxCommunityGoodsEntity.getNxCgAdsenseStartTime();
+        String startHour = cgStartTime.substring(0, 2);
+        String startMinute = cgStartTime.substring(3, 5);
+        BigDecimal hourMinuteStart = new BigDecimal(startHour).multiply(new BigDecimal(60));
+        BigDecimal decimalStart = hourMinuteStart.add(new BigDecimal(startMinute)).setScale(0, BigDecimal.ROUND_HALF_UP);
+        nxCommunityGoodsEntity.setNxCgAdsenseStartTimeZone(decimalStart.toString());
+
+        String cgStopTime = nxCommunityGoodsEntity.getNxCgAdsenseStopTime();
+        String stopHour = cgStopTime.substring(0, 2);
+        String stopMinute = cgStopTime.substring(3, 5);
+        BigDecimal hourMinuteStop = new BigDecimal(stopHour).multiply(new BigDecimal(60));
+        BigDecimal decimalStop = hourMinuteStop.add(new BigDecimal(stopMinute)).setScale(0, BigDecimal.ROUND_HALF_UP);
+        nxCommunityGoodsEntity.setNxCgAdsenseStopTimeZone(decimalStop.toString());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("goodsId", nxCommunityGoodsEntity.getNxCommunityGoodsId());
+        NxCommunityAdsenseEntity adsenseEntity = nxCommunityAdsenseService.queryGoodsAdsenseByParams(map);
+
+        String cgStartTimeAd = nxCommunityGoodsEntity.getNxCgAdsenseStartTime();
+        String startHourAd = cgStartTimeAd.substring(0, 2);
+        String startMinuteAd = cgStartTimeAd.substring(3, 5);
+        BigDecimal hourMinuteStartAd = new BigDecimal(startHourAd).multiply(new BigDecimal(60));
+        BigDecimal decimalStartAd = hourMinuteStartAd.add(new BigDecimal(startMinuteAd)).setScale(0, BigDecimal.ROUND_HALF_UP);
+        nxCommunityGoodsEntity.setNxCgAdsenseStartTimeZone(decimalStartAd.toString());
+
+        String cgStopTimeAd = nxCommunityGoodsEntity.getNxCgAdsenseStopTime();
+        String stopHourAd = cgStopTimeAd.substring(0, 2);
+        String stopMinuteAd = cgStopTimeAd.substring(3, 5);
+        BigDecimal hourMinuteStopAd = new BigDecimal(stopHourAd).multiply(new BigDecimal(60));
+        BigDecimal decimalStopAd = hourMinuteStopAd.add(new BigDecimal(stopMinuteAd)).setScale(0, BigDecimal.ROUND_HALF_UP);
+        nxCommunityGoodsEntity.setNxCgAdsenseStopTimeZone(decimalStopAd.toString());
+
+        adsenseEntity.setNxCaStartTimeZone(decimalStartAd.toString());
+        adsenseEntity.setNxCaStopTimeZone(decimalStopAd.toString());
+        adsenseEntity.setNxCaStartTime(nxCommunityGoodsEntity.getNxCgAdsenseStartTime());
+        adsenseEntity.setNxCaStopTime(nxCommunityGoodsEntity.getNxCgAdsenseStopTime());
+
+        nxCommunityAdsenseService.update(adsenseEntity);
+
+
+
+
+            cgService.update(nxCommunityGoodsEntity);
+
+
+
+        return R.ok();
+    }
+
+
     @RequestMapping(value = "/updateComGoods", method = RequestMethod.POST)
     @ResponseBody
     public R updateComGoods (@RequestBody NxCommunityGoodsEntity nxCommunityGoodsEntity) {
 
-        Map<String, Object> mapS = new HashMap<>();
-        mapS.put("goodsId", nxCommunityGoodsEntity.getNxCommunityGoodsId());
-        mapS.put("xiaoyuStatus", 5);
-        List<NxCommunityOrdersSubEntity> subEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapS);
+//        Map<String, Object> mapS = new HashMap<>();
+//        mapS.put("goodsId", nxCommunityGoodsEntity.getNxCommunityGoodsId());
+//        mapS.put("xiaoyuStatus", 5);
+//        List<NxCommunityOrdersSubEntity> subEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapS);
 
-        if(subEntities.size() == 0){
+//        if(subEntities.size() == 0){
 
             BigDecimal goodsPrice = new BigDecimal(nxCommunityGoodsEntity.getNxCgGoodsPrice());
             BigDecimal fractionalPart = goodsPrice.subtract(goodsPrice.setScale(0, RoundingMode.DOWN)).multiply(new BigDecimal(10)).setScale(0,BigDecimal.ROUND_HALF_UP);
@@ -267,9 +322,9 @@ public class NxCommunityGoodsController {
 
             return R.ok().put("data", nxCommunityGoodsEntity);
 
-        }else{
-            return R.error(-1, "有订单不能修改");
-        }
+//        }else{
+//            return R.error(-1, "有订单不能修改");
+//        }
 
     }
 
@@ -399,6 +454,7 @@ public class NxCommunityGoodsController {
         nxCommunityGoodsEntity.setNxCgNxFatherId(-1);
         nxCommunityGoodsEntity.setNxCgNxGrandId(-1);
         nxCommunityGoodsEntity.setNxCgNxGreatGrandId(-1);
+        nxCommunityGoodsEntity.setNxCgIsOpenAdsense(0);
 
         BigDecimal goodsPrice = new BigDecimal(nxCommunityGoodsEntity.getNxCgGoodsPrice());
         BigDecimal fractionalPart = goodsPrice.subtract(goodsPrice.setScale(0, RoundingMode.DOWN)).multiply(new BigDecimal(10)).setScale(0,BigDecimal.ROUND_HALF_UP);
@@ -646,7 +702,7 @@ public class NxCommunityGoodsController {
             Map<String, Object> map = new HashMap<>();
             map.put("goodsId", goodsId);
             NxCommunityAdsenseEntity communityAdsenseEntity = nxCommunityAdsenseService.queryGoodsAdsenseByParams(map);
-            communityAdsenseEntity.setNxCaClickTo(filePath);
+            communityAdsenseEntity.setNxCaFilePath(filePath);
             nxCommunityAdsenseService.update(communityAdsenseEntity);
         }
 

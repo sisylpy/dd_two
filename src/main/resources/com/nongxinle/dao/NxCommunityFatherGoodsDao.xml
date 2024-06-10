@@ -562,7 +562,7 @@
             </if>
             and ncfg.nx_cfg_father_goods_level = 2 and grand.nx_cfg_father_goods_level = 1 and ncg.nx_cg_pull_off  =  #{off}
         </where>
-		order by grand.nx_cfg_father_goods_sort, ncfg.nx_cfg_father_goods_sort
+		order by grand.nx_cfg_father_goods_sort, ncfg.nx_cfg_father_goods_sort, ncg.nx_cg_goods_sort
     </select>
 
 
@@ -585,7 +585,7 @@
             </if>
             and ncfg.nx_cfg_father_goods_level = 2 and grand.nx_cfg_father_goods_level = 1
         </where>
-        order by grand.nx_cfg_father_goods_sort, ncfg.nx_cfg_father_goods_sort
+        order by grand.nx_cfg_father_goods_sort, ncfg.nx_cfg_father_goods_sort, ncg.nx_cg_goods_sort
     </select>
 
     <insert id="save" parameterType="com.nongxinle.entity.NxCommunityFatherGoodsEntity"
@@ -604,7 +604,8 @@
          `nx_cfg_price_amount`,
          `nx_cfg_price_two_amount`,
          `nx_cfg_price_three_amount`,
-         `nx_cfg_order_rank`)
+         `nx_cfg_order_rank`
+         )
         values (#{nxCommunityFatherGoodsId},
                 #{nxCfgFatherGoodsName},
                 #{nxCfgFatherGoodsImg},

@@ -22,7 +22,7 @@ public interface NxCommunityOrdersService {
 
 	void update(NxCommunityOrdersEntity nxOrders);
 	
-	void delete(Integer nxOrdersId);
+	void deleteWithSubOrders(Integer nxOrdersId);
 	
 	void deleteBatch(Integer[] nxOrdersIds);
 
@@ -49,4 +49,6 @@ public interface NxCommunityOrdersService {
     Integer queryCommOrderCount(Map<String, Object> map);
 
 	double queryCommOrderSubtotal(Map<String, Object> map);
+
+	void delete(Integer nxOrdersId);
 }

@@ -456,6 +456,9 @@
 			<if test="commId != null">
 				and nx_cg_community_id = #{commId}
 			</if>
+			<if test="pullOff != null">
+				and nx_cg_pull_off = #{pullOff}
+			</if>
 			<if test="searchStr != null">
 			  and	nx_cg_goods_name like concat('%', #{searchStr}, '%')
 			</if>

@@ -169,6 +169,7 @@ public class NxCommunityOrdersController {
         Map<String, Object> map = new HashMap<>();
         map.put("commId", commId);
         map.put("date", date);
+        map.put("status", 5);
         System.out.println("dateeee" + map);
         List<NxCommunityOrdersEntity> ordersEntities = nxCommunityOrdersService.queryCustomerOrder(map);
 
@@ -202,6 +203,7 @@ public class NxCommunityOrdersController {
                 Map<String, Object> map = new HashMap<>();
                 map.put("date", whichDay);
                 map.put("commId", commId);
+                map.put("status", 5);
                 String substring = whichDay.substring(8, 10);
                 dateList.add(substring);
 
@@ -227,7 +229,6 @@ public class NxCommunityOrdersController {
         return R.ok().put("data", mapR);
 
     }
-
 
     @RequestMapping(value = "/changeServiceTime/{id}")
     @ResponseBody
@@ -576,6 +577,7 @@ public class NxCommunityOrdersController {
                 subEntity.setNxCosStatus(99);
                 nxCommunityOrdersSubService.update(subEntity);
 
+
             }
         }
 
@@ -817,39 +819,6 @@ public class NxCommunityOrdersController {
                         subEntity.setNxCosStatus(0);
                         nxCommunityOrdersSubService.update(subEntity);
 
-                        Integer nxOsCommunityGoodsId = subEntity.getNxCosCommunityGoodsId();
-                        Map<String, Object> mapUG = new HashMap<>();
-                        mapUG.put("nxOsCommunityGoodsId", nxOsCommunityGoodsId);
-                        mapUG.put("nxCugUserId", subEntity.getNxCosOrderUserId());
-                        NxCustomerUserGoodsEntity userGoodsEntity = nxCustomerUserGoodsDao.queryByCommunityGoodsId(mapUG);
-
-                        if (userGoodsEntity != null) {
-                            userGoodsEntity.setNxCugLastOrderTime(formatWhatDayTime(0));
-                            userGoodsEntity.setNxCugLastOrderQuantity(subEntity.getNxCosQuantity());
-                            userGoodsEntity.setNxCugLastOrderStandard(subEntity.getNxCosStandard());
-                            userGoodsEntity.setNxCugLastOrderTime(formatWhatDay(0));
-                            userGoodsEntity.setNxCugJoinMyTemplate(0);
-                            Integer nxCugOrderTimes = userGoodsEntity.getNxCugOrderTimes();
-                            userGoodsEntity.setNxCugOrderTimes(nxCugOrderTimes + 1);
-                            String nxCugOrderAmount = userGoodsEntity.getNxCugOrderAmount();
-                            String nxOsQuantity = subEntity.getNxCosQuantity();
-                            BigDecimal addS = new BigDecimal(nxCugOrderAmount).add(new BigDecimal(nxOsQuantity));
-                            userGoodsEntity.setNxCugOrderAmount(addS.toString());
-                            nxCustomerUserGoodsDao.update(userGoodsEntity);
-                        } else {
-                            NxCustomerUserGoodsEntity newUserGoodsEntity = new NxCustomerUserGoodsEntity();
-                            newUserGoodsEntity.setNxCugFirstOrderTime(formatWhatDay(0));
-                            newUserGoodsEntity.setNxCugOrderAmount(subEntity.getNxCosQuantity());
-                            newUserGoodsEntity.setNxCugCommunityGoodsId(subEntity.getNxCosCommunityGoodsId());
-                            newUserGoodsEntity.setNxCugOrderTimes(1);
-                            newUserGoodsEntity.setNxCugUserId(subEntity.getNxCosOrderUserId());
-                            newUserGoodsEntity.setNxCugLastOrderTime(formatWhatDay(0));
-                            newUserGoodsEntity.setNxCugJoinMyTemplate(0);
-                            newUserGoodsEntity.setNxCugLastOrderQuantity(subEntity.getNxCosQuantity());
-                            newUserGoodsEntity.setNxCugLastOrderStandard(subEntity.getNxCosStandard());
-                            newUserGoodsEntity.setNxCugType(0);
-                            nxCustomerUserGoodsDao.save(newUserGoodsEntity);
-                        }
                     }
                 }
 
@@ -859,6 +828,44 @@ public class NxCommunityOrdersController {
 
         return R.ok().put("data", nxOrders.getNxCommunityOrdersId());
 
+    }
+
+
+    private  void saveUserGoods(NxCommunityOrdersSubEntity subEntity){
+
+        Integer nxOsCommunityGoodsId = subEntity.getNxCosCommunityGoodsId();
+        Map<String, Object> mapUG = new HashMap<>();
+        mapUG.put("nxOsCommunityGoodsId", nxOsCommunityGoodsId);
+        mapUG.put("nxCugUserId", subEntity.getNxCosOrderUserId());
+        NxCustomerUserGoodsEntity userGoodsEntity = nxCustomerUserGoodsDao.queryByCommunityGoodsId(mapUG);
+
+        if (userGoodsEntity != null) {
+            userGoodsEntity.setNxCugLastOrderTime(formatWhatDayTime(0));
+            userGoodsEntity.setNxCugLastOrderQuantity(subEntity.getNxCosQuantity());
+            userGoodsEntity.setNxCugLastOrderStandard(subEntity.getNxCosStandard());
+            userGoodsEntity.setNxCugLastOrderTime(formatWhatDay(0));
+            userGoodsEntity.setNxCugJoinMyTemplate(0);
+            Integer nxCugOrderTimes = userGoodsEntity.getNxCugOrderTimes();
+            userGoodsEntity.setNxCugOrderTimes(nxCugOrderTimes + 1);
+            String nxCugOrderAmount = userGoodsEntity.getNxCugOrderAmount();
+            String nxOsQuantity = subEntity.getNxCosQuantity();
+            BigDecimal addS = new BigDecimal(nxCugOrderAmount).add(new BigDecimal(nxOsQuantity));
+            userGoodsEntity.setNxCugOrderAmount(addS.toString());
+            nxCustomerUserGoodsDao.update(userGoodsEntity);
+        } else {
+            NxCustomerUserGoodsEntity newUserGoodsEntity = new NxCustomerUserGoodsEntity();
+            newUserGoodsEntity.setNxCugFirstOrderTime(formatWhatDay(0));
+            newUserGoodsEntity.setNxCugOrderAmount(subEntity.getNxCosQuantity());
+            newUserGoodsEntity.setNxCugCommunityGoodsId(subEntity.getNxCosCommunityGoodsId());
+            newUserGoodsEntity.setNxCugOrderTimes(1);
+            newUserGoodsEntity.setNxCugUserId(subEntity.getNxCosOrderUserId());
+            newUserGoodsEntity.setNxCugLastOrderTime(formatWhatDay(0));
+            newUserGoodsEntity.setNxCugJoinMyTemplate(0);
+            newUserGoodsEntity.setNxCugLastOrderQuantity(subEntity.getNxCosQuantity());
+            newUserGoodsEntity.setNxCugLastOrderStandard(subEntity.getNxCosStandard());
+            newUserGoodsEntity.setNxCugType(0);
+            nxCustomerUserGoodsDao.save(newUserGoodsEntity);
+        }
     }
 
 
@@ -878,32 +885,25 @@ public class NxCommunityOrdersController {
         BigDecimal add = multiply.add(new BigDecimal(nxOrders.getNxCoServiceMinute()));
         nxOrders.setNxCoServiceTime(add.toString());
         nxOrders.setNxCoDate(formatWhatDate(0));
-        nxCommunityOrdersService.justSaveWithUserGoods(nxOrders);
+//        nxCommunityOrdersService.justSaveWithUserGoods(nxOrders);
+        nxCommunityOrdersService.justSave(nxOrders);
 
         List<NxCommunityOrdersSubEntity> nxOrdersSubEntities = nxOrders.getNxOrdersSubEntities();
         if (nxOrdersSubEntities.size() > 0) {
             for (NxCommunityOrdersSubEntity subEntity : nxOrdersSubEntities) {
-
                 subEntity.setNxCosOrdersId(nxOrders.getNxCommunityOrdersId());
                 subEntity.setNxCosStatus(0);
                 nxCommunityOrdersSubService.update(subEntity);
             }
         }
 
-        if (nxOrders.getNxCustomerUserCardEntities().size() > 0) {
-            List<NxCustomerUserCardEntity> nxCustomerUserCardEntities = nxOrders.getNxCustomerUserCardEntities();
-            for (NxCustomerUserCardEntity userCardEntity : nxCustomerUserCardEntities) {
-                if (userCardEntity.getNxCucaIsSelected() == 1) {
-                    userCardEntity.setNxCucaComOrderId(nxOrders.getNxCommunityOrdersId());
-                    userCardEntity.setNxCucaStatus(0);
-                    nxCustomerUserCardService.update(userCardEntity);
-                }
-            }
-        }
-
         return R.ok().put("data", nxOrders.getNxCommunityOrdersId());
 
     }
+
+
+
+
 
     @ResponseBody
     @RequestMapping(value = "/customerCashPay", method = RequestMethod.POST)
@@ -952,9 +952,6 @@ public class NxCommunityOrdersController {
             nxOrders.setNxCoPaymentStatus(0);
             nxOrders.setNxCoWxOutTradeNo(tradeNo);
             nxCommunityOrdersService.update(nxOrders);
-
-
-
 
             reMap.put("orderId", nxOrders.getNxCommunityOrdersId().toString());
 
@@ -1005,6 +1002,9 @@ public class NxCommunityOrdersController {
                     List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
                     if (nxCommunityOrdersSubEntities.size() > 0) {
                         for (NxCommunityOrdersSubEntity subEntity : nxCommunityOrdersSubEntities) {
+                            //检查 Adsense
+                            checkAdsenseGoods(subEntity.getNxCosCommunityGoodsId(), subEntity);
+
                             subEntity.setNxCosStatus(1);
                             subEntity.setNxCosServiceTime(billEntity.getNxCoServiceTime());
                             subEntity.setNxCosPickUpCode(billEntity.getNxCoWeighNumber());
@@ -1012,16 +1012,14 @@ public class NxCommunityOrdersController {
                             subEntity.setNxCosServiceDate(billEntity.getNxCoServiceDate());
                             subEntity.setNxCosServiceTime(billEntity.getNxCoServiceTime());
                             nxCommunityOrdersSubService.update(subEntity);
+
+                            saveUserGoods(subEntity);
+
                             if (subEntity.getNxCosCucId() != null) {
                                 NxCustomerUserCouponEntity customerUserCouponEntity = nxCustomerUserCouponService.equalObject(subEntity.getNxCosCucId());
                                 customerUserCouponEntity.setNxCucStatus(2);
                                 nxCustomerUserCouponService.update(customerUserCouponEntity);
                             }
-
-                            //检查 Adsense
-                            checkAdsenseGoods(subEntity.getNxCosCommunityGoodsId(), subEntity);
-
-
                         }
                     }
                     Map<String, Object> mapC = new HashMap<>();
@@ -1054,6 +1052,10 @@ public class NxCommunityOrdersController {
                             List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(map);
                             if (nxCommunityOrdersSubEntities.size() > 0) {
                                 for (NxCommunityOrdersSubEntity subEntity : nxCommunityOrdersSubEntities) {
+
+                                    //检查 Adsense
+                                    checkAdsenseGoods(subEntity.getNxCosCommunityGoodsId(), subEntity);
+
                                     subEntity.setNxCosStatus(1);
                                     subEntity.setNxCosServiceTime(billEntity.getNxCoServiceTime());
                                     subEntity.setNxCosPickUpCode(billEntity.getNxCoWeighNumber());
@@ -1061,14 +1063,14 @@ public class NxCommunityOrdersController {
                                     subEntity.setNxCosServiceDate(billEntity.getNxCoServiceDate());
                                     subEntity.setNxCosServiceTime(billEntity.getNxCoServiceTime());
                                     nxCommunityOrdersSubService.update(subEntity);
+                                    saveUserGoods(subEntity);
+
                                     if (subEntity.getNxCosCucId() != null) {
                                         NxCustomerUserCouponEntity customerUserCouponEntity = nxCustomerUserCouponService.equalObject(subEntity.getNxCosCucId());
                                         customerUserCouponEntity.setNxCucStatus(2);
                                         nxCustomerUserCouponService.update(customerUserCouponEntity);
                                     }
 
-                                    //检查 Adsense
-                                    checkAdsenseGoods(subEntity.getNxCosCommunityGoodsId(), subEntity);
 
                                 }
                             }

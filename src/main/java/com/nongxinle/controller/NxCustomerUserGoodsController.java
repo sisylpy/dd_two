@@ -117,6 +117,7 @@ public class NxCustomerUserGoodsController {
         map.put("searchStr", searchStr);
         map.put("userId", userId);
         map.put("nowMinute", getNowMinute());
+        map.put("pullOff", 0);
         System.out.println("searee" + map);
         List<NxCommunityGoodsEntity> communityGoodsEntities = nxCustomerUserGoodsService.userQueryCommGoods(map);
 
@@ -124,7 +125,6 @@ public class NxCustomerUserGoodsController {
         Map<String, Object> mapA = new HashMap<>();
         mapA.put("orderUserId", userId);
         mapA.put("status", -1);
-//        mapA.put("orderType", 0);
         List<NxCommunityOrdersSubEntity> nxCommunityOrdersSubEntities = nxCommunityOrdersSubService.querySubOrdersByParams(mapA);
 
         Map<String, Object> mapC = new HashMap<>();

@@ -22,4 +22,6 @@ public interface NxCustomerUserDao extends BaseDao<NxCustomerUserEntity> {
     Map<String, Object> queryCustomerUserInfo(Integer gbDepartmentUserId);
 
     List<NxCustomerUserEntity> queryCustomerByParams(Map<String, Object> map);
+
+    Integer queryCustomerUserCount(Map<String, Object> map);
 }

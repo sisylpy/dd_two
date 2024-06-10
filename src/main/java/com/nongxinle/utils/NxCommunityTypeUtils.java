@@ -7,9 +7,9 @@ package com.nongxinle.utils;
 public class NxCommunityTypeUtils {
 
 
-    public final static Integer Nx_COMMUNITY_GOODS_SELL_TYPE_ALL_TIME = 1;
-    public final static Integer Nx_COMMUNITY_GOODS_SELL_TYPE_PART_TIME = 2;
-    public final static Integer Nx_COMMUNITY_GOODS_SELL_TYPE_COUPON = 3;
+    public final static Integer Nx_COMMUNITY_GOODS_SELL_TYPE_ALL_TIME = 1; //全时段
+    public final static Integer Nx_COMMUNITY_GOODS_SELL_TYPE_PART_TIME = 2; //部分时段
+    public final static Integer Nx_COMMUNITY_GOODS_SELL_TYPE_COUPON = 3; //优惠卷商品
 
     public final static Integer NX_COMMUNITY_ORDER_STATUS_PINDAN_NEW = -1;  //新拼单
     public final static Integer NX_COMMUNITY_ORDER_STATUS_NEW = 0;  //新订单
@@ -18,6 +18,7 @@ public class NxCommunityTypeUtils {
     public final static Integer NX_COMMUNITY_ORDER_STATUS_LABELS_PRINT = 3;  // 标签打印完成已打印
     public final static Integer NX_COMMUNITY_ORDER_STATUS_BILL_PRINT = 4;  // 总单已打印
     public final static Integer NX_COMMUNITY_ORDER_STATUS_ORDER_FINISH = 5;  //顾客完成
+    public final static Integer NX_COMMUNITY_ORDER_STATUS_ORDER_CANCEL = 99;  //取消订单
 
     public final static Integer NX_COMMUNITY_ORDER_SUB_STATUS_SAVE = -1;  //新订单
     public final static Integer NX_COMMUNITY_ORDER_SUB_STATUS_ORDER_SAVE = 0;  //新订单

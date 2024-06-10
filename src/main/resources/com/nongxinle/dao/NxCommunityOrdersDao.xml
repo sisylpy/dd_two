@@ -337,9 +337,14 @@
 	<select id="queryCustomerOrder" resultMap="ordersInformation">
 		select * ,
 		deliveryUser.nx_CU_user_id 'delivery_nx_CU_user_id',
+		deliveryUser.nx_CU_join_date 'delivery_nx_CU_join_date',
+		deliveryUser.nx_CU_order_amount 'delivery_nx_CU_order_amount',
+		deliveryUser.nx_CU_order_times 'delivery_nx_CU_order_times',
 		deliveryUser.nx_CU_customer_id 'delivery_nx_CU_customer_id',
 		deliveryUser.nx_CU_wx_avatar_url 'delivery_nx_CU_wx_avatar_url',
 		deliveryUser.nx_CU_wx_nick_name 'delivery_nx_CU_wx_nick_name',
+		deliveryUser.nx_CU_wx_phone_number 'delivery_nx_CU_wx_phone_number',
+
 		deliveryCus.nx_customer_id 'delivery_nx_customer_id',
 		deliveryCus.nx_customer_card_waste_date 'delivery_nx_customer_card_waste_date'
 		from nx_community_orders as o
@@ -498,9 +503,13 @@
 	<select id="queryOrdersDetail" resultMap="ordersInformation">
 		select *,
 		deliveryUser.nx_CU_user_id 'delivery_nx_CU_user_id',
+		deliveryUser.nx_CU_join_date 'delivery_nx_CU_join_date',
+		deliveryUser.nx_CU_order_amount 'delivery_nx_CU_order_amount',
+		deliveryUser.nx_CU_order_times 'delivery_nx_CU_order_times',
 		deliveryUser.nx_CU_customer_id 'delivery_nx_CU_customer_id',
 		deliveryUser.nx_CU_wx_avatar_url 'delivery_nx_CU_wx_avatar_url',
 		deliveryUser.nx_CU_wx_nick_name 'delivery_nx_CU_wx_nick_name',
+		deliveryUser.nx_CU_wx_phone_number 'delivery_nx_CU_wx_phone_number',
 		deliveryCus.nx_customer_id 'delivery_nx_customer_id',
 		deliveryCus.nx_customer_card_waste_date 'delivery_nx_customer_card_waste_date',
 
@@ -537,6 +546,8 @@
 		left join nx_customer_user_card as ncuc on ncuc.nx_cuca_com_order_id = o.nx_community_orders_id
 		left join nx_community_card as ncc  on ncc.nx_community_card_id = ncuc.nx_cuca_card_id
 		left join nx_customer as dc on o.nx_CO_customer_id = dc.nx_customer_id
+		left join nx_customer_user as ou on o.nx_CO_user_id = ou.nx_CU_user_id
+
 		left join nx_customer_user as du on o.nx_CO_delivery_user_id = du.nx_CU_user_id
 		left join nx_community_orders_sub as os on o.nx_community_orders_id = os.nx_COS_orders_id
 		left join nx_community_goods as cg on cg.nx_community_goods_id = os.nx_COS_community_goods_id
@@ -590,8 +601,14 @@
 
 	<resultMap id="deliveryUser" type="NxCustomerUserEntity">
 		<id property="nxCuUserId" column="delivery_nx_CU_user_id"/>
+		<result property="nxCuJoinDate" column="delivery_nx_CU_join_date"/>
+		<result property="nxCuOrderAmount" column="delivery_nx_CU_order_amount"/>
+		<result property="nxCuOrderTimes" column="delivery_nx_CU_order_times"/>
 		<result property="nxCuWxAvatarUrl" column="delivery_nx_CU_wx_avatar_url"/>
 		<result property="nxCuCustomerId" column="delivery_nx_CU_customer_id"/>
+		<result property="nxCuWxNickName" column="delivery_nx_CU_wx_nick_name"/>
+		<result property="nxCuWxPhoneNumber" column="delivery_nx_CU_wx_phone_number"/>
+		<result property="nxCuWxAvatarUrl" column="delivery_nx_CU_wx_avatar_url"/>
 		<association property="nxCustomerEntity" resultMap="deliveryCustomer"/>
 	</resultMap>
 
@@ -674,9 +691,13 @@
 	<select id="queryPindanDetail" resultMap="pindanDetail">
 		select *,
 		deliveryUser.nx_CU_user_id 'delivery_nx_CU_user_id',
+		deliveryUser.nx_CU_join_date 'delivery_nx_CU_join_date',
+		deliveryUser.nx_CU_order_amount 'delivery_nx_CU_order_amount',
+		deliveryUser.nx_CU_order_times 'delivery_nx_CU_order_times',
 		deliveryUser.nx_CU_customer_id 'delivery_nx_CU_customer_id',
 		deliveryUser.nx_CU_wx_avatar_url 'delivery_nx_CU_wx_avatar_url',
 		deliveryUser.nx_CU_wx_nick_name 'delivery_nx_CU_wx_nick_name',
+		deliveryUser.nx_CU_wx_phone_number 'delivery_nx_CU_wx_phone_number',
 		deliveryCus.nx_customer_id 'delivery_nx_customer_id',
 		deliveryCus.nx_customer_card_waste_date 'delivery_nx_customer_card_waste_date',
 
@@ -748,9 +769,13 @@
 	<select id="queryOrdersItemDetail" resultMap="ordersInformationJust">
 		select *,
 		deliveryUser.nx_CU_user_id 'delivery_nx_CU_user_id',
+		deliveryUser.nx_CU_join_date 'delivery_nx_CU_join_date',
+		deliveryUser.nx_CU_order_amount 'delivery_nx_CU_order_amount',
+		deliveryUser.nx_CU_order_times 'delivery_nx_CU_order_times',
 		deliveryUser.nx_CU_customer_id 'delivery_nx_CU_customer_id',
 		deliveryUser.nx_CU_wx_avatar_url 'delivery_nx_CU_wx_avatar_url',
 		deliveryUser.nx_CU_wx_nick_name 'delivery_nx_CU_wx_nick_name',
+		deliveryUser.nx_CU_wx_phone_number 'delivery_nx_CU_wx_phone_number',
 		deliveryCus.nx_customer_id 'delivery_nx_customer_id',
 		deliveryCus.nx_customer_card_waste_date 'delivery_nx_customer_card_waste_date'
 		from nx_community_orders as o
@@ -818,7 +843,7 @@
 
 	</select>
 	<select id="queryCommOrderSubtotal" resultType="java.lang.Double">
-		select SUM(nx_Co_total)  from nx_community_orders as o
+		select SUM(o.nx_Co_total)  from nx_community_orders as o
 		<where>
 			<if test="commId != null">
 				and o.nx_CO_community_id =  #{commId}
